@@ -1,0 +1,116 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  # Run acceptance tests in a matrix with Terraform CLI versions
+  Generate_Genesis:
+    name: Generate genesis transaction
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      # ...existing code...
+      - name: Install base system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt-get install -y \
+            tzdata \
+            apt-transport-https \
+            ca-certificates \
+            gnupg2 \
+            software-properties-common \
+            wget \
+            zip
+      - name: Install indy-node meta dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            python3-wcwidth \
+            python3-setuptools \
+            python3-pytest \
+            python3-pip \
+            libgflags-dev \
+            libsnappy-dev \
+            zlib1g-dev \
+            libbz2-dev \
+            liblz4-dev
+      - name: Add bionic-security for libssl1.0.0
+        run: |
+          sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3B4FE6ACC0B21F32
+          echo "deb http://security.ubuntu.com/ubuntu bionic-security main" | sudo tee -a /etc/apt/sources.list
+      - name: Add Hyperledger Indy Artifactory for Ursa
+        run: |
+          sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 9692C00E657DDE61
+          sudo bash -c 'echo "deb https://hyperledger.jfrog.io/artifactory/indy bionic master" >> /etc/apt/sources.list'
+          sudo apt-get update
+          sudo apt-get install -y \
+            ursa \
+            libsodium23 \
+            iptables \
+            at
+      - name: Install plenum release packages
+        run: |
+          cd /tmp/
+          for URL in \
+          https://github.com/hyperledger/indy-plenum/releases/download/v1.13.1/third-party-dependencies.zip \
+          https://github.com/hyperledger/indy-plenum/releases/download/v1.13.1/plenum-deb.zip \
+          ; do \
+            echo "downloading $URL" \
+            && wget -nv $URL \
+            && unzip *.zip \
+            && sudo dpkg -i artifacts/*/*.deb \
+            && sudo rm -rf /tmp/* \
+          ; done
+      - name: Install indy-node
+        run: |
+          cd /tmp/
+          for URL in \
+          https://github.com/hyperledger/indy-node/releases/download/v1.13.2/third-party-dependencies.zip \
+          https://github.com/hyperledger/indy-node/releases/download/v1.13.2/indy_node-deb.zip \
+          ; do \
+            echo "downloading $URL" \
+            && wget -nv $URL \
+            && unzip *.zip \
+            && sudo dpkg -i artifacts/*/*.deb \
+            && sudo rm -rf /tmp/* \
+          ; done
+      - name: Install and set Python 3.8
+        run: |
+          sudo pip install six
+          sudo add-apt-repository ppa:deadsnakes/ppa -y
+          sudo apt-get update
+          sudo apt-get install -y python3.8
+          sudo rm /usr/bin/python3
+          sudo ln -s /usr/bin/python3.8 /usr/bin/python3
+      - name: Set PYTHONPATH
+        run: |
+          echo "PYTHONPATH=/usr/local/lib/python3.8:/usr/local/lib/python3.8/dist-packages/:/usr/local/lib/python3.8/site-packages/:/usr/local/lib/python3.10/dist-packages/" >> $GITHUB_ENV
+      - name: Fix path to libursa
+        run: |
+          sudo ln -s /usr/lib/ursa/libursa.so /usr/lib/libursa.so
+      - name: Create Indy Config
+        run: |
+          sudo tee /etc/indy/indy_config.py > /dev/null <<EOF
+          NETWORK_NAME='${{ vars.TF_VAR_NETWORK_NAME }}'
+          KEYS_DIR='/var/lib/indy'
+          EOF
+      - name: Ensure /var/lib/indy exists and set permissions
+        run: |
+          sudo mkdir -p /var/lib/indy
+          sudo chown $USER:$USER /var/lib/indy
+          sudo chmod 755 /var/lib/indy
+      - name: Generate genesis transaction
+        run: |
+          OUTPUT=$(init_indy_keys --name=naesb1 --seed=SEED0000000000000000000000000001)
+          PUB_KEY=$(echo "$OUTPUT" | grep "Public key is" | head -n1 | awk '{print $4}')
+          BLS_KEY=$(echo "$OUTPUT" | grep "BLS Public key is" | awk '{print $5}')
+          echo "$PUB_KEY"
+          echo "PUB_KEY=$PUB_KEY" >> $GITHUB_ENV
+          echo "BLS_KEY=$BLS_KEY" >> $GITHUB_ENV
