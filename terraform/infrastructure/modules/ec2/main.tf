@@ -20,81 +20,6 @@ data "aws_ami" "amazon_linux_2" {
   }
 }
 
-
-
-resource "aws_iam_role" "instance_role" {
-  name = format("%s-%s-%s-%s", var.Prefix, "ec2-indy-node", var.EnvCode, "instanceprofile")
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      }
-    ]
-  })
-
-  tags = local.tags
-}
-
-resource "aws_iam_instance_profile" "instance_profile" {
-  path = "/"
-  role = aws_iam_role.instance_role.name
-  tags = local.tags
-}
-
-data "aws_iam_policy_document" "instance_policy" {
-  statement {
-    actions = [
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:BatchGetImage",
-      "ecr:BatchGetImage",
-      "ecr:DescribeImages",
-      "ecr:DescribeImages",
-      "ecr:DescribeRepositories",
-      "ecr:GetAuthorizationToken",
-      "ecr:GetAuthorizationToken",
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:GetRepositoryPolicy",
-      "ecr:GetRepositoryPolicy",
-      "ecr:ListImages",
-      "iam:GetRole",
-      "iam:GetUser",
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:DescribeLogGroups",
-      "logs:DescribeLogStreams",
-      "logs:GetLogEvents",
-      "logs:PutLogEvents",
-      "logs:PutRetentionPolicy",
-      "sts:GetCallerIdentity"
-    ]
-    effect    = "Allow"
-    resources = ["*"]
-  }
-  statement {
-    effect    = "Allow"
-    actions   = ["s3:GetObject"]
-    resources = ["${var.GenesisBucketArn}/*"]
-  }
-  statement {
-    effect    = "Allow"
-    actions   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
-    resources = [var.node_seed_arn_1, var.node_seed_arn_2]
-  }
-}
-
-resource "aws_iam_role_policy" "instance_policy" {
-  name   = format("%s-%s-%s-%s", var.Prefix, "ec2-indy-node", var.EnvCode, "instancepolicy")
-  role   = aws_iam_role.instance_role.id
-  policy = data.aws_iam_policy_document.instance_policy.json
-}
-
 data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
   vars = {
@@ -117,7 +42,7 @@ data "template_file" "user_data" {
 resource "aws_instance" "indy_node" {
   ami                    = data.aws_ami.amazon_linux_2.id
   instance_type          = "t3.medium"
-  iam_instance_profile   = aws_iam_instance_profile.instance_profile.name
+  iam_instance_profile   = var.InstanceProfileName
   user_data              = file("${path.module}/user-data.sh")
   tags                   = local.tags
 
