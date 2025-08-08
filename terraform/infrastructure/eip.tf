@@ -21,7 +21,7 @@ resource "aws_eip" "two" {
 }
 
 resource "aws_security_group" "node_security_group" {
-  name        = format("%s-%s-%s-%s", var.Prefix, "indy-node", var.EnvCode)
+  name        = format("%s-%s-%s", var.Prefix, "indy-node", var.EnvCode)
   description = "Security group for EC2 instance for node communication"
   vpc_id      = module.vpc.vpc_id
 
