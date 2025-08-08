@@ -88,6 +88,7 @@ resource "aws_security_group" "ec2_security_group" {
 module "ec2_node1" {
   source                 = "./modules/ec2"
   Prefix                 = var.Prefix
+  ClientSecurityGroupID = aws_security_group.ec2_security_group.id
   SolTag                 = var.SolTag
   EnvCode                = var.EnvCode
   env_tag                = var.EnvTag
@@ -116,6 +117,7 @@ module "ec2_node1" {
 
 module "ec2_node2" {
   source                 = "./modules/ec2"
+  ClientSecurityGroupID = aws_security_group.ec2_security_group.id
   Prefix                 = var.Prefix
   SolTag                 = var.SolTag
   EnvCode                = var.EnvCode
