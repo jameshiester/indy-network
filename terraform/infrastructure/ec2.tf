@@ -78,7 +78,7 @@ module "ec2_node1" {
   SolTag                 = var.SolTag
   EnvCode                = var.EnvCode
   env_tag                = var.EnvTag
-  GenesisBucketArn       = aws_s3_bucket.genesis_bucket.arn
+  GenesisBucketArn       = aws_s3_bucket.genesis_bucket.bucket_domain_name
   GenesisPoolFileKey     = aws_s3_object.pool_transactions.key
   GenesisDomainFileKey   = aws_s3_object.domain_transactions.key
   ComposeKey             = aws_s3_object.docker_compose_yml.key
@@ -109,7 +109,7 @@ module "ec2_node2" {
   SolTag                 = var.SolTag
   EnvCode                = var.EnvCode
   env_tag                = var.EnvTag
-  GenesisBucketArn       = aws_s3_bucket.genesis_bucket.arn
+  GenesisBucketArn       = aws_s3_bucket.genesis_bucket.bucket_domain_name
   GenesisPoolFileKey     = aws_s3_object.pool_transactions.key
   GenesisDomainFileKey   = aws_s3_object.domain_transactions.key
   ComposeKey             = aws_s3_object.docker_compose_yml.key
