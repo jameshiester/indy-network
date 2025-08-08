@@ -99,10 +99,10 @@ data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
   vars = {
     aws_region              = var.Region
-    indy_node_name_1        = var.node_name_1
-    indy_node_name_2        = var.node_name_2
-    indy_node_seed_arn_1    = var.node_seed_arn_1
-    indy_node_seed_arn_2    = var.node_seed_arn_2
+    node_name_1        = var.node_name_1
+    node_name_2        = var.node_name_2
+    node_seed_arn_1    = var.node_seed_arn_1
+    node_seed_arn_2    = var.node_seed_arn_2
     network_name            = var.NetworkName
     node_ip                 = var.NodeIP
     client_ip               = var.ClientIP
