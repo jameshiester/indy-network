@@ -30,8 +30,17 @@ sudo service docker start
 sudo usermod -a -G docker ec2-user
 
 aws s3api get-object --bucket ${compose_bucket} --key ${compose_key} docker-compose.yml
-aws s3api get-object --bucket ${compose_bucket} --key ${genesis_pool_file_key} pool_transactions_genesis
-aws s3api get-object --bucket ${compose_bucket} --key ${genesis_domain_file_key} domain_transactions_genesis
+sudo mkdir -p /etc/indy
+aws s3 cp "s3://${compose_bucket}/${genesis_pool_file_key}" /etc/indy/pool_transactions_genesis
+aws s3 cp "s3://${compose_bucket}/${genesis_domain_file_key}" /etc/indy/domain_transactions_genesis
+sudo chmod 644 /etc/indy/pool_transactions_genesis /etc/indy/domain_transactions_genesis
+
+sudo mkdir -p /etc/indy2
+aws s3 cp "s3://${compose_bucket}/${genesis_pool_file_key}" /etc/indy2/pool_transactions_genesis
+aws s3 cp "s3://${compose_bucket}/${genesis_domain_file_key}" /etc/indy2/domain_transactions_genesis
+sudo chmod 644 /etc/indy2/pool_transactions_genesis /etc/indy2/domain_transactions_genesis
+
+
 
 $(aws ecr get-login --no-include-email --region ${aws_region})
 echo "*** Getting Secrets ***"

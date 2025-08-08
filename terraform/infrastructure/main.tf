@@ -55,8 +55,8 @@ module "ec2_node1" {
   node_seed_arn_2        = aws_secretsmanager_secret.node_seed_2.arn
   NodeIP                 = aws_eip.one.public_ip
   ClientIP               = aws_eip.one.private_ip
-  NetworkInterfaceID     = aws_network_interface.node1.id
-  EIPAllocationID        = aws_eip.node1.id
+  NetworkInterfaceID     = aws_network_interface.public_1.id
+  EIPAllocationID        = aws_eip.one.id
   private_subnets        = module.vpc.private_subnets
   public_subnets         = module.vpc.public_subnets
   vpc_id                 = module.vpc.vpc_id
@@ -84,8 +84,8 @@ module "ec2_node2" {
   node_seed_arn_2        = aws_secretsmanager_secret.node_seed_4.arn
   NodeIP                 = aws_eip.two.public_ip
   ClientIP               = aws_eip.two.private_ip
-  NetworkInterfaceID     = aws_network_interface.node2.id
-  EIPAllocationID        = aws_eip.node2.id
+  NetworkInterfaceID     = aws_network_interface.public_2.id
+  EIPAllocationID        = aws_eip.two.id
   private_subnets        = module.vpc.private_subnets
   public_subnets         = module.vpc.public_subnets
   vpc_id                 = module.vpc.vpc_id
