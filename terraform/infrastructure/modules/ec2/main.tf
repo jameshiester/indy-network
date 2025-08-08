@@ -43,7 +43,7 @@ resource "aws_instance" "indy_node" {
   ami                    = data.aws_ami.amazon_linux_2.id
   instance_type          = "t3.medium"
   iam_instance_profile   = var.InstanceProfileName
-  user_data              = file("${path.module}/user-data.sh")
+  user_data              = data.template_file.user_data.rendered
   tags                   = local.tags
 
   network_interface {
