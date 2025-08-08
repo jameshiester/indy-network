@@ -14,9 +14,78 @@ env:
    AWS_BUCKET_NAME: ${{ secrets.TF_STATE_BUCKET_NAME }}
    AWS_BUCKET_KEY_NAME: ${{ secrets.TF_STATE_BUCKET_KEY }}
 
-jobs:    
+jobs: 
+  docker-node:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./docker/node
+    environment: 
+      name: dev
+    env:
+      TF_VAR_Region: ${{ vars.TF_VAR_REGION }}
+      TF_VAR_AZ01: ${{ vars.TF_VAR_AZ01 }}
+      TF_VAR_AZ02: ${{ vars.TF_VAR_AZ02 }}
+      TF_VAR_Prefix: ${{ vars.TF_VAR_PREFIX }}
+      TF_VAR_SolTag: ${{ vars.TF_VAR_SOLTAG }}
+      TF_VAR_GitHubRepo: ${{ vars.TF_VAR_GITHUBREPO }}
+      TF_VAR_EnvCode: ${{ vars.TF_VAR_ENVCODE }}
+      TF_VAR_EnvTag: ${{ vars.TF_VAR_ENVTAG }}
+      TF_VAR_VPCCIDR: ${{ vars.TF_VAR_VPCCIDR }}
+      TF_VAR_NETWORK_NAME: ${{ vars.TF_VAR_NETWORK_NAME }}
+      TF_VAR_ECR_SERVER_REPO: ${{ vars.TF_VAR_ECR_SERVER_REPO }}
+      TF_VAR_ECR_NODE_REPO: ${{ vars.TF_VAR_ECR_NODE_REPO }} 
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4  
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ vars.TF_VAR_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHub-Actions-OIDC-TERRAFORM 
+      - name: Check ECS image exists
+        id: ecsimage
+        run: |
+          if aws ecr describe-images --repository-name ${{ vars.TF_VAR_ECR_NODE_REPO }} --image-ids imageTag=$IMAGE_TAG >/dev/null 2>&1
+          then
+            echo "image_exists=true" >> "$GITHUB_ENV"
+          else
+            echo "image_exists=false" >> "$GITHUB_ENV"
+          fi
+
+      - name: Check for changes in go api
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          working-directory: ./
+          base: ${{ github.ref }}
+          filters: |
+            docker:
+              - './**'
+
+      - name: Login to Amazon ECR
+        if: steps.filter.outputs.docker == 'true' || env.image_exists == 'false'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push docker image to Amazon ECR
+        id: build-image
+        if: steps.filter.outputs.docker == 'true' || env.image_exists == 'false'
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ vars.TF_VAR_ECR_NODE_REPO }}
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./Dockerfile.ubuntu22 .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker tag $REGISTRY/$REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:latest
+          docker push $REGISTRY/$REPOSITORY:latest
+          echo "image=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
   terraform:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    needs: docker-node
     defaults:
       run:
         working-directory: ./terraform/infrastructure
@@ -33,6 +102,8 @@ jobs:
       TF_VAR_EnvTag: ${{ vars.TF_VAR_ENVTAG }}
       TF_VAR_VPCCIDR: ${{ vars.TF_VAR_VPCCIDR }}
       TF_VAR_NETWORK_NAME: ${{ vars.TF_VAR_NETWORK_NAME }}
+      TF_VAR_ECR_SERVER_REPO: ${{ vars.TF_VAR_ECR_SERVER_REPO }}
+      TF_VAR_ECR_NODE_REPO: ${{ vars.TF_VAR_ECR_NODE_REPO }}
     steps:
       - name: Git checkout
         uses: actions/checkout@v4

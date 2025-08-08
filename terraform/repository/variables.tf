@@ -17,6 +17,11 @@ variable "Region" {
   default     = "us-east-1"
 }
 
+variable "Domain" {
+  description = "DNS Name"
+  type        = string
+}
+
 variable "Prefix" {
   description = "Prefix used to name all resources"
   type        = string

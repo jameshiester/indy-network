@@ -163,7 +163,7 @@ rm -f "$TEMP_CMD_FILE" "$TEMP_OUTPUT_FILE"
 echo "Step 2: Creating node indy keys..."
 
 
-output=$(init_indy_keys --name=${NETWORK_NAME}-${NODE_NAME} --seed=$NODE_SEED)
+output=$(init_indy_keys --name=${NODE_NAME} --seed=$NODE_SEED)
 NODE_PUBLIC_KEY=$(echo "$output" | grep "Public key is" | tail -n1 | awk '{print $4}')
 NODE_VERIFICATION_KEY=$(echo "$output" | grep "Verification key is" | tail -n1 | awk '{print $4}')
 NODE_BLS_PUBLIC_KEY=$(echo "$output" | grep "BLS Public key is" | awk '{print $5}')
@@ -176,7 +176,7 @@ OUTPUT_FILE="/home/indy/output/${NETWORK_NAME}_${NODE_NAME}_genesis.json"
 cat > "$OUTPUT_FILE" << EOF
 {
   "steward_name": "$STEWARD_NAME",
-  "validator_alias": "${NETWORK_NAME}-${NODE_NAME}",
+  "validator_alias": "${NODE_NAME}",
   "node_ip_address": "$PUBLIC_IP",
   "node_port": "$NODE_PORT",
   "client_ip_address": "$PRIVATE_IP",

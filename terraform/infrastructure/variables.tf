@@ -53,3 +53,18 @@ variable "NETWORK_NAME" {
   type        = string
 }
 
+variable "ECSService" {
+  description = "Name of Amazon ECS Service"
+  type        = string
+}
+
+variable "ECR_NODE_REPO" {
+  description = "Name of Amazon ECR repository for indy node"
+  type        = string
+}
+
+variable "ECSCluster" {
+  description = "Name of Amazon ECS Cluster"
+  type        = string
+}
+

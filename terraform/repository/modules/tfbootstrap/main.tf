@@ -205,3 +205,171 @@ output "tfstate_bucket_name" {
 output "tfstate_dynamodb_table_name" {
   value = aws_dynamodb_table.tfstate.name
 }
+
+output "ecr_node_repo_name" {
+  value = aws_ecr_repository.node.repository_url
+}
+
+output "ecr_server_repo_name" {
+  value = aws_ecr_repository.server.repository_url
+}
+
+# Create Amazon ECR repository to store Docker image
+resource "aws_ecr_repository" "node" {
+  name                 = "${var.ECRNodeRepo}-${var.EnvCode}"
+  image_tag_mutability = "MUTABLE"
+  force_delete         = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  encryption_configuration {
+    encryption_type = "KMS"
+    kms_key         = aws_kms_key.mswebapp.arn
+  }
+
+  tags = {
+    Name         = format("%s-%s-%s", var.Prefix, "indy-node", var.EnvCode)
+    resourcetype = "compute"
+    codeblock    = "ecscluster"
+  }
+}
+
+# Create ECR lifecycle policy to delete untagged images after 1 day
+resource "aws_ecr_lifecycle_policy" "node" {
+  repository = aws_ecr_repository.node.name
+
+  policy = <<EOF
+{
+  "rules": [
+    {
+      "rulePriority": 1,
+      "description": "Delete untagged images after one day",
+      "selection": {
+        "tagStatus": "untagged",
+        "countType": "sinceImagePushed",
+        "countUnit": "days",
+        "countNumber": 1
+      },
+      "action": {
+        "type": "expire"
+      }
+    }
+  ]
+}
+EOF
+}
+
+# Create Amazon ECR repository to store Docker image
+resource "aws_ecr_repository" "server" {
+  name                 = "${var.ECRServerRepo}-${var.EnvCode}"
+  image_tag_mutability = "MUTABLE"
+  force_delete         = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  encryption_configuration {
+    encryption_type = "KMS"
+    kms_key         = aws_kms_key.mswebapp.arn
+  }
+
+  tags = {
+    Name         = format("%s-%s-%s", var.Prefix, "indy-server", var.EnvCode)
+    resourcetype = "compute"
+    codeblock    = "ecscluster"
+  }
+}
+
+# Create ECR lifecycle policy to delete untagged images after 1 day
+resource "aws_ecr_lifecycle_policy" "server" {
+  repository = aws_ecr_repository.server.name
+
+  policy = <<EOF
+{
+  "rules": [
+    {
+      "rulePriority": 1,
+      "description": "Delete untagged images after one day",
+      "selection": {
+        "tagStatus": "untagged",
+        "countType": "sinceImagePushed",
+        "countUnit": "days",
+        "countNumber": 1
+      },
+      "action": {
+        "type": "expire"
+      }
+    }
+  ]
+}
+EOF
+}
+
+# Create KMS key for solution
+resource "aws_kms_key" "mswebapp" {
+  description             = "KMS key to secure various aspects of the indy network"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.mswebappkms.json
+
+  tags = {
+    Name         = format("%s%s%s%s", var.Prefix, "kms", var.EnvCode, "indy-network")
+    resourcetype = "security"
+    codeblock    = "ecscluster"
+  }
+}
+
+# Create KMS Alias. Only used in this context to provide a friendly display name
+resource "aws_kms_alias" "mswebapp" {
+  name          = "alias/indy-${var.EnvCode}"
+  target_key_id = aws_kms_key.mswebapp.key_id
+}
+
+data "aws_iam_policy_document" "mswebappkms" {
+  statement {
+    # https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-overview.html
+    sid    = "Enable IAM User Permissions"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions = [
+      "kms*"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+  statement {
+    # https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/encrypt-log-data-kms.html
+    sid    = "Allow Cloudwatch access to KMS Key"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["logs.${var.Region}.amazonaws.com"]
+    }
+    actions = [
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*"
+    ]
+    resources = [
+      "*"
+    ]
+    condition {
+      test     = "ArnLike"
+      variable = "kms:EncryptionContext:aws:logs:arn"
+      values = [
+        "arn:aws:logs:${var.Region}:${data.aws_caller_identity.current.account_id}:*"
+      ]
+    }
+  }
+}

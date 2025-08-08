@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  node-1:
+    image: ${NODE_IMAGE_NAME}
+    logging:
+      driver: 'awslogs'
+      options:
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${LOG_GROUP}
+        awslogs-stream: ${INDY_NODE_NAME1}
+    restart: always
+    environment:
+      - INDY_NODE_NAME: ${INDY_NODE_NAME1}
+      - INDY_NETWORK_NAME: ${INDY_NETWORK_NAME}
+      - INDY_NODE_SEED: ${INDY_NODE_SEED1}
+      - INDY_NODE_IP: ${INDY_NODE_IP}
+      - INDY_CLIENT_IP: ${INDY_CLIENT_IP}
+      - INDY_NODE_PORT: 9701
+      - INDY_CLIENT_PORT: 9702
+    volumes:
+      - ./etc_indy/node1:/etc/indy
+    ports:
+      - 9701:9701
+      - 9702:9702
+  node-2:
+    image: ${NODE_IMAGE_NAME}
+    logging:
+      driver: 'awslogs'
+      options:
+        awslogs-region:  ${AWS_REGION}
+        awslogs-group: ${LOG_GROUP}
+        awslogs-stream: ${INDY_NODE_NAME2}
+    restart: always
+    environment:
+      - INDY_NODE_NAME: ${INDY_NODE_NAME2}
+      - INDY_NETWORK_NAME: ${INDY_NETWORK_NAME}
+      - INDY_NODE_SEED: ${INDY_NODE_SEED2}
+      - INDY_NODE_IP: ${INDY_NODE_IP}
+      - INDY_CLIENT_IP: ${INDY_CLIENT_IP}
+      - INDY_NODE_PORT: 9703
+      - INDY_CLIENT_PORT: 9704
+    volumes:
+      - ./etc_indy/node2:/etc/indy
+    ports:
+      - 9703:9703
+      - 9704:9704

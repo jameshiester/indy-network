@@ -35,117 +35,60 @@ module "vpc" {
   tags = local.tags
 }
 
-# Generate random passwords for steward and node seeds
-resource "random_password" "steward_seed_1" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
+module "ec2_node1" {
+  source = "./modules/ec2"
+  Prefix = var.Prefix
+  SolTag = var.SolTag
+  EnvCode = var.EnvCode
+  env_tag = var.EnvTag
+  GenesisBucketArn = aws_s3_bucket.genesis_bucket.arn
+  GenesisPoolFileKey = aws_s3_object.pool_transactions.key
+  GenesisDomainFileKey = aws_s3_object.domain_transactions.key
+  ComposeKey = aws_s3_object.docker_compose_yml.key
+  node_name_1 = module.node_genesis_1.node_name
+  node_name_2 = module.node_genesis_2.node_name
+  ECR_NODE_REPO = var.ECR_NODE_REPO
+  EnvTag = var.EnvTag
+  NetworkSecurityGroupID = module.vpc.private_app_network_security_group_id
+  NetworkName = var.NETWORK_NAME
+  node_seed_arn_1 = aws_secretsmanager_secret.node_seed_1.arn
+  node_seed_arn_2 = aws_secretsmanager_secret.node_seed_2.arn
+  NodeIP = aws_eip.one.public_ip
+  ClientIP = aws_eip.one.private_ip
+  NetworkInterfaceID = aws_network_interface.node1.id
+  EIPAllocationID = aws_eip.node1.id
+  private_subnets = module.vpc.private_subnets
+  public_subnets = module.vpc.public_subnets
+  vpc_id = module.vpc.vpc_id
+  vpc_cidr = local.vpc_cidr
+  azs = local.azs
 }
 
-resource "random_password" "steward_seed_2" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
-
-resource "random_password" "steward_seed_3" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
-
-resource "random_password" "steward_seed_4" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
-
-resource "random_password" "node_seed_1" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
-
-resource "random_password" "node_seed_2" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
-
-resource "random_password" "node_seed_3" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
-
-resource "random_password" "node_seed_4" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
-
-# Node Genesis Module Instances
-module "node_genesis_1" {
-  source       = "./modules/node_genesis"
-  node_name    = "1"
-  steward_name = var.NETWORK_NAME
-
-  steward_seed = random_password.steward_seed_1.result
-  node_seed    = random_password.node_seed_1.result
-  public_ip    = aws_eip.one.public_ip
-  private_ip   = aws_eip.one.private_ip
-  network_name = var.NETWORK_NAME
-
-}
-
-module "node_genesis_2" {
-  source       = "./modules/node_genesis"
-  node_name    = "2"
-  steward_name = var.NETWORK_NAME
-  steward_seed = random_password.steward_seed_2.result
-  node_seed    = random_password.node_seed_2.result
-  public_ip    = aws_eip.one.public_ip
-  private_ip   = aws_eip.one.private_ip
-  network_name = var.NETWORK_NAME
-  depends_on   = [module.node_genesis_1]
-}
-
-module "node_genesis_3" {
-  source       = "./modules/node_genesis"
-  node_name    = "3"
-  steward_name = var.NETWORK_NAME
-  steward_seed = random_password.steward_seed_3.result
-  node_seed    = random_password.node_seed_3.result
-  public_ip    = aws_eip.two.public_ip
-  private_ip   = aws_eip.two.private_ip
-  network_name = var.NETWORK_NAME
-  depends_on   = [module.node_genesis_2]
-}
-
-module "node_genesis_4" {
-  source       = "./modules/node_genesis"
-  node_name    = "4"
-  steward_name = var.NETWORK_NAME
-  steward_seed = random_password.steward_seed_4.result
-  node_seed    = random_password.node_seed_4.result
-  public_ip    = aws_eip.two.public_ip
-  private_ip   = aws_eip.two.private_ip
-  network_name = var.NETWORK_NAME
-  depends_on   = [module.node_genesis_3]
+module "ec2_node2" {
+  source = "./modules/ec2"
+  Prefix = var.Prefix
+  SolTag = var.SolTag
+  EnvCode = var.EnvCode
+  env_tag = var.EnvTag
+  GenesisBucketArn = aws_s3_bucket.genesis_bucket.arn
+  GenesisPoolFileKey = aws_s3_object.pool_transactions.key
+  GenesisDomainFileKey = aws_s3_object.domain_transactions.key
+  ComposeKey = aws_s3_object.docker_compose_yml.key
+  node_name_1 = module.node_genesis_3.node_name
+  node_name_2 = module.node_genesis_4.node_name
+  ECR_NODE_REPO = var.ECR_NODE_REPO
+  EnvTag = var.EnvTag
+  NetworkSecurityGroupID = module.vpc.private_app_network_security_group_id
+  NetworkName = var.NETWORK_NAME
+  node_seed_arn_1 = aws_secretsmanager_secret.node_seed_3.arn
+  node_seed_arn_2 = aws_secretsmanager_secret.node_seed_4.arn
+  NodeIP = aws_eip.two.public_ip
+  ClientIP = aws_eip.two.private_ip
+  NetworkInterfaceID = aws_network_interface.node2.id
+  EIPAllocationID = aws_eip.node2.id
+  private_subnets = module.vpc.private_subnets
+  public_subnets = module.vpc.public_subnets
+  vpc_id = module.vpc.vpc_id
+  vpc_cidr = local.vpc_cidr
+  azs = local.azs
 }
