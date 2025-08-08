@@ -35,6 +35,7 @@ data "aws_iam_policy_document" "SampleApp" {
       "ec2:DescribeNetworkAcls",
       "ec2:DescribeNetworkInterfaces",
       "ec2:DescribePrefixLists",
+      "iam:AddRoleToInstanceProfile",
       "ec2:DescribeRouteTables",
       "ec2:DescribeSecurityGroupRules",
       "ec2:DescribeSecurityGroups",
