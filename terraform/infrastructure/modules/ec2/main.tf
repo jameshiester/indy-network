@@ -146,19 +146,19 @@ resource "aws_iam_role_policy" "instance_policy" {
 data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
   vars = {
-    aws_region           = var.Region
-    indy_node_name_1     = var.node_name_1
-    indy_node_name_2     = var.node_name_2
-    indy_node_seed_arn_1 = var.node_seed_arn_1
-    indy_node_seed_arn_2 = var.node_seed_arn_2
-    network_name         = var.NetworkName
-    node_ip              = var.NodeIP
-    client_ip            = var.ClientIP
-    compose_bucket       = var.GenesisBucketArn
-    compose_key          = var.ComposeKey
-    genesis_pool_file_key = var.GenesisPoolFileKey
+    aws_region              = var.Region
+    indy_node_name_1        = var.node_name_1
+    indy_node_name_2        = var.node_name_2
+    indy_node_seed_arn_1    = var.node_seed_arn_1
+    indy_node_seed_arn_2    = var.node_seed_arn_2
+    network_name            = var.NetworkName
+    node_ip                 = var.NodeIP
+    client_ip               = var.ClientIP
+    compose_bucket          = var.GenesisBucketArn
+    compose_key             = var.ComposeKey
+    genesis_pool_file_key   = var.GenesisPoolFileKey
     genesis_domain_file_key = var.GenesisDomainFileKey
-    ecr_node_repo          = var.ECR_NODE_REPO
+    ecr_node_repo           = var.ECR_NODE_REPO
   }
 }
 

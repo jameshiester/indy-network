@@ -62,8 +62,8 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
 
 # Use existing provider if it exists, otherwise use the newly created one
 locals {
-  ECRNodeRepo = "indy-node"
-  ECRServerRepo = "indy-server"
+  ECRNodeRepo                 = "indy-node"
+  ECRServerRepo               = "indy-server"
   github_actions_provider_arn = data.aws_iam_openid_connect_provider.github_actions_existing.arn != null ? data.aws_iam_openid_connect_provider.github_actions_existing.arn : aws_iam_openid_connect_provider.github_actions[0].arn
 }
 
@@ -79,8 +79,8 @@ module "tfbootstrap_dev" {
   GitHubRepo        = var.GitHubRepo
   GitHubEnv         = "dev"
   GitHubProviderArn = local.github_actions_provider_arn
-  ECRNodeRepo = local.ECRNodeRepo
-  ECRServerRepo = local.ECRServerRepo
+  ECRNodeRepo       = local.ECRNodeRepo
+  ECRServerRepo     = local.ECRServerRepo
 }
 
 
@@ -96,8 +96,8 @@ module "tfbootstrap_test" {
   GitHubRepo        = var.GitHubRepo
   GitHubEnv         = "test"
   GitHubProviderArn = local.github_actions_provider_arn
-  ECRNodeRepo = local.ECRNodeRepo
-  ECRServerRepo = local.ECRServerRepo
+  ECRNodeRepo       = local.ECRNodeRepo
+  ECRServerRepo     = local.ECRServerRepo
 }
 
 module "tfbootstrap_prod" {
@@ -112,8 +112,8 @@ module "tfbootstrap_prod" {
   GitHubRepo        = var.GitHubRepo
   GitHubEnv         = "prod"
   GitHubProviderArn = local.github_actions_provider_arn
-  ECRNodeRepo = local.ECRNodeRepo
-  ECRServerRepo = local.ECRServerRepo
+  ECRNodeRepo       = local.ECRNodeRepo
+  ECRServerRepo     = local.ECRServerRepo
 }
 
 resource "github_repository_environment_deployment_policy" "dev" {
@@ -222,13 +222,13 @@ locals {
   environment_variables_dev = merge(
     local.environment_variables_common,
     {
-      TF_VAR_ENVCODE        = "dv"
-      TF_VAR_ENVTAG         = "Development"
-      TF_VAR_DBINSTANCESIZE = "db.t4g.micro"
-      TF_STATE_BUCKET_NAME  = module.tfbootstrap_dev.tfstate_bucket_name
-      TF_VAR_ECR_NODE_REPO  = module.tfbootstrap_dev.ecr_node_repo_name
-      TF_VAR_ECR_SERVER_REPO  = module.tfbootstrap_dev.ecr_server_repo_name
-      TF_STATE_BUCKET_KEY   = "terraform/${var.GitHubRepo}/dev.tfstate"
+      TF_VAR_ENVCODE         = "dv"
+      TF_VAR_ENVTAG          = "Development"
+      TF_VAR_DBINSTANCESIZE  = "db.t4g.micro"
+      TF_STATE_BUCKET_NAME   = module.tfbootstrap_dev.tfstate_bucket_name
+      TF_VAR_ECR_NODE_REPO   = module.tfbootstrap_dev.ecr_node_repo_name
+      TF_VAR_ECR_SERVER_REPO = module.tfbootstrap_dev.ecr_server_repo_name
+      TF_STATE_BUCKET_KEY    = "terraform/${var.GitHubRepo}/dev.tfstate"
     }
   )
   # Declare test specific GitHub Environments variables
