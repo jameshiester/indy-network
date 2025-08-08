@@ -6,7 +6,7 @@ readonly EC2_INSTANCE_METADATA_URL="http://169.254.169.254/latest/meta-data"
 
 function lookup_path_in_instance_metadata() {
     local -r path=$1
-    curl --silent --show-error --location "${EC2_INSTANCE_METADATA_URL}/${path}/"
+    curl --silent --show-error --location "$EC2_INSTANCE_METADATA_URL/$path/"
 }
 
 function get_instance_id() {
