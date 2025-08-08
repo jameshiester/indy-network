@@ -49,7 +49,7 @@ module "ec2_node1" {
   node_name_2            = module.node_genesis_2.node_name
   ECR_NODE_REPO          = var.ECR_NODE_REPO
   EnvTag                 = var.EnvTag
-  NetworkSecurityGroupID = module.vpc.private_app_network_security_group_id
+  NetworkSecurityGroupID = aws_security_group.node_security_group.id
   NetworkName            = var.NETWORK_NAME
   node_seed_arn_1        = aws_secretsmanager_secret.node_seed_1.arn
   node_seed_arn_2        = aws_secretsmanager_secret.node_seed_2.arn
@@ -78,7 +78,7 @@ module "ec2_node2" {
   node_name_2            = module.node_genesis_4.node_name
   ECR_NODE_REPO          = var.ECR_NODE_REPO
   EnvTag                 = var.EnvTag
-  NetworkSecurityGroupID = module.vpc.private_app_network_security_group_id
+  NetworkSecurityGroupID = aws_security_group.node_security_group.id
   NetworkName            = var.NETWORK_NAME
   node_seed_arn_1        = aws_secretsmanager_secret.node_seed_3.arn
   node_seed_arn_2        = aws_secretsmanager_secret.node_seed_4.arn
