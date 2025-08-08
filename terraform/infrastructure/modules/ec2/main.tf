@@ -20,55 +20,7 @@ data "aws_ami" "amazon_linux_2" {
   }
 }
 
-resource "aws_security_group" "ec2_security_group" {
-  name        = format("%s%s%s%s", var.Prefix, "ec2", var.EnvCode, "securitygroup")
-  description = "Security group for EC2 instance"
-  vpc_id      = var.vpc_id
 
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 6543
-    to_port     = 6543
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 9702
-    to_port     = 9702
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 9704
-    to_port     = 9702
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 9702
-    to_port     = 9702
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 9704
-    to_port     = 9702
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = local.tags
-}
 
 resource "aws_iam_role" "instance_role" {
   name = format("%s-%s-%s-%s", var.Prefix, "ec2-indy-node", var.EnvCode, "instanceprofile")
@@ -165,7 +117,7 @@ data "template_file" "user_data" {
 resource "aws_instance" "indy_node" {
   ami                    = data.aws_ami.amazon_linux_2.id
   instance_type          = "t3.medium"
-  vpc_security_group_ids = [aws_security_group.ec2_security_group.id, var.NetworkSecurityGroupID]
+  vpc_security_group_ids = [var.ClientSecurityGroupID, var.NetworkSecurityGroupID]
   iam_instance_profile   = aws_iam_instance_profile.instance_profile.name
   user_data              = file("${path.module}/user-data.sh")
   tags                   = local.tags

@@ -117,6 +117,7 @@ data "aws_iam_policy_document" "SampleApp" {
       "logs:ListTagsForResource",
       "resource-groups:CreateGroup",
       "resource-groups:UpdateGroupQuery",
+      "secretsmanager:GetResourcePolicy",
       "SNS:AddPermission",
       "SNS:CreateTopic",
       "SNS:DeleteTopic",

@@ -35,6 +35,56 @@ module "vpc" {
   tags = local.tags
 }
 
+resource "aws_security_group" "ec2_security_group" {
+  name        = format("%s-%s-%s", var.Prefix, "indy-client", var.EnvCode)
+  description = "Security group for EC2 instance"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 6543
+    to_port     = 6543
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 9702
+    to_port     = 9702
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 9704
+    to_port     = 9702
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 9702
+    to_port     = 9702
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 9704
+    to_port     = 9702
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = local.tags
+}
+
 module "ec2_node1" {
   source                 = "./modules/ec2"
   Prefix                 = var.Prefix

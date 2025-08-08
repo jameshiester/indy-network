@@ -125,6 +125,11 @@ variable "NetworkSecurityGroupID" {
   type        = string
 }
 
+variable "ClientSecurityGroupID" {
+  description = "ID of the client network security group"
+  type        = string
+}
+
 variable "NetworkName" {
   description = "Network name (default: sandbox)"
   type        = string
