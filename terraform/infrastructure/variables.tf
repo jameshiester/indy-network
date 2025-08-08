@@ -63,8 +63,3 @@ variable "ECR_NODE_REPO" {
   type        = string
 }
 
-variable "ECSCluster" {
-  description = "Name of Amazon ECS Cluster"
-  type        = string
-}
-
