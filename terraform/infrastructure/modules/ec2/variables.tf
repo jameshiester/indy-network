@@ -139,3 +139,8 @@ variable "ECR_NODE_REPO" {
   description = "Name of Amazon ECR repository for indy node"
   type        = string
 }
+
+variable "InstanceProfileName" {
+  description = "Name of the instance profile"
+  type        = string
+}
