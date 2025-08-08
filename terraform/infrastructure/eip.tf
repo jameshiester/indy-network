@@ -1,11 +1,14 @@
 resource "aws_network_interface" "public_1" {
   subnet_id   = module.vpc.public_subnets[0]
   private_ips = ["10.0.0.10"]
+    security_groups = [aws_security_group.ec2_security_group.id, aws_security_group.node_security_group.id]
+
 }
 
 resource "aws_network_interface" "public_2" {
   subnet_id   = module.vpc.public_subnets[1]
   private_ips = ["10.0.1.10"]
+  security_groups = [aws_security_group.ec2_security_group.id, aws_security_group.node_security_group.id]
 }
 
 resource "aws_eip" "one" {

@@ -117,7 +117,6 @@ data "template_file" "user_data" {
 resource "aws_instance" "indy_node" {
   ami                    = data.aws_ami.amazon_linux_2.id
   instance_type          = "t3.medium"
-  vpc_security_group_ids = [var.ClientSecurityGroupID, var.NetworkSecurityGroupID]
   iam_instance_profile   = aws_iam_instance_profile.instance_profile.name
   user_data              = file("${path.module}/user-data.sh")
   tags                   = local.tags
