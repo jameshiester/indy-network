@@ -125,7 +125,8 @@ resource "null_resource" "genesis_executor" {
 resource "aws_s3_object" "pool_transactions" {
   bucket = aws_s3_bucket.genesis_bucket.bucket
   key    = "pool_transactions"
-  source = "${path.module}/pool_transactions_genesis"
+  source = "pool_transactions_genesis"
+  etag   = filemd5("pool_transactions_genesis")
 
   depends_on = [
     null_resource.genesis_executor,
@@ -138,8 +139,8 @@ resource "aws_s3_object" "pool_transactions" {
 resource "aws_s3_object" "domain_transactions" {
   bucket = aws_s3_bucket.genesis_bucket.bucket
   key    = "domain_transactions"
-  source = "${path.module}/domain_transactions_genesis"
-  etag   = filemd5("${path.module}/domain_transactions_genesis")
+  source = "domain_transactions_genesis"
+  etag   = filemd5("domain_transactions_genesis")
   depends_on = [
     null_resource.genesis_executor,
     aws_s3_bucket.genesis_bucket
@@ -151,8 +152,8 @@ resource "aws_s3_object" "domain_transactions" {
 resource "aws_s3_object" "docker_compose_yml" {
   bucket = aws_s3_bucket.genesis_bucket.bucket
   key    = "docker-compose.yml"
-  source = "${path.module}/docker-compose.yml"
-  etag   = filemd5("${path.module}/docker-compose.yml")
+  source = "docker-compose.yml"
+  etag   = filemd5("docker-compose.yml")
   tags   = local.tags
 }
 
