@@ -56,4 +56,4 @@ export NODE_IMAGE_NAME=${ecr_node_repo}
 sleep 30
 echo "*** Starting Network ***"
 
-docker-compose -p network -d ${compose_profile} up --quiet-pull
+docker-compose -p network -d up --quiet-pull
