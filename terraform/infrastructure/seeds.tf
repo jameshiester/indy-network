@@ -126,8 +126,6 @@ resource "aws_s3_object" "pool_transactions" {
   bucket = aws_s3_bucket.genesis_bucket.bucket
   key    = "pool_transactions"
   source = "pool_transactions_genesis"
-  etag   = filemd5("pool_transactions_genesis")
-
   depends_on = [
     null_resource.genesis_executor,
     aws_s3_bucket.genesis_bucket
@@ -140,7 +138,6 @@ resource "aws_s3_object" "domain_transactions" {
   bucket = aws_s3_bucket.genesis_bucket.bucket
   key    = "domain_transactions"
   source = "domain_transactions_genesis"
-  etag   = filemd5("domain_transactions_genesis")
   depends_on = [
     null_resource.genesis_executor,
     aws_s3_bucket.genesis_bucket
