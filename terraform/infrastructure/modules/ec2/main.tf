@@ -20,6 +20,8 @@ data "aws_ami" "amazon_linux_2" {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
   vars = {
@@ -36,6 +38,7 @@ data "template_file" "user_data" {
     genesis_pool_file_key   = var.GenesisPoolFileKey
     genesis_domain_file_key = var.GenesisDomainFileKey
     ecr_node_repo           = var.ECR_NODE_REPO
+    account_id              = data.aws_caller_identity.current.account_id
   }
 }
 
