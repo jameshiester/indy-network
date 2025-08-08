@@ -63,7 +63,7 @@ resource "aws_security_group" "ec2_security_group" {
 
   ingress {
     from_port   = 9704
-    to_port     = 9702
+    to_port     = 9704
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
