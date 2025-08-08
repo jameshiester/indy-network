@@ -45,6 +45,7 @@ data "aws_iam_policy_document" "SampleApp" {
       "ec2:DescribeVpcEndpointServices",
       "ec2:DescribeVpcEndpointServices",
       "ec2:DescribeVpcs",
+      "ec2:DescribeImages",
       "ec2:DisassociateAddress",
       "ec2:DisassociateRouteTable",
       "ec2:DisassociateVpcCidrBlock",
