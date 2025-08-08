@@ -178,5 +178,5 @@ resource "aws_instance" "indy_node" {
 
 resource "aws_eip_association" "node1" {
   allocation_id = var.EIPAllocationID
-  instance_id   = aws_instance.node1.id
+  instance_id   = aws_instance.indy_node.id
 }
