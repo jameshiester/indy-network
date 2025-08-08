@@ -35,6 +35,8 @@ jobs:
       TF_VAR_NETWORK_NAME: ${{ vars.TF_VAR_NETWORK_NAME }}
       TF_VAR_ECR_SERVER_REPO: ${{ vars.TF_VAR_ECR_SERVER_REPO }}
       TF_VAR_ECR_NODE_REPO: ${{ vars.TF_VAR_ECR_NODE_REPO }} 
+      IMAGE_TAG: ${{github.sha}}
+
     steps:
       - name: Git checkout
         uses: actions/checkout@v4  
