@@ -119,6 +119,8 @@ data "aws_iam_policy_document" "SampleApp" {
       "resource-groups:UpdateGroupQuery",
       "secretsmanager:GetResourcePolicy",
       "secretsmanager:DeleteSecret",
+      "secretsmanager:GetSecretValue",
+      "iam:TagInstanceProfile",
       "iam:CreateInstanceProfile",
       "SNS:AddPermission",
       "SNS:CreateTopic",
