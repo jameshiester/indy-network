@@ -22,9 +22,9 @@ function get_public_ip {
 }
 
 ec2_instance_id=$(get_instance_id)
-
+echo "installing dependencies..."
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
-sudo yum update -y
+# sudo yum update -y
 sudo yum install -q -y amazon-cloudwatch-agent yum-utils systemd-networkd unzip
 echo "installing docker..."
 # sudo amazon-linux-extras install -y docker
