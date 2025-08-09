@@ -28,7 +28,7 @@ sudo yum install -q -y amazon-cloudwatch-agent yum-utils docker systemd-networkd
 
 sudo service docker start
 sudo usermod -a -G docker ec2-user
-
+echo --bucket ${compose_bucket}
 aws s3api get-object --bucket ${compose_bucket} --key ${compose_key} docker-compose.yml
 sudo mkdir -p /etc/indy
 aws s3 cp "s3://${compose_bucket}/${genesis_pool_file_key}" /etc/indy/pool_transactions_genesis
