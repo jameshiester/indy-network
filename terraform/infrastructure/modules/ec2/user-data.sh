@@ -45,8 +45,8 @@ echo "*** Logging in to ECR ***"
 echo --region "${aws_region}"
 echo --account_id "${account_id}"
 echo --aws_region "${aws_region}"
-command -v docker || echo "docker not in PATH"
-aws ecr get-login-password --region "${aws_region}" | sudo docker login --username AWS --password-stdin "${account_id}.dkr.ecr.${aws_region}.amazonaws.com"
+docker --version || echo "docker not in PATH"
+$(aws ecr get-login-password --region "${aws_region}" | sudo docker login --username AWS --password-stdin "${account_id}.dkr.ecr.${aws_region}.amazonaws.com")
 echo "*** Getting Secrets ***"
 export INDY_NODE_SEED1=$(aws secretsmanager get-secret-value --secret-id ${node_seed_arn_1} --query SecretString --output text)
 export INDY_NODE_SEED2=$(aws secretsmanager get-secret-value --secret-id ${node_seed_arn_2} --query SecretString --output text)
