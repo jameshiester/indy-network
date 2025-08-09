@@ -24,8 +24,8 @@ function get_public_ip {
 ec2_instance_id=$(get_instance_id)
 
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
-sudo yum install -q -y amazon-cloudwatch-agent yum-utils docker systemd-networkd unzip
-
+sudo yum install -q -y amazon-cloudwatch-agent yum-utils systemd-networkd unzip
+sudo amazon-linux-extras install docker
 sudo service docker start
 sudo usermod -a -G docker ec2-user
 echo --bucket ${compose_bucket}
@@ -41,7 +41,7 @@ aws s3 cp "s3://${compose_bucket}/${genesis_domain_file_key}" /etc/indy2/domain_
 sudo chmod 644 /etc/indy2/pool_transactions_genesis /etc/indy2/domain_transactions_genesis
 
 
-
+echo "*** Logging in to ECR ***"
 $(aws ecr get-login-password --region "${aws_region}" | docker login --username AWS --password-stdin "${account_id}.dkr.ecr.${aws_region}.amazonaws.com")
 echo "*** Getting Secrets ***"
 export INDY_NODE_SEED1=$(aws secretsmanager get-secret-value --secret-id ${node_seed_arn_1} --query SecretString --output text)
