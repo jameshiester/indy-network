@@ -42,7 +42,11 @@ sudo chmod 644 /etc/indy2/pool_transactions_genesis /etc/indy2/domain_transactio
 
 
 echo "*** Logging in to ECR ***"
-$(aws ecr get-login-password --region "${aws_region}" | docker login --username AWS --password-stdin "${account_id}.dkr.ecr.${aws_region}.amazonaws.com")
+echo --region "${aws_region}"
+echo --account_id "${account_id}"
+echo --aws_region "${aws_region}"
+command -v docker || echo "docker not in PATH"
+aws ecr get-login-password --region "${aws_region}" | sudo docker login --username AWS --password-stdin "${account_id}.dkr.ecr.${aws_region}.amazonaws.com"
 echo "*** Getting Secrets ***"
 export INDY_NODE_SEED1=$(aws secretsmanager get-secret-value --secret-id ${node_seed_arn_1} --query SecretString --output text)
 export INDY_NODE_SEED2=$(aws secretsmanager get-secret-value --secret-id ${node_seed_arn_2} --query SecretString --output text)
