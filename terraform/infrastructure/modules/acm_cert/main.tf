@@ -18,7 +18,6 @@ resource "aws_acm_certificate" "cert" {
   domain_name       = var.Subdomain != "" ? "${var.Subdomain}.${var.Domain}" : var.Domain
   validation_method = "DNS"
   tags              = local.tags
-
 }
 
 resource "aws_route53_record" "cert_validation" {

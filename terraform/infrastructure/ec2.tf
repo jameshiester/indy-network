@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "instance_policy" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
-    resources = [aws_secretsmanager_secret.node_seed_1.arn, aws_secretsmanager_secret.node_seed_2.arn,aws_secretsmanager_secret.node_seed_3.arn,aws_secretsmanager_secret.node_seed_4.arn]
+    resources = [aws_secretsmanager_secret.node_seed_1.arn, aws_secretsmanager_secret.node_seed_2.arn, aws_secretsmanager_secret.node_seed_3.arn, aws_secretsmanager_secret.node_seed_4.arn]
   }
 }
 
@@ -74,7 +74,7 @@ resource "aws_iam_role_policy" "instance_policy" {
 module "ec2_node1" {
   source                 = "./modules/ec2"
   Prefix                 = var.Prefix
-  ClientSecurityGroupID = aws_security_group.ec2_security_group.id
+  ClientSecurityGroupID  = aws_security_group.ec2_security_group.id
   SolTag                 = var.SolTag
   EnvCode                = var.EnvCode
   env_tag                = var.EnvTag
@@ -104,7 +104,7 @@ module "ec2_node1" {
 
 module "ec2_node2" {
   source                 = "./modules/ec2"
-  ClientSecurityGroupID = aws_security_group.ec2_security_group.id
+  ClientSecurityGroupID  = aws_security_group.ec2_security_group.id
   Prefix                 = var.Prefix
   SolTag                 = var.SolTag
   EnvCode                = var.EnvCode

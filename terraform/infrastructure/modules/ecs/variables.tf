@@ -64,10 +64,7 @@ variable "EnvTag" {
   type        = string
 }
 
-variable "ECR_NODE_REPO" {
-  description = "Name of Amazon ECR repository for indy node"
-  type        = string
-}
+
 
 variable "ECR_SERVER_REPO" {
   description = "Name of Amazon ECR repository for indy server"
