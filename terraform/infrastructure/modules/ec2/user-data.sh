@@ -27,41 +27,41 @@ exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 sudo yum update -y
 sudo yum install -q -y amazon-cloudwatch-agent yum-utils systemd-networkd unzip
 echo "installing docker..."
-sudo amazon-linux-extras install -y docker
-sudo systemctl enable --now docker
-sudo usermod -a -G docker ec2-user
-echo "installing docker compose v2 plugin..."
-sudo mkdir -p /usr/local/lib/docker/cli-plugins
-sudo curl -sSL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
-sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-echo --bucket ${compose_bucket}
-aws s3api get-object --bucket ${compose_bucket} --key ${compose_key} docker-compose.yml
-sudo mkdir -p /etc/indy
-aws s3 cp "s3://${compose_bucket}/${genesis_pool_file_key}" /etc/indy/pool_transactions_genesis
-aws s3 cp "s3://${compose_bucket}/${genesis_domain_file_key}" /etc/indy/domain_transactions_genesis
-sudo chmod 644 /etc/indy/pool_transactions_genesis /etc/indy/domain_transactions_genesis
+# sudo amazon-linux-extras install -y docker
+# sudo systemctl enable --now docker
+# sudo usermod -a -G docker ec2-user
+# echo "installing docker compose v2 plugin..."
+# sudo mkdir -p /usr/local/lib/docker/cli-plugins
+# sudo curl -sSL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
+# sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+# echo --bucket ${compose_bucket}
+# aws s3api get-object --bucket ${compose_bucket} --key ${compose_key} docker-compose.yml
+# sudo mkdir -p /etc/indy
+# aws s3 cp "s3://${compose_bucket}/${genesis_pool_file_key}" /etc/indy/pool_transactions_genesis
+# aws s3 cp "s3://${compose_bucket}/${genesis_domain_file_key}" /etc/indy/domain_transactions_genesis
+# sudo chmod 644 /etc/indy/pool_transactions_genesis /etc/indy/domain_transactions_genesis
 
-sudo mkdir -p /etc/indy2
-aws s3 cp "s3://${compose_bucket}/${genesis_pool_file_key}" /etc/indy2/pool_transactions_genesis
-aws s3 cp "s3://${compose_bucket}/${genesis_domain_file_key}" /etc/indy2/domain_transactions_genesis
-sudo chmod 644 /etc/indy2/pool_transactions_genesis /etc/indy2/domain_transactions_genesis
+# sudo mkdir -p /etc/indy2
+# aws s3 cp "s3://${compose_bucket}/${genesis_pool_file_key}" /etc/indy2/pool_transactions_genesis
+# aws s3 cp "s3://${compose_bucket}/${genesis_domain_file_key}" /etc/indy2/domain_transactions_genesis
+# sudo chmod 644 /etc/indy2/pool_transactions_genesis /etc/indy2/domain_transactions_genesis
 
 
-echo "*** Logging in to ECR ***"
-echo "${aws_region}"
-echo "${account_id}"
-$(aws ecr get-login-password --region "${aws_region}" | docker login --username AWS --password-stdin "${account_id}.dkr.ecr.${aws_region}.amazonaws.com")
-echo "*** Getting Secrets ***"
-export INDY_NODE_SEED1=$(aws secretsmanager get-secret-value --secret-id ${node_seed_arn_1} --query SecretString --output text)
-export INDY_NODE_SEED2=$(aws secretsmanager get-secret-value --secret-id ${node_seed_arn_2} --query SecretString --output text)
-export INDY_NODE_NAME1=${node_name_1}
-export INDY_NODE_NAME2=${node_name_2}
-export INDY_NETWORK_NAME=${network_name}
-export INDY_NODE_IP=${node_ip}
-export INDY_CLIENT_IP=${client_ip}
-export AWS_REGION=${aws_region}
-export NODE_IMAGE_NAME=${ecr_node_repo}
-sleep 30
-echo "*** Starting Network ***"
+# echo "*** Logging in to ECR ***"
+# echo "${aws_region}"
+# echo "${account_id}"
+# $(aws ecr get-login-password --region "${aws_region}" | docker login --username AWS --password-stdin "${account_id}.dkr.ecr.${aws_region}.amazonaws.com")
+# echo "*** Getting Secrets ***"
+# export INDY_NODE_SEED1=$(aws secretsmanager get-secret-value --secret-id ${node_seed_arn_1} --query SecretString --output text)
+# export INDY_NODE_SEED2=$(aws secretsmanager get-secret-value --secret-id ${node_seed_arn_2} --query SecretString --output text)
+# export INDY_NODE_NAME1=${node_name_1}
+# export INDY_NODE_NAME2=${node_name_2}
+# export INDY_NETWORK_NAME=${network_name}
+# export INDY_NODE_IP=${node_ip}
+# export INDY_CLIENT_IP=${client_ip}
+# export AWS_REGION=${aws_region}
+# export NODE_IMAGE_NAME=${ecr_node_repo}
+# sleep 30
+# echo "*** Starting Network ***"
 
-docker compose -p network up -d --quiet-pull
+# docker compose -p network up -d --quiet-pull
