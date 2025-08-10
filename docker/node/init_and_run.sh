@@ -10,7 +10,7 @@ set -e
 
 date -Iseconds
 
-echo "INDY_NETWORK_NAME=${INDY_NETWORK_NAME:=naesb}"
+echo "INDY_NETWORK_NAME=${INDY_NETWORK_NAME:=sandbox}"
 echo "INDY_NODE_NAME=${INDY_NODE_NAME:=node1}"
 echo "INDY_NODE_IP=${INDY_NODE_IP:=0.0.0.0}"
 echo "INDY_NODE_PORT=${INDY_NODE_PORT:=9701}"

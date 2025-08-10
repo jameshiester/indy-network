@@ -10,8 +10,8 @@ services:
         awslogs-stream: ${INDY_NODE_NAME1}
     restart: always
     environment:
-      INDY_NODE_NAME: ${INDY_NODE_NAME1}
-      INDY_NETWORK_NAME: ${INDY_NETWORK_NAME}
+      INDY_NODE_NAME: ${INDY_NODE_NAME1:-node1}
+      INDY_NETWORK_NAME: ${INDY_NETWORK_NAME:-sandbox}
       INDY_NODE_SEED: ${INDY_NODE_SEED1}
       INDY_NODE_IP: ${INDY_NODE_IP}
       INDY_CLIENT_IP: ${INDY_CLIENT_IP}
