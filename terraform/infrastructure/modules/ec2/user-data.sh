@@ -1,6 +1,8 @@
 #!/bin/bash
-echo "starting user data..."
+
 set -e
+echo "starting user data..."
+
 
 readonly EC2_INSTANCE_METADATA_URL="http://169.254.169.254/latest/meta-data"
 

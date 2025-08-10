@@ -10,13 +10,13 @@ services:
         awslogs-stream: ${INDY_NODE_NAME1}
     restart: always
     environment:
-      - INDY_NODE_NAME: ${INDY_NODE_NAME1}
-      - INDY_NETWORK_NAME: ${INDY_NETWORK_NAME}
-      - INDY_NODE_SEED: ${INDY_NODE_SEED1}
-      - INDY_NODE_IP: ${INDY_NODE_IP}
-      - INDY_CLIENT_IP: ${INDY_CLIENT_IP}
-      - INDY_NODE_PORT: 9701
-      - INDY_CLIENT_PORT: 9702
+      INDY_NODE_NAME: ${INDY_NODE_NAME1}
+      INDY_NETWORK_NAME: ${INDY_NETWORK_NAME}
+      INDY_NODE_SEED: ${INDY_NODE_SEED1}
+      INDY_NODE_IP: ${INDY_NODE_IP}
+      INDY_CLIENT_IP: ${INDY_CLIENT_IP}
+      INDY_NODE_PORT: "9701"
+      INDY_CLIENT_PORT: "9702"
     volumes:
       - ./etc_indy/node1:/etc/indy
       - /etc/indy:/etc/indy/${INDY_NETWORK_NAME}
@@ -34,13 +34,13 @@ services:
         awslogs-stream: ${INDY_NODE_NAME2}
     restart: always
     environment:
-      - INDY_NODE_NAME: ${INDY_NODE_NAME2}
-      - INDY_NETWORK_NAME: ${INDY_NETWORK_NAME}
-      - INDY_NODE_SEED: ${INDY_NODE_SEED2}
-      - INDY_NODE_IP: ${INDY_NODE_IP}
-      - INDY_CLIENT_IP: ${INDY_CLIENT_IP}
-      - INDY_NODE_PORT: 9703
-      - INDY_CLIENT_PORT: 9704
+      INDY_NODE_NAME: ${INDY_NODE_NAME2}
+      INDY_NETWORK_NAME: ${INDY_NETWORK_NAME}
+      INDY_NODE_SEED: ${INDY_NODE_SEED2}
+      INDY_NODE_IP: ${INDY_NODE_IP}
+      INDY_CLIENT_IP: ${INDY_CLIENT_IP}
+      INDY_NODE_PORT: "9703"
+      INDY_CLIENT_PORT: "9704"
     volumes:
       - ./etc_indy/node2:/etc/indy
       - /etc/indy2:/var/lib/indy/${INDY_NETWORK_NAME}
