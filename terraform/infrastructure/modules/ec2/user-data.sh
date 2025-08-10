@@ -22,6 +22,7 @@ function get_public_ip {
 }
 
 ec2_instance_id=$(get_instance_id)
+
 echo "installing dependencies..."
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 # sudo yum update -y
