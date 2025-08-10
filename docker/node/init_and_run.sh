@@ -23,6 +23,7 @@ echo "INDY_NODE_SEED=[$(echo -n $INDY_NODE_SEED|wc -c) characters]"
 # Set NETWORK_NAME in indy_config.py
 awk '{if (index($1, "NETWORK_NAME") != 0) {print("NETWORK_NAME = \"'$INDY_NETWORK_NAME'\"")} else print($0)}' /etc/indy/indy_config.py> /tmp/indy_config.py
 sed -i -n -e '/^controlServiceHost=/!p' -e "\$acontrolServiceHost='$CONTROLLER_CONTAINER_NAME'" /tmp/indy_config.py
+mkdir -p /etc/indy
 mv /tmp/indy_config.py /etc/indy/indy_config.py
 
 # Init indy-node
