@@ -25,6 +25,7 @@ data "aws_caller_identity" "current" {}
 data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
   vars = {
+    log_group_name          = var.LogGroupName
     aws_region              = var.Region
     node_name_1             = var.node_name_1
     node_name_2             = var.node_name_2

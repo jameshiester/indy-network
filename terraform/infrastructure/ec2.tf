@@ -71,6 +71,12 @@ resource "aws_iam_role_policy" "instance_policy" {
   policy = data.aws_iam_policy_document.instance_policy.json
 }
 
+resource "aws_cloudwatch_log_group" "indy_node_log_group" {
+  name = format("%s-%s-%s", var.Prefix, "indy-node", var.EnvCode)
+  retention_in_days = 30
+  tags = local.tags
+}
+
 module "ec2_node1" {
   source                 = "./modules/ec2"
   Prefix                 = var.Prefix
@@ -78,6 +84,7 @@ module "ec2_node1" {
   SolTag                 = var.SolTag
   EnvCode                = var.EnvCode
   env_tag                = var.EnvTag
+  LogGroupName           = aws_cloudwatch_log_group.indy_node_log_group.name
   GenesisBucketArn       = aws_s3_bucket.genesis_bucket.bucket
   GenesisPoolFileKey     = aws_s3_object.pool_transactions.key
   GenesisDomainFileKey   = aws_s3_object.domain_transactions.key
@@ -109,6 +116,7 @@ module "ec2_node2" {
   SolTag                 = var.SolTag
   EnvCode                = var.EnvCode
   env_tag                = var.EnvTag
+  LogGroupName           = aws_cloudwatch_log_group.indy_node_log_group.name
   GenesisBucketArn       = aws_s3_bucket.genesis_bucket.bucket
   GenesisPoolFileKey     = aws_s3_object.pool_transactions.key
   GenesisDomainFileKey   = aws_s3_object.domain_transactions.key

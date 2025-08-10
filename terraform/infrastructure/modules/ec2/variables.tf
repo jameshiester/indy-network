@@ -144,3 +144,9 @@ variable "InstanceProfileName" {
   description = "Name of the instance profile"
   type        = string
 }
+
+variable "LogGroupName" {
+  description = "Name of the log group"
+  type        = string
+}
+
