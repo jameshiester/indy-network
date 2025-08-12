@@ -26,6 +26,7 @@ sed -i -n -e '/^controlServiceHost=/!p' -e "\$acontrolServiceHost='$CONTROLLER_C
 mkdir -p /etc/indy
 mv /tmp/indy_config.py /etc/indy/indy_config.py
 
+
 # Init indy-node
 if [[ ! -d "/var/lib/indy/$INDY_NETWORK_NAME/keys" ]]
 then

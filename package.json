@@ -1,0 +1,21 @@
+{
+  "name": "indy-network-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "build-docker-server": "docker build -t indy-server -f docker/server/Dockerfile .",
+    "start": "turbo run start",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.6",
+    "concurrently": "^9.0.1",
+    "@types/node": "^22.13.10"
+  },
+  "packageManager": "pnpm@9.15.4"
+}
+

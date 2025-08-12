@@ -94,27 +94,6 @@ resource "aws_cloudwatch_log_group" "network" {
   }
 }
 
-# Create Amazon ECR repository to store Docker image
-resource "aws_ecr_repository" "node" {
-  name                 = var.node_ecr_repo
-  image_tag_mutability = "MUTABLE"
-  force_delete         = true
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  encryption_configuration {
-    encryption_type = "KMS"
-    kms_key         = aws_kms_key.network.arn
-  }
-
-  tags = {
-    Name         = format("%s-%s-%s-%s", var.Prefix, "ecs", var.EnvCode, "node")
-    resourcetype = "compute"
-    codeblock    = "ecscluster"
-  }
-}
 
 resource "aws_ecr_repository" "server" {
   name                 = var.server_ecr_repo

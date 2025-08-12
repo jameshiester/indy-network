@@ -45,7 +45,7 @@ data "template_file" "user_data" {
 
 resource "aws_instance" "indy_node" {
   ami                  = data.aws_ami.amazon_linux_2.id
-  instance_type        = "t3.medium"
+  instance_type        = "t3.nano"
   iam_instance_profile = var.InstanceProfileName
   user_data            = data.template_file.user_data.rendered
   tags                 = local.tags

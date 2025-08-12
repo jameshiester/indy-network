@@ -1,3 +1,15 @@
+## Monorepo (Turborepo)
+
+This repo now includes a Turborepo with two apps:
+
+- apps/api: NestJS API with a `/health` endpoint
+- apps/client: TanStack Start app that renders "Hello World"
+
+Scripts at the root:
+
+- `pnpm dev` or `npm run dev` to run all apps
+- `pnpm build` or `npm run build` to build
+
 # indy-network
 
 ## Creating DIDs

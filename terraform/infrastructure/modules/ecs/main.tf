@@ -9,7 +9,7 @@ locals {
 }
 
 resource "aws_ecs_task_definition" "mswebapp" {
-  family                   = var.node_ecr_repo
+  family                   = var.server_ecr_repo
   requires_compatibilities = ["FARGATE"]
   cpu                      = 1024
   memory                   = 2048
