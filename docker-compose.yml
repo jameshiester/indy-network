@@ -14,5 +14,20 @@ services:
       - AWS_REGION=us-east-1
       - AWS_PROFILE=default
       - AWS_SDK_LOAD_CONFIG=1
+      - DB_TYPE=postgres
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=postgres
+      - DB_SCHEMA=public
     volumes:
       - ${USERPROFILE}/.aws:/root/.aws:ro
+  postgres:
+    image: postgres:15
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres

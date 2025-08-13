@@ -64,19 +64,6 @@ variable "EnvTag" {
   type        = string
 }
 
-
-
-variable "ECR_SERVER_REPO" {
-  description = "Name of Amazon ECR repository for indy server"
-  type        = string
-}
-
-# Web App Build
-variable "node_ecr_repo" {
-  description = "Name of Amazon ECR repository for indy node"
-  type        = string
-}
-
 variable "server_ecr_repo" {
   description = "Name of Amazon ECR repository for indy server"
   type        = string

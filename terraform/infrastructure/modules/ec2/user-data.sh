@@ -30,17 +30,23 @@ exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 # sudo yum update -y
 sudo yum install -q -y amazon-cloudwatch-agent yum-utils systemd-networkd unzip
 mkdir -p /var/log/indy
+mkdir -p /var/log/indy2
 sudo tee /opt/aws/amazon-cloudwatch-agent/config.json <<EOF
 {
   "logs": {
     "logs_collected": {
       "files": {
         "collect_list": [
-          {
-            "file_path": "/var/log/indy/*",
-            "log_group_name": "${log_group_name}",
-            "log_stream_name": "{instance_id}-{hostname}"
-          }
+            {
+                "file_path": "/var/log/indy/*",
+                "log_group_name": "${log_group_name}",
+                "log_stream_name": "${node_name_1}-node"
+            },
+            {
+                "file_path": "/var/log/indy2/*",
+                "log_group_name": "${log_group_name}",
+                "log_stream_name": "${node_name_2}-node"
+            }
         ]
       }
     }

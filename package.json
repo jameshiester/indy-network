@@ -14,7 +14,8 @@
   "devDependencies": {
     "turbo": "^2.0.6",
     "concurrently": "^9.0.1",
-    "@types/node": "^22.13.10"
+    "@types/node": "^22.13.10",
+    "typescript": "~5.4.0"
   },
   "packageManager": "pnpm@9.15.4"
 }
