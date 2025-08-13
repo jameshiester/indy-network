@@ -9,6 +9,7 @@ export class LedgerService {
 
   constructor() {
     this.pool = new PoolCreate({ parameters: { transactions_path: process.env.GENESIS_TXN_PATH } })
+    
   }
 
   getStatus() {
@@ -17,14 +18,16 @@ export class LedgerService {
 
   @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_MINUTE)
   async handleCron() {
-    this.logger.log('Getting transactions');
-    this.logger.log(this.pool.transactions);
+    this.logger.log('Getting transactions...');
+    const status = await this.pool.status
+    this.logger.log(status);
     try {
       const request = new GetTransactionRequest({ ledgerType: 0, seqNo: 1 })
       const response: GetTransactionResponse = await this.pool.submitRequest(request)
       this.logger.debug(response.result.seqNo)
     } catch (error) {
       this.logger.error(error);
+      this.logger.log(error.extra);
     }
   }
 }
