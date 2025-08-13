@@ -3,9 +3,9 @@ export enum LedgerType {
     POOL = 0,
     DOMAIN = 1,
     CONFIG = 2,
-  }
+}
 
-  export enum TransactionType {
+export enum TransactionType {
     NODE = '0',
     NYM = '1',
     ATTRIB = '100',
@@ -24,4 +24,11 @@ export enum LedgerType {
     RECOV_REG_ENTRY = '114',
     POOL_RESTART = '118',
     AUTH_RULE = '120',
+}
+
+export enum IndyRoleType {
+    TRUSTEE = '0',
+    STEWARD = '2',
+    TGB = '100',
+    ENDORSER = '101',
   }

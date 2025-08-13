@@ -7,26 +7,20 @@ const {DB_PORT = 5432, DB_HOST,DB_USERNAME,DB_PASSWORD,DB_DATABASE = 'postgres',
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([
-            Pointer,
-            Transaction,
-    ])]
-})
-export class DBModule{}
-
-@Module({
-    imports: [
         TypeOrmModule.forRoot({
+            autoLoadEntities: true,
             type: DB_TYPE as any,
             host: DB_HOST,
             port: Number(DB_PORT),
             username: DB_USERNAME,
             password: DB_PASSWORD,
             database: DB_DATABASE,
+            synchronize: true,
         }),
         TypeOrmModule.forFeature([
             Pointer,
             Transaction,
-    ])]
+    ])],
+    exports: [TypeOrmModule]
 })
-export class RootDBModule{}
+export class DBModule{}

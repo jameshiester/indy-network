@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LedgerController } from './ledger.controller.js';
 import { LedgerService } from './ledger.service.js';
-import { PointerModule } from 'src/pointer/pointer.module.js';
+import { PointerModule } from '../pointer/pointer.module.js';
 
 @Module({
   imports: [PointerModule],

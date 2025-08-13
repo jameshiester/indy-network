@@ -23,6 +23,9 @@ services:
       - DB_SCHEMA=public
     volumes:
       - ${USERPROFILE}/.aws:/root/.aws:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
   postgres:
     image: postgres:15
     ports:
@@ -31,3 +34,9 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres -h 127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
