@@ -20,11 +20,13 @@ echo "CONTROLLER_CONTAINER_NAME=${CONTROLLER_CONTAINER_NAME:=indy_node_controlle
 
 echo "INDY_NODE_SEED=[$(echo -n $INDY_NODE_SEED|wc -c) characters]"
 
-# Set NETWORK_NAME in indy_config.py
-awk '{if (index($1, "NETWORK_NAME") != 0) {print("NETWORK_NAME = \"'$INDY_NETWORK_NAME'\"") } else print($0)}' /etc/indy/indy_config.py> /tmp/indy_config.py
-sed -i -n -e '/^controlServiceHost=/d' -e '/^enableStdOutLogging[[:space:]]*=/d' -e 'p' -e "\$acontrolServiceHost='$CONTROLLER_CONTAINER_NAME'" -e '\$aenableStdOutLogging = True' /tmp/indy_config.py
+# Set overrides in indy_config.py (append ensures latest values take effect)
 mkdir -p /etc/indy
-mv /tmp/indy_config.py /etc/indy/indy_config.py
+tee -a /etc/indy/indy_config.py >/dev/null <<EOF
+NETWORK_NAME = "$INDY_NETWORK_NAME"
+enableStdOutLogging = True
+EOF
+cat /etc/indy/indy_config.py
 
 
 # Init indy-node
