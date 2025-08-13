@@ -9,7 +9,7 @@ services:
       - 8080:8080
     environment:
       - GENESIS_TXN_PATH=/app/genesis.txn
-      - GENESIS_S3_BUCKET=indy-genesis-dv20250812143339427700000004
+      - GENESIS_S3_BUCKET=indy-genesis-dv
       - GENESIS_S3_KEY=pool_transactions
       - AWS_REGION=us-east-1
       - AWS_PROFILE=default
