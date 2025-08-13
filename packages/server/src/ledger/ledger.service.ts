@@ -15,11 +15,17 @@ export class LedgerService {
     return { status: 'ledger-ok' };
   }
 
-  @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_10_MINUTES)
+  @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_MINUTE)
   async handleCron() {
-    const request = new GetTransactionRequest({ ledgerType: 1, seqNo: 1 })
-    const response: GetTransactionResponse = await this.pool.submitRequest(request)
-    this.logger.debug(response.result.seqNo)
+    this.logger.log('Getting transactions');
+    this.logger.log(this.pool.transactions);
+    try {
+      const request = new GetTransactionRequest({ ledgerType: 0, seqNo: 1 })
+      const response: GetTransactionResponse = await this.pool.submitRequest(request)
+      this.logger.debug(response.result.seqNo)
+    } catch (error) {
+      this.logger.error(error);
+    }
   }
 }
 

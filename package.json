@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",
-    "build-docker-server": "docker build -t indy-server -f docker/server/Dockerfile .",
+    "build-docker-server": "docker build -t indy-server -f docker/server/Dockerfile --progress=plain .",
     "start": "turbo run start",
     "lint": "turbo run lint"
   },

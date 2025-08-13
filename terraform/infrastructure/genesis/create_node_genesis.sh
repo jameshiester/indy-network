@@ -177,9 +177,9 @@ cat > "$OUTPUT_FILE" << EOF
 {
   "steward_name": "$STEWARD_NAME",
   "validator_alias": "${NODE_NAME}",
-  "node_ip_address": "$PUBLIC_IP",
+  "node_ip_address": "$PRIVATE_IP",
   "node_port": "$NODE_PORT",
-  "client_ip_address": "$PRIVATE_IP",
+  "client_ip_address": "$PUBLIC_IP",
   "client_port": "$CLIENT_PORT",
   "validator_verkey": "$NODE_VERIFICATION_KEY",
   "validator_bls_key": "$NODE_BLS_PUBLIC_KEY",
