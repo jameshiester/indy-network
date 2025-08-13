@@ -111,6 +111,8 @@ resource "null_resource" "genesis_executor" {
   provisioner "local-exec" {
     quiet   = true
     command = <<-EOT
+      cat ${path.module}/input/trustee_file.csv
+      cat ${path.module}/input/steward_file.csv
       docker run --rm -v ${path.module}:/var/output -v /etc/indy/:/etc/indy/ -v ${path.module}/input:/var/input genesis 
     EOT
   }
@@ -156,7 +158,7 @@ resource "aws_s3_object" "docker_compose_yml" {
 
 # S3 Bucket for storing genesis files
 resource "aws_s3_bucket" "genesis_bucket" {
-  bucket_prefix = format("%s-%s-%s", var.Prefix, "genesis", var.EnvCode)
+  bucket = format("%s-%s-%s", var.Prefix, "genesis", var.EnvCode)
   force_destroy = true
 
   tags = local.tags
