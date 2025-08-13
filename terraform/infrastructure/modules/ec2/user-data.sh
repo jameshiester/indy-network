@@ -29,6 +29,26 @@ echo "installing dependencies..."
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 # sudo yum update -y
 sudo yum install -q -y amazon-cloudwatch-agent yum-utils systemd-networkd unzip
+mkdir -p /var/log/indy
+sudo tee /opt/aws/amazon-cloudwatch-agent/config.json <<EOF
+{
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/indy/*",
+            "log_group_name": "${log_group_name}",
+            "log_stream_name": "{instance_id}-{hostname}"
+          }
+        ]
+      }
+    }
+  }
+}
+EOF
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/config.json -s
+
 echo "installing docker..."
 
 sudo amazon-linux-extras install -y docker
@@ -71,3 +91,6 @@ sleep 30
 echo "*** Starting Network ***"
 
 docker compose -p network up -d --quiet-pull
+sleep 30
+echo "*** Grabbing Logs ***"
+ls -la /var/log/indy
