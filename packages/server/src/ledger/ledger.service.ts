@@ -1,4 +1,4 @@
-import { GetTransactionResponse, IndyVdrPool, GetTransactionRequest, PoolCreate } from '@hyperledger/indy-vdr-nodejs';
+import { GetTransactionResponse, IndyVdrPool, GetTransactionRequest, PoolCreate, GetValidatorInfoAction, GetValidatorInfoResponse } from '@hyperledger/indy-vdr-nodejs';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PointerService } from '../pointer/pointer.service.js';
@@ -40,7 +40,17 @@ export class LedgerService {
         complete = true;
       }
     }
+  }
 
+  async getValidatorInfo() {
+    this.logger.debug(`Syncing validator info`);
+      try {
+        const request = new GetValidatorInfoAction({submitterDid: process.env.VALIDATOR_DID })
+        const response: GetValidatorInfoResponse = await this.pool.submitAction(request)
+        console.log(response);
+      } catch (error) {
+        this.logger.error(error);
+      }
   }
 
   @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_MINUTE)
@@ -56,6 +66,7 @@ export class LedgerService {
   async syncStatus() {
     const status = await this.pool.status;
     console.log(status);
+    await this.getValidatorInfo();
   }
 }
 
