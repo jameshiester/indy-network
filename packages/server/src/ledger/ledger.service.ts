@@ -23,7 +23,7 @@ export class LedgerService {
     const genesisFilePath = process.env.GENESIS_TXN_PATH;
     if (!genesisFilePath) {
       this.logger.error('Environment variable GENESIS_TXN_PATH is not set.');
-      throw new InternalServerErrorException('GENESIS_TXN_PATH is not configured');
+      throw new InternalServerErrorException('GENESIS_TXN_PATH is not set');
     }
     try {
       const fileContent = await readFile(genesisFilePath, { encoding: 'utf-8' });
