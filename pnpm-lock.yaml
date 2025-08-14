@@ -83,6 +83,9 @@ importers:
       '@nestjs/typeorm':
         specifier: ^10.0.0
         version: 10.0.2(@nestjs/common@10.4.20)(@nestjs/core@10.4.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.25)
+      '@openwallet-foundation/askar-nodejs':
+        specifier: ^0.3.2
+        version: 0.3.2
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -2034,6 +2037,27 @@ packages:
   /@oozcitak/util@8.3.8:
     resolution: {integrity: sha512-T8TbSnGsxo6TDBJx/Sgv/BlVJL3tshxZP7Aq5R1mSnM5OcHY2dQaxLMu2+E8u3gN0MLOzdjurqN4ZRVuzQycOQ==}
     engines: {node: '>=8.0'}
+    dev: false
+
+  /@openwallet-foundation/askar-nodejs@0.3.2:
+    resolution: {integrity: sha512-kHZaPl32azKzqT/+ksRqGXNs9lxTrhbuWVuILS1HNGXA+A5vSINRA8WwDHk2KGZ9WP7jhszbPx804cfRKrrBPA==}
+    engines: {node: '>= 18'}
+    requiresBuild: true
+    dependencies:
+      '@2060.io/ffi-napi': 4.0.9
+      '@2060.io/ref-napi': 3.0.6
+      '@openwallet-foundation/askar-shared': 0.3.2
+      ref-array-di: 1.2.2
+      ref-struct-di: 1.1.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /@openwallet-foundation/askar-shared@0.3.2:
+    resolution: {integrity: sha512-WQSHM5+5Vy1QMUpUTj0DpwFKYdciNcksWsft/iD6Ff+AdDERKo5Mjv/4JSIZIzXUEyq7kqqNbejl4a3TDGeU3A==}
+    dependencies:
+      buffer: 6.0.3
+      tar: 7.4.3
     dev: false
 
   /@parcel/watcher-android-arm64@2.5.1:
