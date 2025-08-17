@@ -8,7 +8,8 @@ services:
     ports:
       - 8080:8080
     environment:
-      - VALIDATOR_DID=7naqyUjhHdKHoEbkmQszzc
+      - VALIDATOR_DID=4bcwdrXuyNBXCCnfCG9tFz
+      - VALIDATOR_SEED=ztMRBAT7gXEC1zcE1tFScet4emeEXOaG
       - GENESIS_TXN_PATH=/app/genesis.txn
       - GENESIS_S3_BUCKET=indy-genesis-dv
       - GENESIS_S3_KEY=pool_transactions

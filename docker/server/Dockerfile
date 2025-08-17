@@ -2,7 +2,7 @@ FROM node:22-bookworm-slim
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        ca-certificates curl git cmake bash \
+        ca-certificates curl git cmake bash make gcc g++ \
         python3 python3-pip build-essential \
         libsodium23 libssl3 \
     && rm -rf /var/lib/apt/lists/*

@@ -1,9 +1,12 @@
-import { GetTransactionResponse, IndyVdrPool, GetTransactionRequest, PoolCreate, GetValidatorInfoAction, GetValidatorInfoResponse } from '@hyperledger/indy-vdr-nodejs';
+import { GetTransactionResponse, IndyVdrPool, GetTransactionRequest, PoolCreate, GetValidatorInfoAction, GetValidatorInfoResponse, indyVdr } from '@hyperledger/indy-vdr-nodejs';
 import { Injectable, Logger, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Key, KeyAlgorithm } from "@openwallet-foundation/askar-nodejs";
+import { Key, KeyAlgorithm, KeyMethod } from "@openwallet-foundation/askar-nodejs";
 import { PointerService } from '../pointer/pointer.service.js';
 import { readFile } from 'fs/promises';
+import nacl from 'tweetnacl';
+
+const tmpKey = 'password';
 
 @Injectable()
 export class LedgerService {
@@ -12,7 +15,6 @@ export class LedgerService {
 
   constructor(private readonly pointerService: PointerService) {
     this.pool = new PoolCreate({ parameters: { transactions_path: process.env.GENESIS_TXN_PATH } })
-
   }
 
   getStatus() {
@@ -46,11 +48,11 @@ export class LedgerService {
       try {
         const request = new GetTransactionRequest({ ledgerType: ledger, seqNo: latest + 1 })
         const response: GetTransactionResponse = await this.pool.submitRequest(request)
-        
-        if(response.result.seqNo === undefined){
+
+        if (response.result.seqNo === undefined) {
           this.logger.debug(`Syncing ledger ${ledger} complete. Last synced txn: ${latest}`)
           complete = true;
-        }else {
+        } else {
           await this.pointerService.setLatest(ledger, response.result.seqNo);
           latest = response.result.seqNo;
           this.logger.debug(`Txn ${response.result.seqNo} synced from ledger ${ledger}`)
@@ -64,19 +66,21 @@ export class LedgerService {
   }
 
   async getValidatorInfo() {
-    this.logger.debug(`Syncing validator info`);
+      this.logger.debug(`Syncing validator info`);
       try {
-        const request = new GetValidatorInfoAction({submitterDid: process.env.VALIDATOR_DID });
-        const seed = Uint8Array.from(Buffer.from(process.env.VALIDATOR_SEED));
-        const key = Key.fromSeed({ algorithm: KeyAlgorithm.Bls12381G1, seed });
-        const signature = key.signMessage({message: Buffer.from(request.signatureInput, 'utf8')});
-        request.setSignature({signature: signature});
-        // request.setEndorser({endorser: process.env.VALIDATOR_DID});
-        const response: GetValidatorInfoResponse = await this.pool.submitAction(request)
-        console.log(response);
+        const request = new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID });
+        const seed = Uint8Array.from(Buffer.from(process.env.VALIDATOR_SEED,'utf8'));
+        const naclSignature = nacl.sign.detached(Buffer.from(request.signatureInput, 'utf8'), seed);
+        const key = Key.fromSeed({ algorithm: KeyAlgorithm.Ed25519, seed });
+        const signature = key.signMessage({ message: Buffer.from(request.signatureInput, 'utf8') });
+        this.logger.log(naclSignature)
+        this.logger.log(signature);
+        request.setSignature({ signature: signature });
+        const response: GetValidatorInfoResponse = await this.pool.submitRequest(request)
+        this.logger.log(response)
       } catch (error) {
         this.logger.error(error);
-      }
+    }
   }
 
   @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_MINUTE)

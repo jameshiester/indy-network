@@ -5,7 +5,7 @@ export enum LedgerType {
     CONFIG = 2,
 }
 
-export enum TransactionType {
+export enum IndyTransactionType {
     NODE = '0',
     NYM = '1',
     ATTRIB = '100',
@@ -25,6 +25,28 @@ export enum TransactionType {
     POOL_RESTART = '118',
     AUTH_RULE = '120',
 }
+
+export const mapTransactionTypeToName = (type?: string): string | undefined => {
+    if (!type) return undefined;
+    const transactionType = Object.entries(IndyTransactionType).find(
+      (transactionType) => transactionType[1] === type
+    );
+    if (!transactionType) {
+      return undefined;
+    }
+    return transactionType[0];
+  };
+
+  export const mapRoleTypeToName = (type?: string): string | undefined => {
+    if (!type) return undefined;
+    const role = Object.entries(IndyRoleType).find(
+      (roleType) => roleType[1] === type
+    );
+    if (!role) {
+      return undefined;
+    }
+    return role[0];
+  };
 
 export enum IndyRoleType {
     TRUSTEE = '0',
