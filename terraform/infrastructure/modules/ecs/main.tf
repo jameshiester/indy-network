@@ -55,7 +55,7 @@ resource "aws_ecs_task_definition" "mswebapp" {
         },
         {
           name  = "DB_PORT"
-          value = "${var.db_port}"
+          value = string(var.db_port)
         },
         {
           name  = "DB_HOST"
