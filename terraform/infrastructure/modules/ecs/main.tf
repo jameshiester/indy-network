@@ -72,7 +72,7 @@ resource "aws_ecs_task_definition" "mswebapp" {
           valueFrom = var.steward_seed_arn
         },
         {
-          name      = "DB_HOST"
+          name      = "DB_PASSWORD"
           valueFrom = var.db_secret_arn
         },
       ]
