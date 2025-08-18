@@ -176,7 +176,7 @@ resource "aws_iam_role_policy" "ecstaskexec" {
           "ecr:BatchGetImage"
         ]
         Effect   = "Allow"
-        Resource = ["${aws_ecr_repository.network.arn}"]
+        Resource = ["*"]
       },
       {
         # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/instance_IAM_role.html#cwl_iam_policy
