@@ -48,12 +48,7 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v4  
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ vars.TF_VAR_REGION }}
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          role-session-name: GitHub-Actions-OIDC-TERRAFORM 
+D
       - name: Check ECS image exists
         id: ecsimage
         run: |
@@ -160,6 +155,13 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v4
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ vars.TF_VAR_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHub-Actions-OIDC-TERRAFORM 
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -168,13 +170,6 @@ jobs:
         run: |
           docker pull ${{ vars.TF_VAR_ECR_UTILS_REPO_URL }}:$IMAGE_TAG
           docker pull ${{ vars.TF_VAR_ECR_NODE_REPO_URL }}:$IMAGE_TAG
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ vars.TF_VAR_REGION }}
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          role-session-name: GitHub-Actions-OIDC-TERRAFORM 
 
       - name: Create Indy Config
         run: |
