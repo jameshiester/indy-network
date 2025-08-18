@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "mswebappkms" {
   }
   statement {
     # https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/encrypt-log-data-kms.html
-    sid    = "Allow Cloudwatch access to KMS Key"
+    sid    = "Allow cloudwatch access to KMS Key"
     effect = "Allow"
 
     principals {
@@ -126,7 +126,7 @@ resource "aws_iam_role_policy" "ecstaskexec" {
         Effect   = "Allow"
         Resource = ["*"]
       },
-            {
+      {
         Action = [
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"

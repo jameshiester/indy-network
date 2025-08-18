@@ -41,8 +41,8 @@ module "db" {
     one = {}
     two = {}
   }
-  db_cluster_parameter_group_parameters  = [
-       {
+  db_cluster_parameter_group_parameters = [
+    {
       name  = "rds.force_ssl"
       value = 0
     },
