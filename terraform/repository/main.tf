@@ -65,7 +65,7 @@ locals {
   ECRNodeRepo                 = "indy-node"
   ECRServerRepo               = "indy-server"
   ECRMonitorRepo              = "indy-monitor"
-  ECRUtilsRepo              = "indy-utils"
+  ECRUtilsRepo                = "indy-utils"
   github_actions_provider_arn = data.aws_iam_openid_connect_provider.github_actions_existing.arn != null ? data.aws_iam_openid_connect_provider.github_actions_existing.arn : aws_iam_openid_connect_provider.github_actions[0].arn
 }
 
@@ -77,7 +77,7 @@ module "tfbootstrap_dev" {
   ECRMonitorRepo    = local.ECRMonitorRepo
   ECRNodeRepo       = local.ECRNodeRepo
   ECRServerRepo     = local.ECRServerRepo
-  ECRUtilsRepo              = local.ECRUtilsRepo
+  ECRUtilsRepo      = local.ECRUtilsRepo
   EnvCode           = "dv"
   GitHubEnv         = "dev"
   GitHubOrg         = var.GitHubOrg
@@ -97,7 +97,7 @@ module "tfbootstrap_test" {
   ECRMonitorRepo    = local.ECRMonitorRepo
   ECRNodeRepo       = local.ECRNodeRepo
   ECRServerRepo     = local.ECRServerRepo
-  ECRUtilsRepo              = local.ECRUtilsRepo
+  ECRUtilsRepo      = local.ECRUtilsRepo
   EnvCode           = "ts"
   GitHubEnv         = "test"
   GitHubOrg         = var.GitHubOrg
@@ -115,7 +115,7 @@ module "tfbootstrap_prod" {
   ECRMonitorRepo    = local.ECRMonitorRepo
   ECRNodeRepo       = local.ECRNodeRepo
   ECRServerRepo     = local.ECRServerRepo
-  ECRUtilsRepo              = local.ECRUtilsRepo
+  ECRUtilsRepo      = local.ECRUtilsRepo
   EnvCode           = "pd"
   GitHubEnv         = "prod"
   GitHubOrg         = var.GitHubOrg
@@ -231,20 +231,20 @@ locals {
   environment_variables_dev = merge(
     local.environment_variables_common,
     {
-      TF_STATE_BUCKET_KEY        = "terraform/${var.GitHubRepo}/dev.tfstate"
-      TF_STATE_BUCKET_NAME       = module.tfbootstrap_dev.tfstate_bucket_name
-      TF_VAR_ECR_MONITOR_REPO    = module.tfbootstrap_dev.ecr_monitor_repo_name
-      TF_VAR_ECR_MONITOR_REPO_URL     = module.tfbootstrap_dev.ecr_monitor_repo_url
-      TF_VAR_ECR_NODE_REPO       = module.tfbootstrap_dev.ecr_node_repo_name
-      TF_VAR_ECR_NODE_REPO_URL   = module.tfbootstrap_dev.ecr_node_repo_url
-      TF_VAR_ECR_SERVER_REPO     = module.tfbootstrap_dev.ecr_server_repo_name
-      TF_VAR_ECR_SERVER_REPO_URL = module.tfbootstrap_dev.ecr_server_repo_url
-      TF_VAR_ECR_UTILS_REPO      = module.tfbootstrap_dev.ecr_utils_repo_name
-      TF_VAR_ECR_UTILS_REPO_URL  = module.tfbootstrap_dev.ecr_utils_repo_url
-      TF_VAR_ECSCLUSTER          = "indy-cluster-dev"
-      TF_VAR_ECSSERVICE          = "indy-dev"
-      TF_VAR_ENVCODE             = "dv"
-      TF_VAR_ENVTAG              = "Development"
+      TF_STATE_BUCKET_KEY         = "terraform/${var.GitHubRepo}/dev.tfstate"
+      TF_STATE_BUCKET_NAME        = module.tfbootstrap_dev.tfstate_bucket_name
+      TF_VAR_ECR_MONITOR_REPO     = module.tfbootstrap_dev.ecr_monitor_repo_name
+      TF_VAR_ECR_MONITOR_REPO_URL = module.tfbootstrap_dev.ecr_monitor_repo_url
+      TF_VAR_ECR_NODE_REPO        = module.tfbootstrap_dev.ecr_node_repo_name
+      TF_VAR_ECR_NODE_REPO_URL    = module.tfbootstrap_dev.ecr_node_repo_url
+      TF_VAR_ECR_SERVER_REPO      = module.tfbootstrap_dev.ecr_server_repo_name
+      TF_VAR_ECR_SERVER_REPO_URL  = module.tfbootstrap_dev.ecr_server_repo_url
+      TF_VAR_ECR_UTILS_REPO       = module.tfbootstrap_dev.ecr_utils_repo_name
+      TF_VAR_ECR_UTILS_REPO_URL   = module.tfbootstrap_dev.ecr_utils_repo_url
+      TF_VAR_ECSCLUSTER           = "indy-cluster-dev"
+      TF_VAR_ECSSERVICE           = "indy-dev"
+      TF_VAR_ENVCODE              = "dv"
+      TF_VAR_ENVTAG               = "Development"
     }
   )
   # Declare test specific GitHub Environments variables

@@ -33,27 +33,27 @@ resource "random_password" "trustee_seed_4" {
 
 # Create 4 trustee DID instances
 module "trustee_did_1" {
-  source = "./modules/did_generator"
-  seed   = random_password.trustee_seed_1.result
+  source             = "./modules/did_generator"
+  seed               = random_password.trustee_seed_1.result
   ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
 }
 
 
 module "trustee_did_2" {
-  source = "./modules/did_generator"
-  seed   = random_password.trustee_seed_2.result
+  source             = "./modules/did_generator"
+  seed               = random_password.trustee_seed_2.result
   ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
 }
 
 module "trustee_did_3" {
-  source = "./modules/did_generator"
-  seed   = random_password.trustee_seed_3.result
+  source             = "./modules/did_generator"
+  seed               = random_password.trustee_seed_3.result
   ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
 }
 
 module "trustee_did_4" {
-  source = "./modules/did_generator"
-  seed   = random_password.trustee_seed_4.result
+  source             = "./modules/did_generator"
+  seed               = random_password.trustee_seed_4.result
   ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
 }
 
@@ -586,62 +586,62 @@ resource "aws_secretsmanager_secret_version" "trustee_seed_4" {
 
 # Node Genesis Module Instances
 module "node_genesis_1" {
-  source       = "./modules/node_genesis"
-  node_name    = "node1"
-  steward_name = var.NETWORK_NAME
-  node_port    = "9701"
-  client_port  = "9702"
+  source             = "./modules/node_genesis"
+  node_name          = "node1"
+  steward_name       = var.NETWORK_NAME
+  node_port          = "9701"
+  client_port        = "9702"
   ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
-  steward_seed = random_password.steward_seed_1.result
-  node_seed    = random_password.node_seed_1.result
-  public_ip    = aws_eip.one.public_ip
-  private_ip   = aws_eip.one.private_ip
-  network_name = var.NETWORK_NAME
+  steward_seed       = random_password.steward_seed_1.result
+  node_seed          = random_password.node_seed_1.result
+  public_ip          = aws_eip.one.public_ip
+  private_ip         = aws_eip.one.private_ip
+  network_name       = var.NETWORK_NAME
 
 }
 
 module "node_genesis_2" {
-  source       = "./modules/node_genesis"
-  node_name    = "node2"
-  steward_name = var.NETWORK_NAME
-  node_port    = "9703"
-  client_port  = "9704"
+  source             = "./modules/node_genesis"
+  node_name          = "node2"
+  steward_name       = var.NETWORK_NAME
+  node_port          = "9703"
+  client_port        = "9704"
   ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
-  steward_seed = random_password.steward_seed_2.result
-  node_seed    = random_password.node_seed_2.result
-  public_ip    = aws_eip.one.public_ip
-  private_ip   = aws_eip.one.private_ip
-  network_name = var.NETWORK_NAME
-  depends_on   = [module.node_genesis_1]
+  steward_seed       = random_password.steward_seed_2.result
+  node_seed          = random_password.node_seed_2.result
+  public_ip          = aws_eip.one.public_ip
+  private_ip         = aws_eip.one.private_ip
+  network_name       = var.NETWORK_NAME
+  depends_on         = [module.node_genesis_1]
 }
 
 module "node_genesis_3" {
-  source       = "./modules/node_genesis"
-  node_name    = "node3"
-  node_port    = "9701"
-  client_port  = "9702"
+  source             = "./modules/node_genesis"
+  node_name          = "node3"
+  node_port          = "9701"
+  client_port        = "9702"
   ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
-  steward_name = var.NETWORK_NAME
-  steward_seed = random_password.steward_seed_3.result
-  node_seed    = random_password.node_seed_3.result
-  public_ip    = aws_eip.two.public_ip
-  private_ip   = aws_eip.two.private_ip
-  network_name = var.NETWORK_NAME
-  depends_on   = [module.node_genesis_2]
+  steward_name       = var.NETWORK_NAME
+  steward_seed       = random_password.steward_seed_3.result
+  node_seed          = random_password.node_seed_3.result
+  public_ip          = aws_eip.two.public_ip
+  private_ip         = aws_eip.two.private_ip
+  network_name       = var.NETWORK_NAME
+  depends_on         = [module.node_genesis_2]
 }
 
 module "node_genesis_4" {
-  source       = "./modules/node_genesis"
-  node_name    = "node4"
-  node_port    = "9703"
-  client_port  = "9704"
+  source             = "./modules/node_genesis"
+  node_name          = "node4"
+  node_port          = "9703"
+  client_port        = "9704"
   ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
-  steward_name = var.NETWORK_NAME
-  steward_seed = random_password.steward_seed_4.result
-  node_seed    = random_password.node_seed_4.result
-  public_ip    = aws_eip.two.public_ip
-  private_ip   = aws_eip.two.private_ip
-  network_name = var.NETWORK_NAME
-  depends_on   = [module.node_genesis_3]
+  steward_name       = var.NETWORK_NAME
+  steward_seed       = random_password.steward_seed_4.result
+  node_seed          = random_password.node_seed_4.result
+  public_ip          = aws_eip.two.public_ip
+  private_ip         = aws_eip.two.private_ip
+  network_name       = var.NETWORK_NAME
+  depends_on         = [module.node_genesis_3]
 }
 

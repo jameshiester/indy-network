@@ -22,7 +22,6 @@ module "db" {
     }
   }
   manage_master_user_password          = true
-  manage_master_user_password_rotation = true
 
   monitoring_interval = 60
 
