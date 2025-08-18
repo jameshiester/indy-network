@@ -62,49 +62,6 @@ resource "aws_kms_key" "network" {
   }
 }
 
-
-resource "aws_ecr_repository" "server" {
-  name                 = var.server_ecr_repo
-  image_tag_mutability = "MUTABLE"
-  force_delete         = true
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  encryption_configuration {
-    encryption_type = "KMS"
-    kms_key         = aws_kms_key.network.arn
-  }
-
-  tags = local.tags
-}
-
-# Create ECR lifecycle policy to delete untagged images after 1 day
-resource "aws_ecr_lifecycle_policy" "server" {
-  repository = aws_ecr_repository.server.name
-
-  policy = <<EOF
-{
-  "rules": [
-    {
-      "rulePriority": 1,
-      "description": "Delete untagged images after one day",
-      "selection": {
-        "tagStatus": "untagged",
-        "countType": "sinceImagePushed",
-        "countUnit": "days",
-        "countNumber": 1
-      },
-      "action": {
-        "type": "expire"
-      }
-    }
-  ]
-}
-EOF
-}
-
 # Create Amazon ECS cluster 
 resource "aws_ecs_cluster" "network" {
   name = var.ecs_cluster

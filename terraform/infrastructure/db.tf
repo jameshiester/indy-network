@@ -21,7 +21,7 @@ module "db" {
       cidr_blocks = module.vpc.public_subnets_cidr_blocks
     }
   }
-  manage_master_user_password          = true
+  manage_master_user_password = true
 
   monitoring_interval = 60
 
