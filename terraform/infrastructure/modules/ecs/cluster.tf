@@ -185,13 +185,6 @@ resource "aws_iam_role_policy" "ecstask" {
         Resource = [var.steward_seed_arn, var.db_secret_arn]
       },
       {
-        Action = [
-          "s3:GetObject"
-        ]
-        Effect   = "Allow"
-        Resource = ["s3://${var.genesis_bucket_name}/*"]
-      },
-      {
         # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/instance_IAM_role.html#cwl_iam_policy
         Action = [
           "logs:CreateLogGroup",
