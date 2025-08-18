@@ -218,12 +218,12 @@ locals {
     # Deployment Availability Zone 1 e.g. eu-west-1a
     TF_VAR_AZ01 = "us-east-1a"
     # Deployment Availability Zone 2 e.g. eu-west-1b
-    TF_VAR_AZ02       = "us-east-1b"
-    TF_VAR_PREFIX     = var.Prefix
-    TF_VAR_SERVER_CONTAINER_NAME     = "server"
-    TF_VAR_MONITOR_CONTAINER_NAME     = "monitor"
-    TF_VAR_SOLTAG     = "INDY-NETWORK"
-    TF_VAR_GITHUBREPO = format("%s%s%s", var.GitHubOrg, "/", var.GitHubRepo)
+    TF_VAR_AZ02                   = "us-east-1b"
+    TF_VAR_PREFIX                 = var.Prefix
+    TF_VAR_SERVER_CONTAINER_NAME  = "server"
+    TF_VAR_MONITOR_CONTAINER_NAME = "monitor"
+    TF_VAR_SOLTAG                 = "INDY-NETWORK"
+    TF_VAR_GITHUBREPO             = format("%s%s%s", var.GitHubOrg, "/", var.GitHubRepo)
     # The first two octets of the CIDR IP address range e.g. 10.0
     TF_VAR_VPCCIDR      = "10.0.0.0/16"
     TF_VAR_IMAGETAG     = "1.0.0"
