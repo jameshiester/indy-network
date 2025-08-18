@@ -126,6 +126,14 @@ resource "aws_iam_role_policy" "ecstaskexec" {
         Effect   = "Allow"
         Resource = ["*"]
       },
+            {
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Effect   = "Allow"
+        Resource = [var.steward_seed_arn, var.db_secret_arn]
+      },
       {
         Action = [
           "ecr:BatchCheckLayerAvailability",
