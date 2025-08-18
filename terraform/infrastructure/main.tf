@@ -10,7 +10,7 @@ locals {
     Environment = var.EnvTag
     Solution    = var.SOLTAG
   }
-  master_username = format("%s-%s-%s", var.Prefix, "indy", var.EnvCode)
+  master_username = format("%s%s%s", var.Prefix, "indy", var.EnvCode)
 }
 
 module "vpc" {
