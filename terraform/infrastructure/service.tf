@@ -19,9 +19,10 @@ module "ecs" {
   private_subnets         = module.vpc.private_subnets
   public_subnets          = module.vpc.public_subnets
   server_ecr_repo         = var.ECR_SERVER_REPO
-  SolTag                  = var.SolTag
+  SOLTAG                  = var.SOLTAG
   steward_did             = module.node_genesis_1.steward_did
   steward_seed_arn        = aws_secretsmanager_secret.node_seed_1.arn
   vpc_cidr                = local.vpc_cidr
   vpc_id                  = module.vpc.vpc_id
 }
+

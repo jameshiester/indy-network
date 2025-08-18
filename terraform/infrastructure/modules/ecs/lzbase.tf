@@ -14,7 +14,7 @@ resource "aws_resourcegroups_group" "Terraform" {
   "TagFilters": [
     {
       "Key": "Solution",
-      "Values": ["${var.SolTag}"]
+      "Values": ["${var.SOLTAG}"]
     }
   ]
 }

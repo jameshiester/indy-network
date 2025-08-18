@@ -40,7 +40,7 @@ jobs:
       TF_VAR_NETWORK_NAME: ${{ vars.TF_VAR_NETWORK_NAME }}
       TF_VAR_Prefix: ${{ vars.TF_VAR_PREFIX }}
       TF_VAR_Region: ${{ vars.TF_VAR_REGION }}
-      TF_VAR_SolTag: ${{ vars.TF_VAR_SOLTAG }}
+      TF_VAR_SOLTAG: ${{ vars.TF_VAR_SOLTAG }}
       TF_VAR_VPCCIDR: ${{ vars.TF_VAR_VPCCIDR }}
 
     steps:
@@ -104,7 +104,7 @@ jobs:
       TF_VAR_AZ01: ${{ vars.TF_VAR_AZ01 }}
       TF_VAR_AZ02: ${{ vars.TF_VAR_AZ02 }}
       TF_VAR_Prefix: ${{ vars.TF_VAR_PREFIX }}
-      TF_VAR_SolTag: ${{ vars.TF_VAR_SOLTAG }}
+      TF_VAR_SOLTAG: ${{ vars.TF_VAR_SOLTAG }}
       TF_VAR_GitHubRepo: ${{ vars.TF_VAR_GITHUBREPO }}
       TF_VAR_EnvCode: ${{ vars.TF_VAR_ENVCODE }}
       TF_VAR_EnvTag: ${{ vars.TF_VAR_ENVTAG }}

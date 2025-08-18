@@ -4,7 +4,7 @@ variable "Prefix" {
   type        = string
 }
 
-variable "SolTag" {
+variable "SOLTAG" {
   description = "Solution tag value. All resources are created with a 'Solution' tag name and the value you set here"
   type        = string
 }

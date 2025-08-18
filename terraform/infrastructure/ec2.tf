@@ -81,7 +81,7 @@ module "ec2_node1" {
   source                 = "./modules/ec2"
   Prefix                 = var.Prefix
   ClientSecurityGroupID  = aws_security_group.ec2_security_group.id
-  SolTag                 = var.SolTag
+  SOLTAG                 = var.SOLTAG
   EnvCode                = var.EnvCode
   env_tag                = var.EnvTag
   LogGroupName           = aws_cloudwatch_log_group.indy_node_log_group.name
@@ -110,11 +110,12 @@ module "ec2_node1" {
   InstanceProfileName    = aws_iam_instance_profile.instance_profile.name
 }
 
+
 module "ec2_node2" {
   source                 = "./modules/ec2"
   ClientSecurityGroupID  = aws_security_group.ec2_security_group.id
   Prefix                 = var.Prefix
-  SolTag                 = var.SolTag
+  SOLTAG                 = var.SOLTAG
   EnvCode                = var.EnvCode
   env_tag                = var.EnvTag
   LogGroupName           = aws_cloudwatch_log_group.indy_node_log_group.name

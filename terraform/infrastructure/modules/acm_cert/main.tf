@@ -2,7 +2,7 @@ locals {
   tags = {
     Environment = var.EnvTag
     EnvCode     = var.EnvCode
-    Solution    = var.SolTag
+    Solution    = var.SOLTAG
   }
 }
 

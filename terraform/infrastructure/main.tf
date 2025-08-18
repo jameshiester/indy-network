@@ -8,7 +8,7 @@ locals {
   tags = {
     EnvCode     = var.EnvCode
     Environment = var.EnvTag
-    Solution    = var.SolTag
+    Solution    = var.SOLTAG
   }
   master_username = format("%s-%s-%s", var.Prefix, "indy", var.EnvCode)
 }

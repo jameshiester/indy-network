@@ -2,7 +2,7 @@ locals {
   tags = {
     Environment = var.env_tag
     EnvCode     = var.EnvCode
-    Solution    = var.SolTag
+    Solution    = var.SOLTAG
   }
 }
 
@@ -39,7 +39,7 @@ data "template_file" "user_data" {
     compose_key             = var.ComposeKey
     genesis_pool_file_key   = var.GenesisPoolFileKey
     genesis_domain_file_key = var.GenesisDomainFileKey
-    ecr_node_repo           = var.ECR_NODE_REPO_URL
+    ecr_node_repo           = var.ECR_NODE_REPO
     account_id              = data.aws_caller_identity.current.account_id
   }
 }
