@@ -23,25 +23,25 @@ jobs:
     environment: 
       name: dev
     env:
-      TF_VAR_Region: ${{ vars.TF_VAR_REGION }}
+      IMAGE_TAG: ${{github.sha}}
       TF_VAR_AZ01: ${{ vars.TF_VAR_AZ01 }}
       TF_VAR_AZ02: ${{ vars.TF_VAR_AZ02 }}
-      TF_VAR_Prefix: ${{ vars.TF_VAR_PREFIX }}
-      TF_VAR_SolTag: ${{ vars.TF_VAR_SOLTAG }}
-      TF_VAR_GitHubRepo: ${{ vars.TF_VAR_GITHUBREPO }}
-      TF_VAR_EnvCode: ${{ vars.TF_VAR_ENVCODE }}
-      TF_VAR_EnvTag: ${{ vars.TF_VAR_ENVTAG }}
-      TF_VAR_VPCCIDR: ${{ vars.TF_VAR_VPCCIDR }}
-      TF_VAR_NETWORK_NAME: ${{ vars.TF_VAR_NETWORK_NAME }}
-      TF_VAR_ECR_SERVER_REPO: ${{ vars.TF_VAR_ECR_SERVER_REPO }}
-      TF_VAR_ECR_NODE_REPO: ${{ vars.TF_VAR_ECR_NODE_REPO }} 
+      TF_VAR_ECR_MONITOR_REPO_URL: ${{ vars.TF_VAR_ECR_MONITOR_REPO_URL }} 
       TF_VAR_ECR_MONITOR_REPO: ${{ vars.TF_VAR_ECR_MONITOR_REPO }} 
+      TF_VAR_ECR_NODE_REPO_URL: ${{ vars.TF_VAR_ECR_NODE_REPO_URL }} 
+      TF_VAR_ECR_NODE_REPO: ${{ vars.TF_VAR_ECR_NODE_REPO }} 
+      TF_VAR_ECR_SERVER_REPO_URL: ${{ vars.TF_VAR_ECR_SERVER_REPO_URL }}
+      TF_VAR_ECR_SERVER_REPO: ${{ vars.TF_VAR_ECR_SERVER_REPO }}
       TF_VAR_ECSCluster: ${{ vars.TF_VAR_ECSCLUSTER }} 
       TF_VAR_ECSService: ${{ vars.TF_VAR_ECSSERVICE }} 
-      TF_VAR_ECR_SERVER_REPO_URL: ${{ vars.TF_VAR_ECR_SERVER_REPO_URL }}
-      TF_VAR_ECR_NODE_REPO_URL: ${{ vars.TF_VAR_ECR_NODE_REPO_URL }} 
-      TF_VAR_ECR_MONITOR_REPO_URL: ${{ vars.TF_VAR_ECR_MONITOR_REPO_URL }} 
-      IMAGE_TAG: ${{github.sha}}
+      TF_VAR_EnvCode: ${{ vars.TF_VAR_ENVCODE }}
+      TF_VAR_EnvTag: ${{ vars.TF_VAR_ENVTAG }}
+      TF_VAR_GitHubRepo: ${{ vars.TF_VAR_GITHUBREPO }}
+      TF_VAR_NETWORK_NAME: ${{ vars.TF_VAR_NETWORK_NAME }}
+      TF_VAR_Prefix: ${{ vars.TF_VAR_PREFIX }}
+      TF_VAR_Region: ${{ vars.TF_VAR_REGION }}
+      TF_VAR_SolTag: ${{ vars.TF_VAR_SOLTAG }}
+      TF_VAR_VPCCIDR: ${{ vars.TF_VAR_VPCCIDR }}
 
     steps:
       - name: Git checkout

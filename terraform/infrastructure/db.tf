@@ -4,7 +4,7 @@ data "aws_rds_engine_version" "postgresql" {
 }
 
 module "db" {
-  source = "terraform-aws-modules/rds-aurora/aws"
+  source  = "terraform-aws-modules/rds-aurora/aws"
   version = "9.15.0"
 
   name              = format("%s-%s-%s", var.Prefix, "indy", var.EnvCode)
@@ -21,7 +21,7 @@ module "db" {
       cidr_blocks = module.vpc.public_subnets_cidr_blocks
     }
   }
-  manage_master_user_password = true
+  manage_master_user_password          = true
   manage_master_user_password_rotation = true
 
   monitoring_interval = 60

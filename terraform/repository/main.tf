@@ -64,7 +64,7 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
 locals {
   ECRNodeRepo                 = "indy-node"
   ECRServerRepo               = "indy-server"
-  ECRMonitorRepo               = "indy-monitor"
+  ECRMonitorRepo              = "indy-monitor"
   github_actions_provider_arn = data.aws_iam_openid_connect_provider.github_actions_existing.arn != null ? data.aws_iam_openid_connect_provider.github_actions_existing.arn : aws_iam_openid_connect_provider.github_actions[0].arn
 }
 
@@ -226,17 +226,18 @@ locals {
   environment_variables_dev = merge(
     local.environment_variables_common,
     {
-      TF_VAR_ENVCODE         = "dv"
-      TF_VAR_ENVTAG          = "Development"
-      TF_STATE_BUCKET_NAME   = module.tfbootstrap_dev.tfstate_bucket_name
-      TF_VAR_ECR_NODE_REPO   = module.tfbootstrap_dev.ecr_node_repo_name
-      TF_VAR_ECR_SERVER_REPO = module.tfbootstrap_dev.ecr_server_repo_name
-      TF_VAR_ECR_SERVER_URL = module.tfbootstrap_dev.ecr_server_repo_url
-      TF_VAR_ECR_MONITOR_REPO = module.tfbootstrap_dev.ecr_monitor_repo_name
-      TF_VAR_ECR_MONITOR_URL = module.tfbootstrap_dev.ecr_monitor_repo_url
-      TF_STATE_BUCKET_KEY    = "terraform/${var.GitHubRepo}/dev.tfstate"
-      TF_VAR_ECSCLUSTER     = "indy-cluster-dev"
-      TF_VAR_ECSSERVICE     = "indy-dev"
+      TF_STATE_BUCKET_KEY        = "terraform/${var.GitHubRepo}/dev.tfstate"
+      TF_STATE_BUCKET_NAME       = module.tfbootstrap_dev.tfstate_bucket_name
+      TF_VAR_ECR_MONITOR_REPO    = module.tfbootstrap_dev.ecr_monitor_repo_name
+      TF_VAR_ECR_MONITOR_REPO_URL     = module.tfbootstrap_dev.ecr_monitor_repo_url
+      TF_VAR_ECR_NODE_REPO       = module.tfbootstrap_dev.ecr_node_repo_name
+      TF_VAR_ECR_NODE_REPO_URL   = module.tfbootstrap_dev.ecr_node_repo_url
+      TF_VAR_ECR_SERVER_REPO     = module.tfbootstrap_dev.ecr_server_repo_name
+      TF_VAR_ECR_SERVER_REPO_URL = module.tfbootstrap_dev.ecr_server_repo_url
+      TF_VAR_ECSCLUSTER          = "indy-cluster-dev"
+      TF_VAR_ECSSERVICE          = "indy-dev"
+      TF_VAR_ENVCODE             = "dv"
+      TF_VAR_ENVTAG              = "Development"
     }
   )
   # Declare test specific GitHub Environments variables

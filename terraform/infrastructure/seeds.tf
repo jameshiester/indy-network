@@ -156,7 +156,7 @@ resource "aws_s3_object" "docker_compose_yml" {
 
 # S3 Bucket for storing genesis files
 resource "aws_s3_bucket" "genesis_bucket" {
-  bucket = format("%s-%s-%s", var.Prefix, "genesis", var.EnvCode)
+  bucket        = format("%s-%s-%s", var.Prefix, "genesis", var.EnvCode)
   force_destroy = true
 
   tags = local.tags
@@ -304,7 +304,7 @@ resource "aws_s3_bucket_policy" "genesis_bucket" {
 
 # S3 Bucket for storing compose files (private)
 resource "aws_s3_bucket" "compose_bucket" {
-  bucket = format("%s-%s-%s", var.Prefix, "compose", var.EnvCode)
+  bucket        = format("%s-%s-%s", var.Prefix, "compose", var.EnvCode)
   force_destroy = true
 
   tags = local.tags

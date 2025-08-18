@@ -88,47 +88,47 @@ variable "network_name" {
   description = "Network name (default: sandbox)"
   type        = string
   default     = "sandbox"
-} 
+}
 
 variable "genesis_bucket_name" {
   description = "Name of the S3 bucket containing genesis files"
   type        = string
-} 
+}
 
 variable "domain_transactions_key" {
   description = "Key of the domain transactions file in the S3 bucket"
   type        = string
-} 
+}
 
 variable "pool_transactions_key" {
   description = "Key of the pool transactions file in the S3 bucket"
   type        = string
-} 
+}
 
 variable "db_master_username" {
   description = "Master username for the database"
   type        = string
-} 
+}
 
 variable "db_secret_arn" {
   description = "ARN of the secret for the database"
   type        = string
-} 
+}
 
 variable "db_host" {
   description = "host for the database"
   type        = string
-} 
+}
 
 variable "db_port" {
   description = "host for the database"
   type        = number
-} 
+}
 
 variable "log_group_name" {
   description = "Name of the CloudWatch log group"
   type        = string
-} 
+}
 
 variable "GenesisUrl" {
   description = "Url for the genesis file"
