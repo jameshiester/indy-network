@@ -4,7 +4,7 @@ module "ecs" {
   db_host                 = module.db.cluster_endpoint
   db_master_username      = local.master_username
   db_port                 = module.db.cluster_port
-  db_secret_arn           = module.db.cluster_master_user_secret[0].arn
+  db_secret_arn           = module.db.cluster_master_user_secret.arn
   domain_transactions_key = aws_s3_object.domain_transactions.key
   ecs_cluster             = var.ECSCluster
   ecs_service             = var.ECSService
