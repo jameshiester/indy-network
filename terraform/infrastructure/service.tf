@@ -3,7 +3,7 @@ module "ecs" {
   azs                = local.azs
   db_host            = module.db.db_host
   db_master_username = local.master_username
-  db_port            = module.db.db_port
+  db_port            = module.db.cluster_port
   db_secret_arn      = module.db.cluster_master_user_secret.arn
   domain_transactions_key = aws_s3_object.domain_transactions.key
   ecs_cluster        = var.ECSCluster
