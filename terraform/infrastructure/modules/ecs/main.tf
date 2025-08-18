@@ -99,7 +99,7 @@ resource "aws_ecs_task_definition" "mswebapp" {
 # Create Amazon ECS task service
 resource "aws_ecs_service" "mswebapp" {
   name            = var.ecs_service
-  cluster         = aws_ecs_cluster.mswebapp.id
+  cluster         = aws_ecs_cluster.network.id
   task_definition = aws_ecs_task_definition.mswebapp.arn
   launch_type     = "FARGATE"
   desired_count   = 2
