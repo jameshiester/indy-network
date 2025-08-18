@@ -217,6 +217,92 @@ jobs:
         id: base
         run: terraform apply -auto-approve -input=false
 
+  ecr-server:
+    runs-on: ubuntu-latest
+    needs: terraform
+    environment: 
+      name: dev
+    env:
+      REPOSITORY: ${{ vars.TF_VAR_ECR_SERVER_REPO_URL }}
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4  
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ vars.TF_VAR_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHub-Actions-OIDC-TERRAFORM 
+
+      - name: Check ECS image exists
+        id: ecsimage
+        env:
+          REPOSITORY: ${{ vars.TF_VAR_ECR_SERVER_REPO_URL }}
+        run: |
+          if aws ecr describe-images --repository-name $REPOSITORY --image-ids imageTag=$IMAGE_TAG >/dev/null 2>&1
+          then
+            echo "image_exists=true" >> "$GITHUB_ENV"
+          else
+            echo "image_exists=false" >> "$GITHUB_ENV"
+          fi
+
+      - name: Check for changes in go api
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          working-directory: ./
+          base: ${{ github.ref }}
+          filters: |
+            docker:
+              - './**'
+
+      - name: Login to Amazon ECR
+        if: steps.filter.outputs.docker == 'true' || env.image_exists == 'false'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push docker image to Amazon ECR
+        id: build-image
+        if: steps.filter.outputs.docker == 'true' || env.image_exists == 'false'
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ vars.TF_VAR_ECR_SERVER_REPO_URL }}
+        run: |
+          docker build -t $REPOSITORY:$IMAGE_TAG -f ./Dockerfile .
+          docker push $REPOSITORY:$IMAGE_TAG
+          docker tag $REPOSITORY:$IMAGE_TAG $REPOSITORY:latest
+          docker push $REPOSITORY:latest
+          echo "image=$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+
+      - name: Download task definition
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          TASK_DEFINITION: ${{ vars.TF_VAR_ECR_SERVER_REPO }}
+        if: steps.filter.outputs.go == 'true' || env.image_exists == 'false'
+        run: |
+          aws ecs describe-task-definition --task-definition $TASK_DEFINITION --query taskDefinition > task-definition.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        if: steps.filter.outputs.go == 'true' || env.image_exists == 'false'
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: server
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        if: steps.filter.outputs.go == 'true' || env.image_exists == 'false'
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ vars.TF_VAR_ECSSERVICE  }}
+          cluster: ${{ vars.TF_VAR_ECSCLUSTER  }}
+          wait-for-service-stability: true
+          wait-for-minutes: 7
+
   # deploy-image:
   #   needs: terraform
   #   runs-on: ubuntu-latest

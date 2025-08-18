@@ -19,7 +19,7 @@ resource "aws_ecs_task_definition" "mswebapp" {
   task_role_arn            = aws_iam_role.ecstask.arn
   container_definitions = jsonencode([
     {
-      name                   = "node1"
+      name                   = "server"
       image                  = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.Region}.amazonaws.com/${var.server_ecr_repo}:latest"
       cpu                    = 256
       memory                 = 512
