@@ -234,6 +234,7 @@ locals {
       TF_VAR_ECR_MONITOR_REPO = module.tfbootstrap_dev.ecr_monitor_repo_name
       TF_STATE_BUCKET_KEY    = "terraform/${var.GitHubRepo}/dev.tfstate"
       TF_VAR_ECSCLUSTER     = "indy-cluster-dev"
+      TF_VAR_ECSSERVICE     = "indy-dev"
     }
   )
   # Declare test specific GitHub Environments variables
