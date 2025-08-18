@@ -9,10 +9,31 @@ permissions:
       id-token: write
       contents: read
 env:
-   TF_LOG: INFO
-   AWS_REGION: ${{ vars.TF_VAR_REGION }}
-   AWS_BUCKET_NAME: ${{ secrets.TF_STATE_BUCKET_NAME }}
-   AWS_BUCKET_KEY_NAME: ${{ secrets.TF_STATE_BUCKET_KEY }}
+  TF_LOG: INFO
+  AWS_REGION: ${{ vars.TF_VAR_REGION }}
+  AWS_BUCKET_NAME: ${{ secrets.TF_STATE_BUCKET_NAME }}
+  AWS_BUCKET_KEY_NAME: ${{ secrets.TF_STATE_BUCKET_KEY }}
+  IMAGE_TAG: ${{github.sha}}
+  TF_VAR_AZ01: ${{ vars.TF_VAR_AZ01 }}
+  TF_VAR_AZ02: ${{ vars.TF_VAR_AZ02 }}
+  TF_VAR_ECR_MONITOR_REPO_URL: ${{ vars.TF_VAR_ECR_MONITOR_REPO_URL }} 
+  TF_VAR_ECR_MONITOR_REPO: ${{ vars.TF_VAR_ECR_MONITOR_REPO }} 
+  TF_VAR_ECR_NODE_REPO_URL: ${{ vars.TF_VAR_ECR_NODE_REPO_URL }} 
+  TF_VAR_ECR_NODE_REPO: ${{ vars.TF_VAR_ECR_NODE_REPO }} 
+  TF_VAR_ECR_UTILS_REPO_URL: ${{ vars.TF_VAR_ECR_UTILS_REPO_URL }}
+  TF_VAR_ECR_UTILS_REPO: ${{ vars.TF_VAR_ECR_UTILS_REPO }}
+  TF_VAR_ECR_SERVER_REPO_URL: ${{ vars.TF_VAR_ECR_SERVER_REPO_URL }}
+  TF_VAR_ECR_SERVER_REPO: ${{ vars.TF_VAR_ECR_SERVER_REPO }}
+  TF_VAR_ECSCluster: ${{ vars.TF_VAR_ECSCLUSTER }} 
+  TF_VAR_ECSService: ${{ vars.TF_VAR_ECSSERVICE }} 
+  TF_VAR_EnvCode: ${{ vars.TF_VAR_ENVCODE }}
+  TF_VAR_EnvTag: ${{ vars.TF_VAR_ENVTAG }}
+  TF_VAR_GitHubRepo: ${{ vars.TF_VAR_GITHUBREPO }}
+  TF_VAR_NETWORK_NAME: ${{ vars.TF_VAR_NETWORK_NAME }}
+  TF_VAR_Prefix: ${{ vars.TF_VAR_PREFIX }}
+  TF_VAR_Region: ${{ vars.TF_VAR_REGION }}
+  TF_VAR_SOLTAG: ${{ vars.TF_VAR_SOLTAG }}
+  TF_VAR_VPCCIDR: ${{ vars.TF_VAR_VPCCIDR }}
 
 jobs: 
   docker-node:
@@ -22,26 +43,6 @@ jobs:
         working-directory: ./docker/node
     environment: 
       name: dev
-    env:
-      IMAGE_TAG: ${{github.sha}}
-      TF_VAR_AZ01: ${{ vars.TF_VAR_AZ01 }}
-      TF_VAR_AZ02: ${{ vars.TF_VAR_AZ02 }}
-      TF_VAR_ECR_MONITOR_REPO_URL: ${{ vars.TF_VAR_ECR_MONITOR_REPO_URL }} 
-      TF_VAR_ECR_MONITOR_REPO: ${{ vars.TF_VAR_ECR_MONITOR_REPO }} 
-      TF_VAR_ECR_NODE_REPO_URL: ${{ vars.TF_VAR_ECR_NODE_REPO_URL }} 
-      TF_VAR_ECR_NODE_REPO: ${{ vars.TF_VAR_ECR_NODE_REPO }} 
-      TF_VAR_ECR_SERVER_REPO_URL: ${{ vars.TF_VAR_ECR_SERVER_REPO_URL }}
-      TF_VAR_ECR_SERVER_REPO: ${{ vars.TF_VAR_ECR_SERVER_REPO }}
-      TF_VAR_ECSCluster: ${{ vars.TF_VAR_ECSCLUSTER }} 
-      TF_VAR_ECSService: ${{ vars.TF_VAR_ECSSERVICE }} 
-      TF_VAR_EnvCode: ${{ vars.TF_VAR_ENVCODE }}
-      TF_VAR_EnvTag: ${{ vars.TF_VAR_ENVTAG }}
-      TF_VAR_GitHubRepo: ${{ vars.TF_VAR_GITHUBREPO }}
-      TF_VAR_NETWORK_NAME: ${{ vars.TF_VAR_NETWORK_NAME }}
-      TF_VAR_Prefix: ${{ vars.TF_VAR_PREFIX }}
-      TF_VAR_Region: ${{ vars.TF_VAR_REGION }}
-      TF_VAR_SOLTAG: ${{ vars.TF_VAR_SOLTAG }}
-      TF_VAR_VPCCIDR: ${{ vars.TF_VAR_VPCCIDR }}
 
     steps:
       - name: Git checkout
@@ -85,7 +86,63 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ vars.TF_VAR_ECR_NODE_REPO_URL }}
         run: |
-          docker build -t $REPOSITORY:$IMAGE_TAG -f ./Dockerfile.ubuntu22 .
+          docker build -t $REPOSITORY:$IMAGE_TAG -f ./Dockerfile .
+          docker push $REPOSITORY:$IMAGE_TAG
+          docker tag $REPOSITORY:$IMAGE_TAG $REPOSITORY:latest
+          docker push $REPOSITORY:latest
+          echo "image=$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+    
+  docker-utils:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./docker/genesis
+    environment: 
+      name: dev
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4  
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ vars.TF_VAR_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GitHub-Actions-OIDC-TERRAFORM 
+      - name: Check ECS image exists
+        id: ecsimage
+        run: |
+          if aws ecr describe-images --repository-name ${{ vars.TF_VAR_ECR_UTILS_REPO_URL }} --image-ids imageTag=$IMAGE_TAG >/dev/null 2>&1
+          then
+            echo "image_exists=true" >> "$GITHUB_ENV"
+          else
+            echo "image_exists=false" >> "$GITHUB_ENV"
+          fi
+
+      - name: Check for changes in go api
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          working-directory: ./docker/genesis
+          base: ${{ github.ref }}
+          filters: |
+            docker:
+              - './**'
+
+      - name: Login to Amazon ECR
+        if: steps.filter.outputs.docker == 'true' || env.image_exists == 'false'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push docker image to Amazon ECR
+        id: build-image
+        if: steps.filter.outputs.docker == 'true' || env.image_exists == 'false'
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ vars.TF_VAR_ECR_UTILS_REPO_URL }}
+        run: |
+          docker build -t $REPOSITORY:$IMAGE_TAG -f ./Dockerfile .
           docker push $REPOSITORY:$IMAGE_TAG
           docker tag $REPOSITORY:$IMAGE_TAG $REPOSITORY:latest
           docker push $REPOSITORY:latest
@@ -93,35 +150,24 @@ jobs:
 
   terraform:
     runs-on: ubuntu-latest
-    needs: docker-node
+    needs: [docker-node, docker-utils]
     defaults:
       run:
         working-directory: ./terraform/infrastructure
     environment: 
       name: dev
-    env:
-      TF_VAR_Region: ${{ vars.TF_VAR_REGION }}
-      TF_VAR_AZ01: ${{ vars.TF_VAR_AZ01 }}
-      TF_VAR_AZ02: ${{ vars.TF_VAR_AZ02 }}
-      TF_VAR_Prefix: ${{ vars.TF_VAR_PREFIX }}
-      TF_VAR_SOLTAG: ${{ vars.TF_VAR_SOLTAG }}
-      TF_VAR_GitHubRepo: ${{ vars.TF_VAR_GITHUBREPO }}
-      TF_VAR_EnvCode: ${{ vars.TF_VAR_ENVCODE }}
-      TF_VAR_EnvTag: ${{ vars.TF_VAR_ENVTAG }}
-      TF_VAR_VPCCIDR: ${{ vars.TF_VAR_VPCCIDR }}
-      TF_VAR_NETWORK_NAME: ${{ vars.TF_VAR_NETWORK_NAME }}
-      TF_VAR_ECR_SERVER_REPO: ${{ vars.TF_VAR_ECR_SERVER_REPO }}
-      TF_VAR_ECR_NODE_REPO: ${{ vars.TF_VAR_ECR_NODE_REPO }} 
-      TF_VAR_ECR_MONITOR_REPO: ${{ vars.TF_VAR_ECR_MONITOR_REPO }} 
-      TF_VAR_ECSCluster: ${{ vars.TF_VAR_ECSCLUSTER }} 
-      TF_VAR_ECSService: ${{ vars.TF_VAR_ECSSERVICE }} 
-      TF_VAR_ECR_SERVER_REPO_URL: ${{ vars.TF_VAR_ECR_SERVER_REPO_URL }}
-      TF_VAR_ECR_NODE_REPO_URL: ${{ vars.TF_VAR_ECR_NODE_REPO_URL }} 
-      TF_VAR_ECR_MONITOR_REPO_URL: ${{ vars.TF_VAR_ECR_MONITOR_REPO_URL }} 
-      IMAGE_TAG: ${{github.sha}}
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Pull Docker Image
+        run: |
+          docker pull ${{ vars.TF_VAR_ECR_UTILS_REPO_URL }}:$IMAGE_TAG
+          docker pull ${{ vars.TF_VAR_ECR_NODE_REPO_URL }}:$IMAGE_TAG
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -137,10 +183,6 @@ jobs:
           NETWORK_NAME='${{ vars.TF_VAR_NETWORK_NAME }}'
           KEYS_DIR='/var/lib/indy'
           EOF
-
-      - name: Build Docker Image
-        run: |
-          docker build -f ./genesis/Dockerfile -t genesis ./genesis
 
       - name: Terraform Setup
         uses: hashicorp/setup-terraform@v3

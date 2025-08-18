@@ -37,6 +37,11 @@ variable "ECRNodeRepo" {
   type        = string
 }
 
+variable "ECRUtilsRepo" {
+  description = "Name of Amazon ECR repository for indy utils"
+  type        = string
+}
+
 variable "ECRServerRepo" {
   description = "Name of Amazon ECR repository for indy server"
   type        = string

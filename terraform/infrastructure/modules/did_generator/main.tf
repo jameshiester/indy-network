@@ -28,10 +28,11 @@ resource "null_resource" "create_did" {
   provisioner "local-exec" {
     quiet   = true
     command = <<-EOT
-      docker run --rm -e DID_NAME=${random_string.did_name.result} -e DID_SEED=${var.seed} -e WALLET_NAME=${random_string.wallet_name.result} -v /etc/indy/:/etc/indy/ -v /${path.module}:/home/indy/output genesis /home/indy/create_did.sh
+      docker run --rm -e DID_NAME=${random_string.did_name.result} -e DID_SEED=${var.seed} -e WALLET_NAME=${random_string.wallet_name.result} -v /etc/indy/:/etc/indy/ -v /${path.module}:/home/indy/output ${var.ECR_UTILS_REPO_URL} /home/indy/create_did.sh
     EOT
   }
 }
+
 
 # Read the generated DID and verkey from JSON file
 data "external" "did_info" {

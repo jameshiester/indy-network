@@ -65,6 +65,7 @@ locals {
   ECRNodeRepo                 = "indy-node"
   ECRServerRepo               = "indy-server"
   ECRMonitorRepo              = "indy-monitor"
+  ECRUtilsRepo              = "indy-utils"
   github_actions_provider_arn = data.aws_iam_openid_connect_provider.github_actions_existing.arn != null ? data.aws_iam_openid_connect_provider.github_actions_existing.arn : aws_iam_openid_connect_provider.github_actions[0].arn
 }
 
@@ -73,34 +74,37 @@ module "tfbootstrap_dev" {
   providers = {
     aws = aws.development
   }
-  Region            = var.Region
-  Prefix            = var.Prefix
-  EnvCode           = "dv"
-  GitHubOrg         = var.GitHubOrg
-  GitHubRepo        = var.GitHubRepo
-  GitHubEnv         = "dev"
-  GitHubProviderArn = local.github_actions_provider_arn
+  ECRMonitorRepo    = local.ECRMonitorRepo
   ECRNodeRepo       = local.ECRNodeRepo
   ECRServerRepo     = local.ECRServerRepo
-  ECRMonitorRepo    = local.ECRMonitorRepo
+  ECRUtilsRepo              = local.ECRUtilsRepo
+  EnvCode           = "dv"
+  GitHubEnv         = "dev"
+  GitHubOrg         = var.GitHubOrg
+  GitHubProviderArn = local.github_actions_provider_arn
+  GitHubRepo        = var.GitHubRepo
+  Prefix            = var.Prefix
+  Region            = var.Region
 }
 
 
 module "tfbootstrap_test" {
   source = "./modules/tfbootstrap"
+
   providers = {
     aws = aws.testing
   }
-  Region            = var.Region
-  Prefix            = var.Prefix
-  EnvCode           = "ts"
-  GitHubOrg         = var.GitHubOrg
-  GitHubRepo        = var.GitHubRepo
-  GitHubEnv         = "test"
-  GitHubProviderArn = local.github_actions_provider_arn
+  ECRMonitorRepo    = local.ECRMonitorRepo
   ECRNodeRepo       = local.ECRNodeRepo
   ECRServerRepo     = local.ECRServerRepo
-  ECRMonitorRepo    = local.ECRMonitorRepo
+  ECRUtilsRepo              = local.ECRUtilsRepo
+  EnvCode           = "ts"
+  GitHubEnv         = "test"
+  GitHubOrg         = var.GitHubOrg
+  GitHubProviderArn = local.github_actions_provider_arn
+  GitHubRepo        = var.GitHubRepo
+  Prefix            = var.Prefix
+  Region            = var.Region
 }
 
 module "tfbootstrap_prod" {
@@ -108,16 +112,17 @@ module "tfbootstrap_prod" {
   providers = {
     aws = aws.production
   }
-  Region            = var.Region
-  Prefix            = var.Prefix
-  EnvCode           = "pd"
-  GitHubOrg         = var.GitHubOrg
-  GitHubRepo        = var.GitHubRepo
-  GitHubEnv         = "prod"
-  GitHubProviderArn = local.github_actions_provider_arn
+  ECRMonitorRepo    = local.ECRMonitorRepo
   ECRNodeRepo       = local.ECRNodeRepo
   ECRServerRepo     = local.ECRServerRepo
-  ECRMonitorRepo    = local.ECRMonitorRepo
+  ECRUtilsRepo              = local.ECRUtilsRepo
+  EnvCode           = "pd"
+  GitHubEnv         = "prod"
+  GitHubOrg         = var.GitHubOrg
+  GitHubProviderArn = local.github_actions_provider_arn
+  GitHubRepo        = var.GitHubRepo
+  Prefix            = var.Prefix
+  Region            = var.Region
 }
 
 resource "github_repository_environment_deployment_policy" "dev" {
@@ -234,6 +239,8 @@ locals {
       TF_VAR_ECR_NODE_REPO_URL   = module.tfbootstrap_dev.ecr_node_repo_url
       TF_VAR_ECR_SERVER_REPO     = module.tfbootstrap_dev.ecr_server_repo_name
       TF_VAR_ECR_SERVER_REPO_URL = module.tfbootstrap_dev.ecr_server_repo_url
+      TF_VAR_ECR_UTILS_REPO      = module.tfbootstrap_dev.ecr_utils_repo_name
+      TF_VAR_ECR_UTILS_REPO_URL  = module.tfbootstrap_dev.ecr_utils_repo_url
       TF_VAR_ECSCLUSTER          = "indy-cluster-dev"
       TF_VAR_ECSSERVICE          = "indy-dev"
       TF_VAR_ENVCODE             = "dv"

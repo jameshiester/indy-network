@@ -19,7 +19,7 @@ resource "null_resource" "create_node_genesis" {
   }
 
   provisioner "local-exec" {
-    command = "docker run --rm -v /${path.module}:/home/indy/output -v /etc/indy/:/etc/indy/ genesis /home/indy/create_node_genesis.sh --steward-seed=${var.steward_seed} --node-seed=${var.node_seed} --public-ip=${var.public_ip} --private-ip=${var.private_ip} --node-port=${var.node_port} --client-port=${var.client_port} --network-name=${var.network_name} --steward-name=${var.steward_name} --node-name=${var.node_name}"
+    command = "docker run --rm -v /${path.module}:/home/indy/output -v /etc/indy/:/etc/indy/ ${var.ECR_UTILS_REPO_URL} /home/indy/create_node_genesis.sh --steward-seed=${var.steward_seed} --node-seed=${var.node_seed} --public-ip=${var.public_ip} --private-ip=${var.private_ip} --node-port=${var.node_port} --client-port=${var.client_port} --network-name=${var.network_name} --steward-name=${var.steward_name} --node-name=${var.node_name}"
   }
 }
 

@@ -35,21 +35,26 @@ resource "random_password" "trustee_seed_4" {
 module "trustee_did_1" {
   source = "./modules/did_generator"
   seed   = random_password.trustee_seed_1.result
+  ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
 }
+
 
 module "trustee_did_2" {
   source = "./modules/did_generator"
   seed   = random_password.trustee_seed_2.result
+  ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
 }
 
 module "trustee_did_3" {
   source = "./modules/did_generator"
   seed   = random_password.trustee_seed_3.result
+  ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
 }
 
 module "trustee_did_4" {
   source = "./modules/did_generator"
   seed   = random_password.trustee_seed_4.result
+  ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
 }
 
 # Create trustee CSV content
@@ -111,7 +116,7 @@ resource "null_resource" "genesis_executor" {
   provisioner "local-exec" {
     quiet   = true
     command = <<-EOT
-      docker run --rm -v ${path.module}:/var/output -v /etc/indy/:/etc/indy/ -v ${path.module}/input:/var/input genesis 
+      docker run --rm -v ${path.module}:/var/output -v /etc/indy/:/etc/indy/ -v ${path.module}/input:/var/input ${var.ECR_UTILS_REPO_URL} 
     EOT
   }
 
@@ -133,6 +138,7 @@ resource "aws_s3_object" "pool_transactions" {
 
   tags = local.tags
 }
+
 
 resource "aws_s3_object" "domain_transactions" {
   bucket = aws_s3_bucket.genesis_bucket.bucket
@@ -585,7 +591,7 @@ module "node_genesis_1" {
   steward_name = var.NETWORK_NAME
   node_port    = "9701"
   client_port  = "9702"
-
+  ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
   steward_seed = random_password.steward_seed_1.result
   node_seed    = random_password.node_seed_1.result
   public_ip    = aws_eip.one.public_ip
@@ -600,6 +606,7 @@ module "node_genesis_2" {
   steward_name = var.NETWORK_NAME
   node_port    = "9703"
   client_port  = "9704"
+  ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
   steward_seed = random_password.steward_seed_2.result
   node_seed    = random_password.node_seed_2.result
   public_ip    = aws_eip.one.public_ip
@@ -613,6 +620,7 @@ module "node_genesis_3" {
   node_name    = "node3"
   node_port    = "9701"
   client_port  = "9702"
+  ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
   steward_name = var.NETWORK_NAME
   steward_seed = random_password.steward_seed_3.result
   node_seed    = random_password.node_seed_3.result
@@ -627,6 +635,7 @@ module "node_genesis_4" {
   node_name    = "node4"
   node_port    = "9703"
   client_port  = "9704"
+  ECR_UTILS_REPO_URL = var.ECR_UTILS_REPO_URL
   steward_name = var.NETWORK_NAME
   steward_seed = random_password.steward_seed_4.result
   node_seed    = random_password.node_seed_4.result
