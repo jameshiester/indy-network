@@ -17,6 +17,17 @@ variable "Region" {
 }
 
 
+variable "SERVER_CONTAINER_NAME" {
+  description = "Name of the server container"
+  type        = string
+}
+
+variable "MONITOR_CONTAINER_NAME" {
+  description = "Name of the monitor container"
+  type        = string
+}
+
+
 variable "EnvCode" {
   description = "2 character code used to name all resources e.g. 'pd' for production"
   type        = string

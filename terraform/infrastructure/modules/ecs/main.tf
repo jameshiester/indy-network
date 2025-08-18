@@ -19,7 +19,7 @@ resource "aws_ecs_task_definition" "mswebapp" {
   task_role_arn            = aws_iam_role.ecstask.arn
   container_definitions = jsonencode([
     {
-      name                   = "server"
+      name                   = var.SERVER_CONTAINER_NAME
       image                  = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.Region}.amazonaws.com/${var.server_ecr_repo}:latest"
       cpu                    = 256
       memory                 = 512
@@ -80,7 +80,7 @@ resource "aws_ecs_task_definition" "mswebapp" {
         logDriver = "awslogs",
         options = {
           awslogs-group         = var.log_group_name,
-          awslogs-region        = "${var.Region}",
+          awslogs-region        = var.Region,
           awslogs-stream-prefix = "awslogs-"
         }
       }
@@ -114,7 +114,7 @@ resource "aws_ecs_service" "mswebapp" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.mswebapp.arn
-    container_name   = "indy-api"
+    container_name   = var.SERVER_CONTAINER_NAME
     container_port   = 8080
   }
 

@@ -5,9 +5,9 @@ on:
     branches:
       - dev
 permissions:
-      # id-token write required for OIDC, contents read required for actions/checkout
-      id-token: write
-      contents: read
+  # id-token write required for OIDC, contents read required for actions/checkout
+  id-token: write
+  contents: read
 env:
   TF_LOG: INFO
   AWS_REGION: ${{ vars.TF_VAR_REGION }}
@@ -34,6 +34,8 @@ env:
   TF_VAR_Region: ${{ vars.TF_VAR_REGION }}
   TF_VAR_SOLTAG: ${{ vars.TF_VAR_SOLTAG }}
   TF_VAR_VPCCIDR: ${{ vars.TF_VAR_VPCCIDR }}
+  TF_VAR_SERVER_CONTAINER_NAME: ${{ vars.TF_VAR_SERVER_CONTAINER_NAME }}
+  TF_VAR_MONITOR_CONTAINER_NAME: ${{ vars.TF_VAR_MONITOR_CONTAINER_NAME }}
 
 jobs: 
   docker-node:
@@ -290,7 +292,7 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: server
+          container-name: ${{ vars.TF_VAR_SERVER_CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
       - name: Deploy Amazon ECS task definition

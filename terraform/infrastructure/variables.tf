@@ -84,6 +84,16 @@ variable "ECR_MONITOR_REPO_URL" {
   type        = string
 }
 
+variable "SERVER_CONTAINER_NAME" {
+  description = "Name of the server container"
+  type        = string
+}
+
+variable "MONITOR_CONTAINER_NAME" {
+  description = "Name of the monitor container"
+  type        = string
+}
+
 variable "ECR_UTILS_REPO_URL" {
   description = "URL of Amazon ECR repository for indy utils"
   type        = string
