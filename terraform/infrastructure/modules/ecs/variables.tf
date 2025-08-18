@@ -16,11 +16,6 @@ variable "Region" {
   default     = "us-east-1"
 }
 
-variable "ECR_UTILS_REPO_URL" {
-  description = "URL of Amazon ECR repository for indy utils"
-  type        = string
-}
-
 
 variable "EnvCode" {
   description = "2 character code used to name all resources e.g. 'pd' for production"
