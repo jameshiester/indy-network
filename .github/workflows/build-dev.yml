@@ -38,6 +38,9 @@ jobs:
       TF_VAR_ECR_MONITOR_REPO: ${{ vars.TF_VAR_ECR_MONITOR_REPO }} 
       TF_VAR_ECSCluster: ${{ vars.TF_VAR_ECSCLUSTER }} 
       TF_VAR_ECSService: ${{ vars.TF_VAR_ECSSERVICE }} 
+      TF_VAR_ECR_SERVER_REPO_URL: ${{ vars.TF_VAR_ECR_SERVER_REPO_URL }}
+      TF_VAR_ECR_NODE_REPO_URL: ${{ vars.TF_VAR_ECR_NODE_REPO_URL }} 
+      TF_VAR_ECR_MONITOR_REPO_URL: ${{ vars.TF_VAR_ECR_MONITOR_REPO_URL }} 
       IMAGE_TAG: ${{github.sha}}
 
     steps:
@@ -112,6 +115,9 @@ jobs:
       TF_VAR_ECR_MONITOR_REPO: ${{ vars.TF_VAR_ECR_MONITOR_REPO }} 
       TF_VAR_ECSCluster: ${{ vars.TF_VAR_ECSCLUSTER }} 
       TF_VAR_ECSService: ${{ vars.TF_VAR_ECSSERVICE }} 
+      TF_VAR_ECR_SERVER_REPO_URL: ${{ vars.TF_VAR_ECR_SERVER_REPO_URL }}
+      TF_VAR_ECR_NODE_REPO_URL: ${{ vars.TF_VAR_ECR_NODE_REPO_URL }} 
+      TF_VAR_ECR_MONITOR_REPO_URL: ${{ vars.TF_VAR_ECR_MONITOR_REPO_URL }} 
       IMAGE_TAG: ${{github.sha}}
     steps:
       - name: Git checkout

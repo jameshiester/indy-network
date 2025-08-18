@@ -69,6 +69,21 @@ variable "ECR_MONITOR_REPO" {
   type        = string
 }
 
+variable "ECR_NODE_REPO_URL" {
+  description = "URL of Amazon ECR repository for indy node"
+  type        = string
+}
+
+variable "ECR_SERVER_REPO_URL" {
+  description = "URL of Amazon ECR repository for indy api"
+  type        = string
+}
+
+variable "ECR_MONITOR_REPO_URL" {
+  description = "URL of Amazon ECR repository for indy monitor"
+  type        = string
+}
+
 variable "ECSService" {
   description = "Name of Amazon ECS Service"
   type        = string

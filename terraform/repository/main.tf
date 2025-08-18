@@ -231,7 +231,9 @@ locals {
       TF_STATE_BUCKET_NAME   = module.tfbootstrap_dev.tfstate_bucket_name
       TF_VAR_ECR_NODE_REPO   = module.tfbootstrap_dev.ecr_node_repo_name
       TF_VAR_ECR_SERVER_REPO = module.tfbootstrap_dev.ecr_server_repo_name
+      TF_VAR_ECR_SERVER_URL = module.tfbootstrap_dev.ecr_server_repo_url
       TF_VAR_ECR_MONITOR_REPO = module.tfbootstrap_dev.ecr_monitor_repo_name
+      TF_VAR_ECR_MONITOR_URL = module.tfbootstrap_dev.ecr_monitor_repo_url
       TF_STATE_BUCKET_KEY    = "terraform/${var.GitHubRepo}/dev.tfstate"
       TF_VAR_ECSCLUSTER     = "indy-cluster-dev"
       TF_VAR_ECSSERVICE     = "indy-dev"

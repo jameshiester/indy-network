@@ -39,7 +39,7 @@ data "template_file" "user_data" {
     compose_key             = var.ComposeKey
     genesis_pool_file_key   = var.GenesisPoolFileKey
     genesis_domain_file_key = var.GenesisDomainFileKey
-    ecr_node_repo           = var.ECR_NODE_REPO
+    ecr_node_repo           = var.ECR_NODE_REPO_URL
     account_id              = data.aws_caller_identity.current.account_id
   }
 }

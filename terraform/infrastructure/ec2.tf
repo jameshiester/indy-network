@@ -92,7 +92,7 @@ module "ec2_node1" {
   ComposeKey             = aws_s3_object.docker_compose_yml.key
   node_name_1            = module.node_genesis_1.node_name
   node_name_2            = module.node_genesis_2.node_name
-  ECR_NODE_REPO          = var.ECR_NODE_REPO
+  ECR_NODE_REPO          = var.ECR_NODE_REPO_URL
   EnvTag                 = var.EnvTag
   NetworkSecurityGroupID = aws_security_group.node_security_group.id
   NetworkName            = var.NETWORK_NAME
@@ -125,7 +125,7 @@ module "ec2_node2" {
   ComposeKey             = aws_s3_object.docker_compose_yml.key
   node_name_1            = module.node_genesis_3.node_name
   node_name_2            = module.node_genesis_4.node_name
-  ECR_NODE_REPO          = var.ECR_NODE_REPO
+  ECR_NODE_REPO          = var.ECR_NODE_REPO_URL
   EnvTag                 = var.EnvTag
   NetworkSecurityGroupID = aws_security_group.node_security_group.id
   NetworkName            = var.NETWORK_NAME
