@@ -62,38 +62,6 @@ resource "aws_kms_key" "network" {
   }
 }
 
-# Create KMS Alias. Only used in this context to provide a friendly display name
-resource "aws_kms_alias" "network" {
-  name          = format("alias/%s-%s-%s", var.Prefix, "indy-network", var.EnvCode)
-  target_key_id = aws_kms_key.network.key_id
-}
-
-# Create CloudWatch log group for ECS logs 
-resource "aws_cloudwatch_log_group" "ecscluster" {
-  name              = format("%s%s%s%s", var.Prefix, "cwl", var.EnvCode, "ecscluster")
-  retention_in_days = 90
-  kms_key_id        = aws_kms_key.network.arn
-
-  tags = {
-    Name         = format("%s%s%s%s", var.Prefix, "cwl", var.EnvCode, "ecscluster")
-    resourcetype = "monitor"
-    codeblock    = "ecscluster"
-  }
-}
-
-# Create CloudWatch log group for Application logs
-resource "aws_cloudwatch_log_group" "network" {
-  name              = format("%s-%s-%s-%s", var.Prefix, "cwl", var.EnvCode, "application")
-  retention_in_days = 30
-  kms_key_id        = aws_kms_key.network.arn
-
-  tags = {
-    Name         = format("%s-%s-%s-%s", var.Prefix, "cwl", var.EnvCode, "application")
-    resourcetype = "monitor"
-    codeblock    = "ecscluster"
-  }
-}
-
 
 resource "aws_ecr_repository" "server" {
   name                 = var.server_ecr_repo
@@ -109,37 +77,9 @@ resource "aws_ecr_repository" "server" {
     kms_key         = aws_kms_key.network.arn
   }
 
-  tags = {
-    Name         = format("%s-%s-%s-%s", var.Prefix, "ecs", var.EnvCode, "server")
-    resourcetype = "compute"
-    codeblock    = "ecscluster"
-  }
+  tags = local.tags
 }
 
-# Create ECR lifecycle policy to delete untagged images after 1 day
-resource "aws_ecr_lifecycle_policy" "node" {
-  repository = aws_ecr_repository.node.name
-
-  policy = <<EOF
-{
-  "rules": [
-    {
-      "rulePriority": 1,
-      "description": "Delete untagged images after one day",
-      "selection": {
-        "tagStatus": "untagged",
-        "countType": "sinceImagePushed",
-        "countUnit": "days",
-        "countNumber": 1
-      },
-      "action": {
-        "type": "expire"
-      }
-    }
-  ]
-}
-EOF
-}
 # Create ECR lifecycle policy to delete untagged images after 1 day
 resource "aws_ecr_lifecycle_policy" "server" {
   repository = aws_ecr_repository.server.name
@@ -181,7 +121,7 @@ resource "aws_ecs_cluster" "network" {
 
       log_configuration {
         cloud_watch_encryption_enabled = true
-        cloud_watch_log_group_name     = aws_cloudwatch_log_group.ecscluster.name
+        cloud_watch_log_group_name     = var.log_group_name
       }
     }
   }
@@ -195,7 +135,7 @@ resource "aws_ecs_cluster" "network" {
 
 # Establish IAM Role with permissions for Amazon ECS to access Amazon ECR for image pulling and CloudWatch for logging
 resource "aws_iam_role" "ecstaskexec" {
-  name = format("%s%s%s%s", var.Prefix, "iar", var.EnvCode, "ecstaskexec")
+  name = format("%s-%s-%s-%s", var.Prefix, "indy-api", var.EnvCode, "exec")
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -216,7 +156,7 @@ resource "aws_iam_role" "ecstaskexec" {
 }
 
 resource "aws_iam_role_policy" "ecstaskexec" {
-  name = format("%s%s%s%s", var.Region, "irp", var.EnvCode, "ecstaskexec")
+  name = format("%s-%s-%s-%s", var.Region, "irp", var.EnvCode, "ecstaskexec")
   role = aws_iam_role.ecstaskexec.id
   policy = jsonencode({
     Version = "2012-10-17"
@@ -255,8 +195,8 @@ resource "aws_iam_role_policy" "ecstaskexec" {
 
 # Establish IAM Role with permissions for Amazon ECS to access Amazon ECR for image pulling and CloudWatch for logging
 resource "aws_iam_role" "ecstask" {
-  name        = format("%s%s%s%s", var.Prefix, "iar", var.EnvCode, "api-role")
-  description = "Role assumed by the usage lakehouse go api task"
+  name        = format("%s-%s-%s", var.Prefix, "indy-api", var.EnvCode)
+  description = "Role assumed by the indy network api tasks"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -270,14 +210,11 @@ resource "aws_iam_role" "ecstask" {
     ]
   })
 
-  tags = {
-    Name  = format("%s%s%s%s", var.Region, "iar", var.EnvCode, "api-role")
-    rtype = "security"
-  }
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy" "ecstask" {
-  name = format("%s%s%s%s", var.Region, "irp", var.EnvCode, "api-role")
+  name = format("%s-%s-%s-%s", var.Region, "irp", var.EnvCode, "api-role")
   role = aws_iam_role.ecstask.id
   policy = jsonencode({
     Version = "2012-10-17"
@@ -288,7 +225,14 @@ resource "aws_iam_role_policy" "ecstask" {
           "secretsmanager:DescribeSecret"
         ]
         Effect   = "Allow"
-        Resource = [var.node_seed_arn_1, var.node_seed_arn_2, var.node_seed_arn_3, var.node_seed_arn_4]
+        Resource = [var.steward_seed_arn, var.db_secret_arn]
+      },
+      {
+        Action = [
+          "s3:GetObject"
+        ]
+        Effect   = "Allow"
+        Resource = ["s3://${var.genesis_bucket_name}/*"]
       },
       {
         # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/instance_IAM_role.html#cwl_iam_policy

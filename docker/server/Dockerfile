@@ -20,6 +20,7 @@ WORKDIR /app
 
 RUN npm install -g pnpm node-gyp turbo@2.0.6
 COPY ./packages/server /app/packages/server
+COPY ./packages/model /app/packages/model
 COPY ./packages/client/package.json /app/packages/client/package.json
 COPY ./package.json /app/package.json
 COPY ./turbo.json /app/turbo.json
@@ -27,7 +28,10 @@ COPY ./pnpm-lock.yaml /app/pnpm-lock.yaml
 COPY ./pnpm-workspace.yaml /app/pnpm-workspace.yaml
 
 RUN pnpm install
+RUN turbo run build --filter=model
 RUN turbo run build --filter=api
+RUN ls -la /app/packages/model/build
+RUN chmod -R 777 /app/packages/model/build
 
 EXPOSE 8080
 

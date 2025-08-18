@@ -69,6 +69,11 @@ variable "server_ecr_repo" {
   type        = string
 }
 
+variable "monitor_ecr_repo" {
+  description = "Name of Amazon ECR repository for indy monitor"
+  type        = string
+}
+
 variable "ecs_service" {
   description = "Name of Amazon ECS Service"
   type        = string
@@ -79,43 +84,13 @@ variable "ecs_cluster" {
   type        = string
 }
 
-variable "node_name_1" {
-  description = "Name for node 1"
+variable "steward_seed_arn" {
+  description = "ARN of the secret used to hold the steward seed"
   type        = string
 }
 
-variable "node_name_2" {
-  description = "Name for node 2"
-  type        = string
-}
-
-variable "node_name_3" {
-  description = "Name for node 3"
-  type        = string
-}
-
-variable "node_name_4" {
-  description = "Name for node 4"
-  type        = string
-}
-
-variable "node_seed_arn_1" {
-  description = "ARN of the secret used to hold the node 1 seed"
-  type        = string
-}
-
-variable "node_seed_arn_2" {
-  description = "ARN of the secret used to hold the node 2 seed"
-  type        = string
-}
-
-variable "node_seed_arn_3" {
-  description = "ARN of the secret used to hold the node 3 seed"
-  type        = string
-}
-
-variable "node_seed_arn_4" {
-  description = "ARN of the secret used to hold the node 4 seed"
+variable "steward_did" {
+  description = "DID of the steward"
   type        = string
 }
 
@@ -124,3 +99,48 @@ variable "network_name" {
   type        = string
   default     = "sandbox"
 } 
+
+variable "genesis_bucket_name" {
+  description = "Name of the S3 bucket containing genesis files"
+  type        = string
+} 
+
+variable "domain_transactions_key" {
+  description = "Key of the domain transactions file in the S3 bucket"
+  type        = string
+} 
+
+variable "pool_transactions_key" {
+  description = "Key of the pool transactions file in the S3 bucket"
+  type        = string
+} 
+
+variable "db_master_username" {
+  description = "Master username for the database"
+  type        = string
+} 
+
+variable "db_secret_arn" {
+  description = "ARN of the secret for the database"
+  type        = string
+} 
+
+variable "db_host" {
+  description = "host for the database"
+  type        = string
+} 
+
+variable "db_port" {
+  description = "host for the database"
+  type        = number
+} 
+
+variable "log_group_name" {
+  description = "Name of the CloudWatch log group"
+  type        = string
+} 
+
+variable "GenesisUrl" {
+  description = "Url for the genesis file"
+  type        = string
+}

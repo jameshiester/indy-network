@@ -41,3 +41,8 @@ variable "ECRServerRepo" {
   description = "Name of Amazon ECR repository for indy server"
   type        = string
 }
+
+variable "ECRMonitorRepo" {
+  description = "Name of Amazon ECR repository for indy monitor"
+  type        = string
+}

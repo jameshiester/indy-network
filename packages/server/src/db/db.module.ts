@@ -3,7 +3,7 @@ import { Module } from "@nestjs/common";
 import { Pointer } from "./pointer.entity";
 import { Transaction } from "./transaction.entity";
 
-const {DB_PORT = 5432, DB_HOST,DB_USERNAME,DB_PASSWORD,DB_DATABASE = 'postgres',DB_SCHEMA, DB_TYPE} = process.env;
+const {DB_PORT = 5432, DB_HOST,DB_USERNAME = 'postgres',DB_PASSWORD,DB_DATABASE = 'postgres',DB_SCHEMA, DB_TYPE = 'postgres'} = process.env;
 
 @Module({
     imports: [
@@ -15,6 +15,7 @@ const {DB_PORT = 5432, DB_HOST,DB_USERNAME,DB_PASSWORD,DB_DATABASE = 'postgres',
             username: DB_USERNAME,
             password: DB_PASSWORD,
             database: DB_DATABASE,
+            schema: DB_SCHEMA,
             synchronize: true,
         }),
         TypeOrmModule.forFeature([

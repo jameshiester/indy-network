@@ -8,6 +8,7 @@
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",
     "build-docker-server": "docker build -t indy-server -f docker/server/Dockerfile --progress=plain .",
+    "build-docker-monitor": "docker build -t indy-monitor -f docker/monitor/Dockerfile --progress=plain ./docker/monitor",
     "start": "turbo run start",
     "lint": "turbo run lint"
   },

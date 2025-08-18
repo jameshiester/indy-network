@@ -111,8 +111,6 @@ resource "null_resource" "genesis_executor" {
   provisioner "local-exec" {
     quiet   = true
     command = <<-EOT
-      cat ${path.module}/input/trustee_file.csv
-      cat ${path.module}/input/steward_file.csv
       docker run --rm -v ${path.module}:/var/output -v /etc/indy/:/etc/indy/ -v ${path.module}/input:/var/input genesis 
     EOT
   }
@@ -164,13 +162,13 @@ resource "aws_s3_bucket" "genesis_bucket" {
   tags = local.tags
 }
 
-# Block public access to the S3 bucket
+# Allow public access to the genesis S3 bucket
 resource "aws_s3_bucket_public_access_block" "genesis_bucket" {
   bucket                  = aws_s3_bucket.genesis_bucket.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 }
 
 # Enable versioning for the S3 bucket
@@ -232,10 +230,158 @@ data "aws_iam_policy_document" "genesis_bucket_tls" {
   }
 }
 
-# Apply policy to enforce TLS 1.2 on S3 bucket
+# IAM Policy for genesis bucket with public read access and TLS enforcement
+data "aws_iam_policy_document" "genesis_bucket_public" {
+  statement {
+    sid    = "PublicReadGetObject"
+    effect = "Allow"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = [
+      "s3:GetObject"
+    ]
+    resources = [
+      "${aws_s3_bucket.genesis_bucket.arn}/*"
+    ]
+  }
+
+  statement {
+    sid    = "Allow HTTPS only"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = [
+      "s3*"
+    ]
+    resources = [
+      "${aws_s3_bucket.genesis_bucket.arn}",
+      "${aws_s3_bucket.genesis_bucket.arn}/*"
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "false"
+      ]
+    }
+  }
+  statement {
+    sid    = "Allow TLS 1.2 and above"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = [
+      "s3*"
+    ]
+    resources = [
+      "${aws_s3_bucket.genesis_bucket.arn}",
+      "${aws_s3_bucket.genesis_bucket.arn}/*"
+    ]
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values = [
+        "1.2"
+      ]
+    }
+  }
+}
+
+# Apply policy to genesis bucket for public read access and TLS enforcement
 resource "aws_s3_bucket_policy" "genesis_bucket" {
   bucket = aws_s3_bucket.genesis_bucket.id
-  policy = data.aws_iam_policy_document.genesis_bucket_tls.json
+  policy = data.aws_iam_policy_document.genesis_bucket_public.json
+}
+
+# S3 Bucket for storing compose files (private)
+resource "aws_s3_bucket" "compose_bucket" {
+  bucket = format("%s-%s-%s", var.Prefix, "compose", var.EnvCode)
+  force_destroy = true
+
+  tags = local.tags
+}
+
+# Block public access to the compose S3 bucket (keep private)
+resource "aws_s3_bucket_public_access_block" "compose_bucket" {
+  bucket                  = aws_s3_bucket.compose_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# Enable versioning for the compose S3 bucket
+resource "aws_s3_bucket_versioning" "compose_bucket" {
+  bucket = aws_s3_bucket.compose_bucket.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# IAM Policy to enforce TLS 1.2 on compose S3 bucket
+data "aws_iam_policy_document" "compose_bucket_tls" {
+  statement {
+    sid    = "Allow HTTPS only"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = [
+      "s3*"
+    ]
+    resources = [
+      "${aws_s3_bucket.compose_bucket.arn}",
+      "${aws_s3_bucket.compose_bucket.arn}/*"
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "false"
+      ]
+    }
+  }
+  statement {
+    sid    = "Allow TLS 1.2 and above"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = [
+      "s3*"
+    ]
+    resources = [
+      "${aws_s3_bucket.compose_bucket.arn}",
+      "${aws_s3_bucket.compose_bucket.arn}/*"
+    ]
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values = [
+        "1.2"
+      ]
+    }
+  }
+}
+
+# Apply policy to enforce TLS 1.2 on compose S3 bucket
+resource "aws_s3_bucket_policy" "compose_bucket" {
+  bucket = aws_s3_bucket.compose_bucket.id
+  policy = data.aws_iam_policy_document.compose_bucket_tls.json
 }
 
 # Generate random passwords for steward and node seeds

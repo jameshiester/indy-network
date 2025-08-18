@@ -1,0 +1,27 @@
+module "ecs" {
+  source             = "./modules/ecs"
+  ecs_cluster        = var.ECSCluster
+  azs                = local.azs
+  db_host            = module.db.db_host
+  log_group_name     = aws_cloudwatch_log_group.indy_node_log_group.name
+  db_master_username = local.master_username
+  db_port            = module.db.db_port
+  db_secret_arn      = module.db.cluster_master_user_secret.arn
+  server_ecr_repo    = var.ECR_SERVER_REPO
+  monitor_ecr_repo   = var.ECR_MONITOR_REPO
+  ecs_service        = var.ECSService
+  EnvCode            = var.EnvCode
+  EnvTag             = var.EnvTag
+  GenesisUrl         = "s3://${aws_s3_bucket.genesis_bucket.bucket}/${aws_s3_object.pool_transactions.key}"
+  Prefix             = var.Prefix
+  private_subnets    = module.vpc.private_subnets
+  public_subnets     = module.vpc.public_subnets
+  SolTag             = var.SolTag
+  steward_did             = module.node_genesis_1.steward_did
+  steward_seed_arn        = aws_secretsmanager_secret.node_seed_1.arn
+  vpc_cidr                = local.vpc_cidr
+  pool_transactions_key   = aws_s3_object.pool_transactions.key
+  domain_transactions_key = aws_s3_object.domain_transactions.key
+  genesis_bucket_name     = aws_s3_bucket.genesis_bucket.bucket
+  vpc_id                  = module.vpc.vpc_id
+}

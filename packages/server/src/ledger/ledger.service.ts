@@ -68,17 +68,43 @@ export class LedgerService {
   async getValidatorInfo() {
       this.logger.debug(`Syncing validator info`);
       try {
-        const request = new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID });
-        const seed = Uint8Array.from(Buffer.from(process.env.VALIDATOR_SEED,'utf8'));
-        const naclSignature = nacl.sign.detached(Buffer.from(request.signatureInput, 'utf8'), seed);
-        const key = Key.fromSeed({ algorithm: KeyAlgorithm.Ed25519, seed });
-        const signature = key.signMessage({ message: Buffer.from(request.signatureInput, 'utf8') });
-        this.logger.log(naclSignature)
-        this.logger.log(signature);
+        const action = new GetValidatorInfoAction({submitterDid: undefined})
+        const response: GetValidatorInfoResponse = await this.pool.submitRequest(action)
+        console.log("success")
+      }catch (error){
+        console.log("error")
+        this.logger.error(error)
+      }
+    
+      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'ascii', 'ascii', true);
+      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'ascii', 'ascii', false);
+      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'utf8', 'utf8', true);
+      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'utf8', 'utf8', false);
+      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'utf8', 'ascii', true);
+      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'utf8', 'ascii', false);
+      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'ascii', 'utf8', true);
+      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'ascii', 'utf8', false);
+  }
+
+  async submitRequest(request: GetValidatorInfoAction, keyEncoding: BufferEncoding, messageEncoding: BufferEncoding,useNacl: boolean) {
+      this.logger.debug(`Syncing validator info`);
+      let signature: Uint8Array;
+      try {
+        if (useNacl){
+          const naclKey = nacl.sign.keyPair.fromSeed(Buffer.from(process.env.VALIDATOR_SEED,keyEncoding));
+          signature = nacl.sign(Buffer.from(request.signatureInput, messageEncoding), naclKey.secretKey);
+        } else {
+          const seed = Uint8Array.from(Buffer.from(process.env.VALIDATOR_SEED,keyEncoding));
+          const key = Key.fromSeed({ algorithm: KeyAlgorithm.Ed25519, seed });
+          signature = key.signMessage({ message: Buffer.from(request.signatureInput, messageEncoding) });
+        }
         request.setSignature({ signature: signature });
-        const response: GetValidatorInfoResponse = await this.pool.submitRequest(request)
-        this.logger.log(response)
+        const response: GetValidatorInfoResponse = await this.pool.submitAction(request)
+
+
+        console.log(keyEncoding,messageEncoding,useNacl,response);
       } catch (error) {
+        console.log(keyEncoding,messageEncoding,useNacl,error)
         this.logger.error(error);
     }
   }

@@ -16,8 +16,13 @@ variable "Region" {
   default     = "us-east-1"
 }
 
-variable "GenesisBucketArn" {
+variable "GenesisBucketName" {
   description = "Arn for genesis file bucket"
+  type        = string
+}
+
+variable "ComposeBucketName" {
+  description = "Name for compose file bucket"
   type        = string
 }
 

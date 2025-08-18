@@ -22,6 +22,11 @@ variable "Domain" {
   type        = string
 }
 
+variable "NetworkName" {
+  description = "Name for the indy network"
+  type        = string
+}
+
 variable "Prefix" {
   description = "Prefix used to name all resources"
   type        = string

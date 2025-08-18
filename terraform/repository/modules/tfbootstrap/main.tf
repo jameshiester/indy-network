@@ -214,6 +214,10 @@ output "ecr_server_repo_name" {
   value = aws_ecr_repository.server.repository_url
 }
 
+output "ecr_monitor_repo_name" {
+  value = aws_ecr_repository.monitor.repository_url
+}
+
 # Create Amazon ECR repository to store Docker image
 resource "aws_ecr_repository" "node" {
   name                 = "${var.ECRNodeRepo}-${var.EnvCode}"
@@ -308,6 +312,53 @@ resource "aws_ecr_lifecycle_policy" "server" {
 EOF
 }
 
+# Create Amazon ECR repository to store Docker image
+resource "aws_ecr_repository" "monitor" {
+  name                 = "${var.ECRMonitorRepo}-${var.EnvCode}"
+  image_tag_mutability = "MUTABLE"
+  force_delete         = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  encryption_configuration {
+    encryption_type = "KMS"
+    kms_key         = aws_kms_key.mswebapp.arn
+  }
+
+  tags = {
+    Name         = format("%s-%s-%s", var.Prefix, "indy-monitor", var.EnvCode)
+    resourcetype = "compute"
+    codeblock    = "ecscluster"
+  }
+}
+
+# Create ECR lifecycle policy to delete untagged images after 1 day
+resource "aws_ecr_lifecycle_policy" "monitor" {
+  repository = aws_ecr_repository.monitor.name
+
+  policy = <<EOF
+{
+  "rules": [
+    {
+      "rulePriority": 1,
+      "description": "Delete untagged images after one day",
+      "selection": {
+        "tagStatus": "untagged",
+        "countType": "sinceImagePushed",
+        "countUnit": "days",
+        "countNumber": 1
+      },
+      "action": {
+        "type": "expire"
+      }
+    }
+  ]
+}
+EOF
+}
+
 # Create KMS key for solution
 resource "aws_kms_key" "mswebapp" {
   description             = "KMS key to secure various aspects of the indy network"
@@ -321,6 +372,8 @@ resource "aws_kms_key" "mswebapp" {
     codeblock    = "ecscluster"
   }
 }
+
+
 
 # Create KMS Alias. Only used in this context to provide a friendly display name
 resource "aws_kms_alias" "mswebapp" {

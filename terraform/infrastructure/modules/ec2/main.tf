@@ -34,7 +34,8 @@ data "template_file" "user_data" {
     network_name            = var.NetworkName
     node_ip                 = var.NodeIP
     client_ip               = var.ClientIP
-    compose_bucket          = var.GenesisBucketArn
+    compose_bucket          = var.ComposeBucketName
+    genesis_bucket          = var.GenesisBucketName
     compose_key             = var.ComposeKey
     genesis_pool_file_key   = var.GenesisPoolFileKey
     genesis_domain_file_key = var.GenesisDomainFileKey

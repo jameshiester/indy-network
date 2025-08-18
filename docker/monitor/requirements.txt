@@ -1,0 +1,10 @@
+asyncio
+pynacl
+gspread
+oauth2client
+fastapi
+uvicorn
+gunicorn
+
+base58
+indy-vdr

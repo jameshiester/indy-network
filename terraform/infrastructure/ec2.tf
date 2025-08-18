@@ -85,7 +85,8 @@ module "ec2_node1" {
   EnvCode                = var.EnvCode
   env_tag                = var.EnvTag
   LogGroupName           = aws_cloudwatch_log_group.indy_node_log_group.name
-  GenesisBucketArn       = aws_s3_bucket.genesis_bucket.bucket
+  GenesisBucketName       = aws_s3_bucket.genesis_bucket.bucket
+  ComposeBucketName       = aws_s3_bucket.compose_bucket.bucket
   GenesisPoolFileKey     = aws_s3_object.pool_transactions.key
   GenesisDomainFileKey   = aws_s3_object.domain_transactions.key
   ComposeKey             = aws_s3_object.docker_compose_yml.key
@@ -117,7 +118,8 @@ module "ec2_node2" {
   EnvCode                = var.EnvCode
   env_tag                = var.EnvTag
   LogGroupName           = aws_cloudwatch_log_group.indy_node_log_group.name
-  GenesisBucketArn       = aws_s3_bucket.genesis_bucket.bucket
+  GenesisBucketName       = aws_s3_bucket.genesis_bucket.bucket
+  ComposeBucketName       = aws_s3_bucket.compose_bucket.bucket
   GenesisPoolFileKey     = aws_s3_object.pool_transactions.key
   GenesisDomainFileKey   = aws_s3_object.domain_transactions.key
   ComposeKey             = aws_s3_object.docker_compose_yml.key

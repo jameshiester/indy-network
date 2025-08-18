@@ -20,15 +20,15 @@ resource "aws_ecs_task_definition" "mswebapp" {
   container_definitions = jsonencode([
     {
       name                   = "node1"
-      image                  = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.Region}.amazonaws.com/${var.node_ecr_repo}:latest"
+      image                  = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.Region}.amazonaws.com/${var.server_ecr_repo}:latest"
       cpu                    = 256
       memory                 = 512
       essential              = true
       readonlyRootFilesystem = false
       portMappings = [
         {
-          containerPort = 80
-          hostPort      = 80
+          containerPort = 8080
+          hostPort      = 8080
           protocol      = "tcp"
         }
       ]
@@ -38,26 +38,54 @@ resource "aws_ecs_task_definition" "mswebapp" {
           value = var.network_name
         },
         {
-          name  = "INDY_NODE_NAME"
-          value = var.node_name_1
+          name  = "GENESIS_S3_BUCKET"
+          value = var.genesis_bucket_name
+        },
+        {
+          name  = "GENESIS_S3_KEY"
+          value = var.pool_transactions_key
+        },
+        {
+          name  = "DB_TYPE"
+          value = "postgres"
+        },
+        {
+          name  = "VALIDATOR_DID"
+          value = var.steward_did
+        },
+        {
+          name  = "DB_PORT"
+          value = var.db_port
+        },
+        {
+          name  = "DB_HOST"
+          value = var.db_host
+        },
+        {
+          name  = "DB_USERNAME"
+          value = var.db_master_username
         }
       ]
       secrets = [
         {
-          name      = "INDY_NODE_SEED"
-          valueFrom = var.node_seed_arn_1
-        }
+          name      = "VALIDATOR_SEED"
+          valueFrom = var.steward_seed_arn
+        },
+        {
+          name      = "DB_HOST"
+          valueFrom = var.db_secret_arn
+        },
       ]
       logconfiguration = {
         logDriver = "awslogs",
         options = {
-          awslogs-group         = "${aws_cloudwatch_log_group.mswebapp.name}",
+          awslogs-group         = var.log_group_name,
           awslogs-region        = "${var.Region}",
           awslogs-stream-prefix = "awslogs-"
         }
       }
       healthCheck = {
-        command         = ["CMD-SHELL", "curl -f http://localhost:80/healthz || exit 1"]
+        command         = ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
         intervalSeconds = 30
         timeoutSeconds  = 5
         retries         = 3
@@ -84,23 +112,12 @@ resource "aws_ecs_service" "mswebapp" {
     assign_public_ip = false # Assigns public IPs in public subnet
   }
 
-  # Alternative: Use specific network interfaces for each task
-  # This requires creating individual services for each task
-  # network_configuration {
-  #   subnets         = [var.public_subnets[0]]
-  #   security_groups = [aws_security_group.app01.id]
-  #   assign_public_ip = true
-  # }
-
   load_balancer {
     target_group_arn = aws_lb_target_group.mswebapp.arn
-    container_name   = "go-api"
-    container_port   = 80
+    container_name   = "indy-api"
+    container_port   = 8080
   }
 
-  tags = {
-    Name  = format("%s%s%s%s", var.Region, "iar", var.EnvCode, "api")
-    rtype = "ecsservice"
-  }
+  tags = local.tags
 }
 

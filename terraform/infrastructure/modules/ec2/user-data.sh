@@ -64,18 +64,17 @@ echo "installing docker compose v2 plugin..."
 sudo mkdir -p /usr/local/lib/docker/cli-plugins
 sudo curl -sSL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
 sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-echo --bucket ${compose_bucket}
 aws s3api get-object --bucket ${compose_bucket} --key ${compose_key} docker-compose.yml
 
 
 sudo mkdir -p /etc/indy1
-aws s3 cp "s3://${compose_bucket}/${genesis_pool_file_key}" /etc/indy1/pool_transactions_genesis
-aws s3 cp "s3://${compose_bucket}/${genesis_domain_file_key}" /etc/indy1/domain_transactions_genesis
+aws s3 cp "s3://${genesis_bucket}/${genesis_pool_file_key}" /etc/indy1/pool_transactions_genesis
+aws s3 cp "s3://${genesis_bucket}/${genesis_domain_file_key}" /etc/indy1/domain_transactions_genesis
 sudo chmod 644 /etc/indy1/pool_transactions_genesis /etc/indy1/domain_transactions_genesis
 
 sudo mkdir -p /etc/indy2
-aws s3 cp "s3://${compose_bucket}/${genesis_pool_file_key}" /etc/indy2/pool_transactions_genesis
-aws s3 cp "s3://${compose_bucket}/${genesis_domain_file_key}" /etc/indy2/domain_transactions_genesis
+aws s3 cp "s3://${genesis_bucket}/${genesis_pool_file_key}" /etc/indy2/pool_transactions_genesis
+aws s3 cp "s3://${genesis_bucket}/${genesis_domain_file_key}" /etc/indy2/domain_transactions_genesis
 sudo chmod 644 /etc/indy2/pool_transactions_genesis /etc/indy2/domain_transactions_genesis
 
 
