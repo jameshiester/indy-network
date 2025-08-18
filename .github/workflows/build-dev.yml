@@ -56,7 +56,7 @@ jobs:
       - name: Check ECS image exists
         id: ecsimage
         run: |
-          if aws ecr describe-images --repository-name ${{ vars.TF_VAR_ECR_NODE_REPO }} --image-ids imageTag=$IMAGE_TAG >/dev/null 2>&1
+          if aws ecr describe-images --repository-name ${{ vars.TF_VAR_ECR_NODE_REPO_URL }} --image-ids imageTag=$IMAGE_TAG >/dev/null 2>&1
           then
             echo "image_exists=true" >> "$GITHUB_ENV"
           else
