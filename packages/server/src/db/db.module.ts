@@ -17,6 +17,9 @@ const {DB_PORT = 5432, DB_HOST,DB_USERNAME = 'postgres',DB_PASSWORD,DB_DATABASE 
             database: DB_DATABASE,
             schema: DB_SCHEMA,
             synchronize: true,
+            ssl: {
+                rejectUnauthorized: false
+            }
         }),
         TypeOrmModule.forFeature([
             Pointer,

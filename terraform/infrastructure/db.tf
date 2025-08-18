@@ -46,6 +46,10 @@ module "db" {
       name  = "rds.force_ssl"
       value = 0
     },
+    {
+      name  = "ssl"
+      value = 0
+    },
   ]
 
   tags = local.tags
