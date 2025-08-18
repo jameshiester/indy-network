@@ -107,7 +107,7 @@ resource "aws_ecs_service" "mswebapp" {
 
 
   network_configuration {
-    subnets          = var.public_subnets
+    subnets          = var.private_subnets
     security_groups  = [aws_security_group.app01.id]
     assign_public_ip = false # Assigns public IPs in public subnet
   }

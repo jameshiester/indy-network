@@ -152,7 +152,7 @@ resource "aws_iam_role_policy" "ecstaskexec" {
           "logs:DescribeLogStreams"
         ]
         Effect   = "Allow"
-        Resource = ["arn:aws:logs:*:*:*"]
+        Resource = ["*"]
       }
     ]
   })
@@ -201,7 +201,7 @@ resource "aws_iam_role_policy" "ecstask" {
           "logs:DescribeLogStreams"
         ]
         Effect   = "Allow"
-        Resource = ["arn:aws:logs:*:*:*"]
+        Resource = ["*"]
       }
     ]
   })
