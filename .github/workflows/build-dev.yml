@@ -67,7 +67,7 @@ jobs:
         uses: dorny/paths-filter@v3
         id: filter
         with:
-          working-directory: ./
+          working-directory: ./docker/node
           base: ${{ github.ref }}
           filters: |
             docker:
@@ -83,7 +83,7 @@ jobs:
         if: steps.filter.outputs.docker == 'true' || env.image_exists == 'false'
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: ${{ vars.TF_VAR_ECR_NODE_REPO }}
+          REPOSITORY: ${{ vars.TF_VAR_ECR_NODE_REPO_URL }}
         run: |
           docker build -t $REPOSITORY:$IMAGE_TAG -f ./Dockerfile.ubuntu22 .
           docker push $REPOSITORY:$IMAGE_TAG
