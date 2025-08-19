@@ -64,4 +64,4 @@ ADD networks.json .
 ADD *.py ./
 ADD plugins ./plugins
 
-ENTRYPOINT ["bash", "-c", "python main.py $@", "--"]
+ENTRYPOINT ["bash", "-c", "python main.py","--web"]

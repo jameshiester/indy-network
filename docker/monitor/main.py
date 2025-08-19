@@ -34,11 +34,11 @@ if __name__ == "__main__":
     enable_verbose(args.verbose)
 
     if args.web:
-        if args.seed:
-            print("WARNING: You are trying to run the REST API with a SEED.")
-            print("Please remove your SEED and try again.")
-            print("Exiting...")
-            exit()
+        # if args.seed:
+        #     print("WARNING: You are trying to run the REST API with a SEED.")
+        #     print("Please remove your SEED and try again.")
+        #     print("Exiting...")
+        #     exit()
 
         # Pass verbose to rest api through env var
         os.environ['VERBOSE'] = str(args.verbose)
@@ -60,6 +60,40 @@ if __name__ == "__main__":
 
             log("Starting web server ...")
             os.system(f'gunicorn -k "{WORKER_CLASS}" -c "{GUNICORN_CONF}" "{APP_MODULE}"')
+        
+        # Add network to networks.json if environment variables are provided
+        genesis_url = os.environ.get('GENESIS_URL')
+        network_name = os.environ.get('INDY_NETWORK_NAME')
+        indy_namespace = os.environ.get('INDY_NAMESPACE')
+        
+        if genesis_url and network_name and indy_namespace:
+            try:
+                # Read existing networks.json or create new one
+                networks_file = 'networks.json'
+                networks_data = {}
+                
+                if os.path.exists(networks_file):
+                    with open(networks_file, 'r') as f:
+                        networks_data = json.load(f)
+                
+                # Create new network entry
+                new_network = {
+                    "genesisUrl": genesis_url,
+                    "name": network_name,
+                    "indyNamespace": indy_namespace
+                }
+                
+                # Add to networks data (using network_name as key)
+                networks_data[network_name] = new_network
+                
+                # Write back to file
+                with open(networks_file, 'w') as f:
+                    json.dump(networks_data, f, indent=2)
+                
+                log(f"Added network '{network_name}' to networks.json")
+                
+            except Exception as e:
+                log(f"Error adding network to networks.json: {e}")
     else:
         log("Starting from the command line ...")
 

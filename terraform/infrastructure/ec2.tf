@@ -60,6 +60,11 @@ data "aws_iam_policy_document" "instance_policy" {
   }
   statement {
     effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.compose_bucket.arn}/*"]
+  }
+  statement {
+    effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
     resources = [aws_secretsmanager_secret.node_seed_1.arn, aws_secretsmanager_secret.node_seed_2.arn, aws_secretsmanager_secret.node_seed_3.arn, aws_secretsmanager_secret.node_seed_4.arn]
   }

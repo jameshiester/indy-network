@@ -85,11 +85,65 @@ resource "aws_ecs_task_definition" "mswebapp" {
         options = {
           awslogs-group         = var.log_group_name,
           awslogs-region        = var.Region,
-          awslogs-stream-prefix = "awslogs-"
+          awslogs-stream-prefix = "server"
         }
       }
       healthCheck = {
         command         = ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+        intervalSeconds = 30
+        timeoutSeconds  = 5
+        retries         = 3
+        startPeriod     = 30
+      }
+    },
+    {
+      name                   = var.MONITOR_CONTAINER_NAME
+      image                  = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.Region}.amazonaws.com/${var.monitor_ecr_repo}:latest"
+      cpu                    = 256
+      memory                 = 512
+      essential              = true
+      readonlyRootFilesystem = false
+      portMappings = [
+        {
+          containerPort = 9000
+          hostPort      = 9000
+          protocol      = "tcp"
+        }
+      ]
+      environment = [
+        {
+          name  = "INDY_NETWORK_NAME"
+          value = var.network_name
+        },
+        {
+          name  = "INDY_NAMESPACE"
+          value = var.network_name
+        },
+        {
+          name  = "PORT"
+          value = "9000"
+        },
+        {
+          name  = "GENESIS_URL"
+          value = "https://${var.genesis_bucket_name}.s3.${var.Region}.amazonaws.com/${var.pool_transactions_key}"
+        }
+      ]
+      secrets = [
+        {
+          name      = "SEED"
+          valueFrom = var.steward_seed_arn
+        }
+      ]
+      logconfiguration = {
+        logDriver = "awslogs",
+        options = {
+          awslogs-group         = var.log_group_name,
+          awslogs-region        = var.Region,
+          awslogs-stream-prefix = "monitor"
+        }
+      }
+      healthCheck = {
+        command         = ["CMD-SHELL", "curl -f http://localhost:9000/networks || exit 1"]
         intervalSeconds = 30
         timeoutSeconds  = 5
         retries         = 3

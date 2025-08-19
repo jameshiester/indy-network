@@ -14,16 +14,6 @@
     "indyNamespace": "sovrin",
     "genesisUrl": "https://raw.githubusercontent.com/sovrin-foundation/sovrin/stable/sovrin/pool_transactions_live_genesis"
   },
-  "vn": {
-    "name": "Local von-network",
-    "indyNamespace": "local:dev-docker",
-    "genesisUrl": "http://host.docker.internal:9000/genesis"
-  },
-  "vn-linux": {
-    "name": "Linux Local von-network",
-    "indyNamespace": "local:dev-linux",
-    "genesisUrl": "http://localhost:9000/genesis"
-  },
   "bcd": {
     "name": "BCovrin Dev",
     "indyNamespace": "bcovrin:dev",
