@@ -128,12 +128,12 @@ resource "aws_ecs_task_definition" "mswebapp" {
           value = "https://${var.genesis_bucket_name}.s3.${var.Region}.amazonaws.com/${var.pool_transactions_key}"
         }
       ]
-      secrets = [
-        {
-          name      = "SEED"
-          valueFrom = var.steward_seed_arn
-        }
-      ]
+      # secrets = [
+      #   {
+      #     name      = "SEED"
+      #     valueFrom = var.steward_seed_arn
+      #   }
+      # ]
       logconfiguration = {
         logDriver = "awslogs",
         options = {
