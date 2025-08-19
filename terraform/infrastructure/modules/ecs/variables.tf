@@ -145,3 +145,8 @@ variable "GenesisUrl" {
   description = "Url for the genesis file"
   type        = string
 }
+
+variable "MonitorPort" {
+  description = "Port for the monitor container"
+  type        = number
+}

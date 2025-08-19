@@ -50,6 +50,14 @@ resource "aws_ecs_task_definition" "mswebapp" {
           value = var.pool_transactions_key
         },
         {
+          name  = "MONITOR_HOST"
+          value = var.MONITOR_CONTAINER_NAME
+        },
+        {
+          name  = "MONITOR_PORT"
+          value = tostring(var.MonitorPort)
+        },
+        {
           name  = "DB_TYPE"
           value = "postgres"
         },
@@ -105,8 +113,8 @@ resource "aws_ecs_task_definition" "mswebapp" {
       readonlyRootFilesystem = false
       portMappings = [
         {
-          containerPort = 9000
-          hostPort      = 9000
+          containerPort = var.MonitorPort
+          hostPort      = var.MonitorPort
           protocol      = "tcp"
         }
       ]
@@ -121,7 +129,7 @@ resource "aws_ecs_task_definition" "mswebapp" {
         },
         {
           name  = "PORT"
-          value = "9000"
+          value = tostring(var.MonitorPort)
         },
         {
           name  = "GENESIS_URL"

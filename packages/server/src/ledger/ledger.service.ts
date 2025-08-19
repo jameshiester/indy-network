@@ -1,12 +1,8 @@
-import { GetTransactionResponse, IndyVdrPool, GetTransactionRequest, PoolCreate, GetValidatorInfoAction, GetValidatorInfoResponse, indyVdr } from '@hyperledger/indy-vdr-nodejs';
+import { GetTransactionResponse, IndyVdrPool, GetTransactionRequest, PoolCreate } from '@hyperledger/indy-vdr-nodejs';
 import { Injectable, Logger, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Key, KeyAlgorithm, KeyMethod } from "@openwallet-foundation/askar-nodejs";
 import { PointerService } from '../pointer/pointer.service.js';
 import { readFile } from 'fs/promises';
-import nacl from 'tweetnacl';
-
-const tmpKey = 'password';
 
 @Injectable()
 export class LedgerService {
@@ -67,47 +63,26 @@ export class LedgerService {
 
   async getValidatorInfo() {
       this.logger.debug(`Syncing validator info`);
+      
       try {
-        const action = new GetValidatorInfoAction({submitterDid: undefined})
-        const response: GetValidatorInfoResponse = await this.pool.submitRequest(action)
-        console.log("success")
-      }catch (error){
-        console.log("error")
-        this.logger.error(error)
-      }
-    
-      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'ascii', 'ascii', true);
-      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'ascii', 'ascii', false);
-      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'utf8', 'utf8', true);
-      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'utf8', 'utf8', false);
-      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'utf8', 'ascii', true);
-      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'utf8', 'ascii', false);
-      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'ascii', 'utf8', true);
-      await this.submitRequest(new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID }), 'ascii', 'utf8', false);
-  }
-
-  async submitRequest(request: GetValidatorInfoAction, keyEncoding: BufferEncoding, messageEncoding: BufferEncoding,useNacl: boolean) {
-      this.logger.debug(`Syncing validator info`);
-      let signature: Uint8Array;
-      try {
-        if (useNacl){
-          const naclKey = nacl.sign.keyPair.fromSeed(Buffer.from(process.env.VALIDATOR_SEED,keyEncoding));
-          signature = nacl.sign(Buffer.from(request.signatureInput, messageEncoding), naclKey.secretKey);
-        } else {
-          const seed = Uint8Array.from(Buffer.from(process.env.VALIDATOR_SEED,keyEncoding));
-          const key = Key.fromSeed({ algorithm: KeyAlgorithm.Ed25519, seed });
-          signature = key.signMessage({ message: Buffer.from(request.signatureInput, messageEncoding) });
-        }
-        request.setSignature({ signature: signature });
-        const response: GetValidatorInfoResponse = await this.pool.submitAction(request)
-
-
-        console.log(keyEncoding,messageEncoding,useNacl,response);
+        const monitorHost = process.env.MONITOR_HOST || 'localhost';
+        const monitorPort = process.env.MONITOR_PORT || '8080';
+        const networkName = process.env.INDY_NETWORK_NAME || 'default';
+        
+        const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}`;
+        this.logger.debug(`Making request to: ${url}`);
+        
+        const response = await fetch(url);
+        const responseData = await response.json();
+        this.logger.debug(`Monitor response: ${JSON.stringify(responseData)}`);
+        
+        return responseData;
       } catch (error) {
-        console.log(keyEncoding,messageEncoding,useNacl,error)
-        this.logger.error(error);
-    }
+        this.logger.error(`Failed to get validator info from monitor: ${error.message}`);
+        throw error;
+      }
   }
+
 
   @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_MINUTE)
   async syncLedgers() {
