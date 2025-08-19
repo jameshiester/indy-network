@@ -153,7 +153,7 @@ resource "aws_s3_object" "domain_transactions" {
 }
 
 resource "aws_s3_object" "docker_compose_yml" {
-  bucket = aws_s3_bucket.genesis_bucket.bucket
+  bucket = aws_s3_bucket.compose_bucket.bucket
   key    = "docker-compose.yml"
   source = "docker-compose.yml"
   etag   = filemd5("docker-compose.yml")
