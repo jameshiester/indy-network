@@ -73,8 +73,7 @@ resource "aws_ecs_task_definition" "mswebapp" {
         },
         {
           name      = "DB_PASSWORD"
-          valueFrom = var.db_secret_arn
-          jsonKey   = "password"
+          valueFrom = "${var.db_secret_arn}:password::"
         },
       ]
       logconfiguration = {
