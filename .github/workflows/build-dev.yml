@@ -390,7 +390,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ${{ vars.TF_VAR_MONITOR_CONTAINER_NAME }}
-          image:  ${{needs.ecr-server.outputs.image}}
+          image:  ${{needs.ecr-monitor.outputs.image}}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
