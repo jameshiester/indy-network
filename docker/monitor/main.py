@@ -15,7 +15,7 @@ from plugin_collection import PluginCollection
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fetch the status of all the indy-nodes within a given pool.")
-    parser.add_argument("--net", choices=Networks.get_ids(), help="Connect to a known network using an ID.")
+    parser.add_argument("--net", choices=Networks.get_ids(), default=os.environ.get('NET'), help="Connect to a known network using an ID.")
     parser.add_argument("--list-nets", action="store_true", help="List known networks.")
     parser.add_argument("--genesis-url", default=os.environ.get('GENESIS_URL') , help="The url to the genesis file describing the ledger pool.  Can be specified using the 'GENESIS_URL' environment variable.")
     parser.add_argument("--genesis-path", default=os.getenv("GENESIS_PATH"), help="The path to the genesis file describing the ledger pool.  Can be specified using the 'GENESIS_PATH' environment variable.")
@@ -33,7 +33,6 @@ if __name__ == "__main__":
 
     enable_verbose(args.verbose)
 
-    if args.web:
         # if args.seed:
         #     print("WARNING: You are trying to run the REST API with a SEED.")
         #     print("Please remove your SEED and try again.")
@@ -41,76 +40,56 @@ if __name__ == "__main__":
         #     exit()
 
         # Pass verbose to rest api through env var
-        os.environ['VERBOSE'] = str(args.verbose)
-        # Add network to networks.json if environment variables are provided
-        genesis_url = os.environ.get('GENESIS_URL')
-        network_name = os.environ.get('INDY_NETWORK_NAME')
-        indy_namespace = os.environ.get('INDY_NAMESPACE')
-        
-        if genesis_url and network_name and indy_namespace:
-            try:
-                # Read existing networks.json or create new one
-                networks_file = 'networks.json'
-                networks_data = {}
-                
-                if os.path.exists(networks_file):
-                    with open(networks_file, 'r') as f:
-                        networks_data = json.load(f)
-                
-                # Create new network entry
-                new_network = {
-                    "genesisUrl": genesis_url,
-                    "name": network_name,
-                    "indyNamespace": indy_namespace
-                }
-                
-                # Add to networks data (using network_name as key)
-                networks_data[network_name] = new_network
-                
-                # Write back to file
-                with open(networks_file, 'w') as f:
-                    json.dump(networks_data, f, indent=2)
-                
-                log(f"Added network '{network_name}' to networks.json")
-                
-            except Exception as e:
-                log(f"Error adding network to networks.json: {e}")
+    os.environ['VERBOSE'] = str(args.verbose)
+    # Add network to networks.json if environment variables are provided
+    genesis_url = os.environ.get('GENESIS_URL')
+    network_name = os.environ.get('INDY_NETWORK_NAME')
+    indy_namespace = os.environ.get('INDY_NAMESPACE')
+    
+    if genesis_url and network_name and indy_namespace:
+        try:
+            # Read existing networks.json or create new one
+            networks_file = 'networks.json'
+            networks_data = {}
+            
+            if os.path.exists(networks_file):
+                with open(networks_file, 'r') as f:
+                    networks_data = json.load(f)
+            
+            # Create new network entry
+            new_network = {
+                "genesisUrl": genesis_url,
+                "name": network_name,
+                "indyNamespace": indy_namespace
+            }
+            
+            # Add to networks data (using network_name as key)
+            networks_data[network_name] = new_network
+            
+            # Write back to file
+            with open(networks_file, 'w') as f:
+                json.dump(networks_data, f, indent=2)
+            
+            log(f"Added network '{network_name}' to networks.json")
+            
+        except Exception as e:
+            log(f"Error adding network to networks.json: {e}")
 
-        MODULE_NAME = os.environ.get('MODULE_NAME', "rest_api")
-        VARIABLE_NAME = os.environ.get('VARIABLE_NAME', "app")
-        APP_MODULE = os.environ.get('APP_MODULE', f"{MODULE_NAME}:{VARIABLE_NAME}")
+    MODULE_NAME = os.environ.get('MODULE_NAME', "rest_api")
+    VARIABLE_NAME = os.environ.get('VARIABLE_NAME', "app")
+    APP_MODULE = os.environ.get('APP_MODULE', f"{MODULE_NAME}:{VARIABLE_NAME}")
 
-        if args.debug:
-            HOST = os.environ.get('HOST', '0.0.0.0')
-            PORT = os.environ.get('PORT', '8080')
-            LOG_LEVEL = os.environ.get('LOG_LEVEL', 'info')
+    if args.debug:
+        HOST = os.environ.get('HOST', '0.0.0.0')
+        PORT = os.environ.get('PORT', '8080')
+        LOG_LEVEL = os.environ.get('LOG_LEVEL', 'info')
 
-            log("Starting web server in debug mode ...")
-            os.system(f'uvicorn --reload --host {HOST} --port {PORT} --log-level {LOG_LEVEL} "{APP_MODULE}"')
-        else:
-            GUNICORN_CONF = os.environ.get('GUNICORN_CONF', 'gunicorn_conf.py')
-            WORKER_CLASS = os.environ.get('WORKER_CLASS', "uvicorn.workers.UvicornWorker")
-
-            log("Starting web server ...")
-            os.system(f'gunicorn -k "{WORKER_CLASS}" -c "{GUNICORN_CONF}" "{APP_MODULE}"')
-        
-
+        log("Starting web server in debug mode ...")
+        os.system(f'uvicorn --reload --host {HOST} --port {PORT} --log-level {LOG_LEVEL} "{APP_MODULE}"')
     else:
-        log("Starting from the command line ...")
+        GUNICORN_CONF = os.environ.get('GUNICORN_CONF', 'gunicorn_conf.py')
+        WORKER_CLASS = os.environ.get('WORKER_CLASS', "uvicorn.workers.UvicornWorker")
 
-        if args.list_nets:
-            print(json.dumps(Networks.get_networks(), indent=2))
-            exit()
-
-        log("indy-vdr version:", indy_vdr.version())
-        did_seed = None if not args.seed else args.seed
-        ident = create_did(did_seed)
-        networks = Networks()
-        pool_collection = PoolCollection(args.verbose, networks)
-        network = networks.resolve(args.net, args.genesis_url, args.genesis_path)
-        node_info = FetchStatus(args.verbose, pool_collection)
-        result = asyncio.get_event_loop().run_until_complete(node_info.fetch(network.id, monitor_plugins, args.nodes, ident))
-        if args.raw:
-            print(json.dumps(result, separators=(',', ':')))
-        else:
-            print(json.dumps(result, indent=2))
+        log("Starting web server ...")
+        os.system(f'gunicorn -k "{WORKER_CLASS}" -c "{GUNICORN_CONF}" "{APP_MODULE}"')
+    
