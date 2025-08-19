@@ -42,25 +42,6 @@ if __name__ == "__main__":
 
         # Pass verbose to rest api through env var
         os.environ['VERBOSE'] = str(args.verbose)
-
-        MODULE_NAME = os.environ.get('MODULE_NAME', "rest_api")
-        VARIABLE_NAME = os.environ.get('VARIABLE_NAME', "app")
-        APP_MODULE = os.environ.get('APP_MODULE', f"{MODULE_NAME}:{VARIABLE_NAME}")
-
-        if args.debug:
-            HOST = os.environ.get('HOST', '0.0.0.0')
-            PORT = os.environ.get('PORT', '8080')
-            LOG_LEVEL = os.environ.get('LOG_LEVEL', 'info')
-
-            log("Starting web server in debug mode ...")
-            os.system(f'uvicorn --reload --host {HOST} --port {PORT} --log-level {LOG_LEVEL} "{APP_MODULE}"')
-        else:
-            GUNICORN_CONF = os.environ.get('GUNICORN_CONF', 'gunicorn_conf.py')
-            WORKER_CLASS = os.environ.get('WORKER_CLASS', "uvicorn.workers.UvicornWorker")
-
-            log("Starting web server ...")
-            os.system(f'gunicorn -k "{WORKER_CLASS}" -c "{GUNICORN_CONF}" "{APP_MODULE}"')
-        
         # Add network to networks.json if environment variables are provided
         genesis_url = os.environ.get('GENESIS_URL')
         network_name = os.environ.get('INDY_NETWORK_NAME')
@@ -94,6 +75,26 @@ if __name__ == "__main__":
                 
             except Exception as e:
                 log(f"Error adding network to networks.json: {e}")
+
+        MODULE_NAME = os.environ.get('MODULE_NAME', "rest_api")
+        VARIABLE_NAME = os.environ.get('VARIABLE_NAME', "app")
+        APP_MODULE = os.environ.get('APP_MODULE', f"{MODULE_NAME}:{VARIABLE_NAME}")
+
+        if args.debug:
+            HOST = os.environ.get('HOST', '0.0.0.0')
+            PORT = os.environ.get('PORT', '8080')
+            LOG_LEVEL = os.environ.get('LOG_LEVEL', 'info')
+
+            log("Starting web server in debug mode ...")
+            os.system(f'uvicorn --reload --host {HOST} --port {PORT} --log-level {LOG_LEVEL} "{APP_MODULE}"')
+        else:
+            GUNICORN_CONF = os.environ.get('GUNICORN_CONF', 'gunicorn_conf.py')
+            WORKER_CLASS = os.environ.get('WORKER_CLASS', "uvicorn.workers.UvicornWorker")
+
+            log("Starting web server ...")
+            os.system(f'gunicorn -k "{WORKER_CLASS}" -c "{GUNICORN_CONF}" "{APP_MODULE}"')
+        
+
     else:
         log("Starting from the command line ...")
 

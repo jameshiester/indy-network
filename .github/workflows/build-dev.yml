@@ -376,7 +376,7 @@ jobs:
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         if: ${{needs.ecr-server.outputs.changes}}
-        id: task-def-server
+        id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
@@ -385,7 +385,7 @@ jobs:
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         if: ${{needs.ecr-monitor.outputs.changes}}
-        id: task-def-monitor
+        id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
