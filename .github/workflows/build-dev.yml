@@ -376,7 +376,7 @@ jobs:
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         if: ${{needs.ecr-server.outputs.changes}}
-        id: task-def
+        id: task-def-server
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
@@ -385,7 +385,7 @@ jobs:
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         if: ${{needs.ecr-monitor.outputs.changes}}
-        id: task-def
+        id: task-def-monitor
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
@@ -396,7 +396,7 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         if: ${{needs.ecr-monitor.outputs.changes}} || ${{needs.ecr-server.outputs.changes}}
         with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          task-definition: ${{ needs.ecr-monitor.outputs.changes == 'true' && steps.task-def-monitor.outputs.task-definition || steps.task-def-server.outputs.task-definition }}
           service: ${{ vars.TF_VAR_ECSSERVICE  }}
           cluster: ${{ vars.TF_VAR_ECSCLUSTER  }}
           wait-for-service-stability: true
