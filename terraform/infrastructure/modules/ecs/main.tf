@@ -38,6 +38,10 @@ resource "aws_ecs_task_definition" "mswebapp" {
           value = var.network_name
         },
         {
+          name  = "GENESIS_TXN_PATH"
+          value = "/app/genesis.txn"
+        },
+        {
           name  = "GENESIS_S3_BUCKET"
           value = var.genesis_bucket_name
         },
