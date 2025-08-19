@@ -149,4 +149,5 @@ variable "GenesisUrl" {
 variable "MonitorPort" {
   description = "Port for the monitor container"
   type        = number
+  default     = 9000
 }
