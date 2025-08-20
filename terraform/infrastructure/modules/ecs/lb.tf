@@ -71,15 +71,6 @@ resource "aws_security_group" "app01" {
   }
 
   ingress {
-    description     = "Application Inbound"
-    from_port       = 9000
-    to_port         = 9000
-    protocol        = "tcp"
-    security_groups = [aws_security_group.web01.id]
-    self            = true
-  }
-
-  ingress {
     description     = "Self Inbound"
     from_port       = 9000
     to_port         = 9000
