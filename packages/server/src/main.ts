@@ -12,7 +12,6 @@ async function bootstrap() {
   const genesisPath = process.env.GENESIS_TXN_PATH || '/app/genesis.txn';
   const s3Bucket = process.env.GENESIS_S3_BUCKET;
   const s3Key = process.env.GENESIS_S3_KEY;
-  console.log(process.env.DB_PASSWORD);
   if (genesisPath && s3Bucket && s3Key) {
     try {
       const s3 = new S3Client({region: process.env.AWS_REGION || 'us-east-1' });

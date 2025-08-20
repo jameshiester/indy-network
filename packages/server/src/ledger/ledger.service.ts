@@ -1,8 +1,9 @@
-import { GetTransactionResponse, IndyVdrPool, GetTransactionRequest, PoolCreate } from '@hyperledger/indy-vdr-nodejs';
+import { GetTransactionResponse, IndyVdrPool, GetTransactionRequest, PoolCreate, GetValidatorInfoAction, GetValidatorInfoResponse } from '@hyperledger/indy-vdr-nodejs';
 import { Injectable, Logger, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PointerService } from '../pointer/pointer.service.js';
 import { readFile } from 'fs/promises';
+import { Key, KeyAlgorithm } from '@openwallet-foundation/askar-nodejs';
 
 @Injectable()
 export class LedgerService {
@@ -143,6 +144,24 @@ export class LedgerService {
     }
   }
 
+  async getValidatorInfoSigned() {
+    try {
+
+
+    const request = new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID });
+        const seed = Uint8Array.from(Buffer.from(process.env.SEED));
+        const key = Key.fromSeed({ algorithm: KeyAlgorithm.Ed25519, seed });
+        const signature = key.signMessage({ message: Buffer.from(request.signatureInput, 'utf8') });
+        this.logger.log(signature);
+        request.setSignature({ signature: signature });
+        const response: GetValidatorInfoResponse = await this.pool.submitRequest(request)
+        this.logger.log(response);
+      } catch (error) {
+        this.logger.error(`Failed to get validator info: ${error.message}`);
+        throw error;
+      }
+  }
+
 
   @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_MINUTE)
   async syncLedgers() {
@@ -155,7 +174,8 @@ export class LedgerService {
 
   @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_MINUTE)
   async syncStatus() {
-    await this.getValidatorInfo();
+    // await this.getValidatorInfo();
+    await this.getValidatorInfoSigned();
   }
 }
 
