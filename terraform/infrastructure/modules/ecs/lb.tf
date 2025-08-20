@@ -75,6 +75,7 @@ resource "aws_security_group" "app01" {
     from_port       = 9000
     to_port         = 9000
     protocol        = "tcp"
+    security_groups = [aws_security_group.web01.id]
     self            = true
   }
 
@@ -137,6 +138,24 @@ resource "aws_lb_listener" "mswebapp" {
   })
 }
 
+# Create ALB listener
+# WARNING: Consider changing port to 443 and protocol to HTTPS for production environments 
+resource "aws_lb_listener" "monitor" {
+  load_balancer_arn = aws_lb.mswebapp.arn
+  port              = "9000"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.monitor.arn
+  }
+
+  tags = merge(local.tags, {
+    Name  = format("%s-%s-%s", var.Region, "indy-api-monitor", var.EnvCode)
+    rtype = "network"
+  })
+}
+
 # Define ALB Target Group
 # WARNING: Lifecyle and name_prefix added for testing. Issue discussed here https://github.com/hashicorp/terraform-provider-aws/issues/16889
 resource "aws_lb_target_group" "mswebapp" {
@@ -164,6 +183,37 @@ resource "aws_lb_target_group" "mswebapp" {
 
   tags = merge(local.tags, {
     Name  = format("%s-%s-%s-%s", var.Region, "indy-api", var.EnvCode, "api")
+    rtype = "network"
+  })
+}
+
+# Define ALB Target Group
+# WARNING: Lifecyle and name_prefix added for testing. Issue discussed here https://github.com/hashicorp/terraform-provider-aws/issues/16889
+resource "aws_lb_target_group" "monitor" {
+  name_prefix                   = "indy-"
+  port                          = 9000
+  protocol                      = "HTTP"
+  target_type                   = "ip"
+  vpc_id                        = var.vpc_id
+  load_balancing_algorithm_type = "round_robin"
+
+  health_check {
+    path    = "/health"
+    matcher = "200"
+  }
+
+  stickiness {
+    enabled         = true
+    type            = "lb_cookie"
+    cookie_duration = 86400
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = merge(local.tags, {
+    Name  = format("%s-%s-%s-%s", var.Region, "indy-api", var.EnvCode, "monitor")
     rtype = "network"
   })
 }
