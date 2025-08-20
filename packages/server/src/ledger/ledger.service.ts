@@ -61,6 +61,65 @@ export class LedgerService {
     }
   }
 
+  private async getMonitorInfo(monitorHost: string, monitorPort: string, networkName: string, headers: Record<string, string>) {
+    const url = `http://${monitorHost}:${monitorPort}/networks`;
+    // const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}`;
+    this.logger.debug(`Making request to: ${url}`);
+    
+    try {
+      const response = await fetch(url, {
+        headers
+      });
+      
+      if (!response.ok) {
+        this.logger.error(`Monitor request failed with status: ${response.status} ${response.statusText}`);
+        throw new Error(`Monitor request failed with status: ${response.status} ${response.statusText}`);
+      }
+      
+      const responseData = await response.json();
+      this.logger.debug(`Monitor response: ${JSON.stringify(responseData)}`);
+      
+      return responseData;
+    } catch (error) {
+      this.logger.error(`Failed to get monitor info: ${error.message}`);
+      this.logger.error(`Monitor error details:`, {
+        name: error.name,
+        stack: error.stack,
+        cause: error.cause,
+        url: url,
+        headers: headers
+      });
+    }
+  }
+
+  private async getNodeInfo(monitorHost: string, monitorPort: string, networkName: string, headers: Record<string, string>) {
+    const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}/node1`;
+    this.logger.debug(`Making node request to: ${url}`);
+    
+    try {
+      const nodeResponse = await fetch(url, {headers});
+      
+      if (!nodeResponse.ok) {
+        this.logger.error(`Node request failed with status: ${nodeResponse.status} ${nodeResponse.statusText}`);
+        throw new Error(`Node request failed with status: ${nodeResponse.status} ${nodeResponse.statusText}`);
+      }
+      
+      const nodeResponseData = await nodeResponse.json();
+      this.logger.debug(`Node response: ${JSON.stringify(nodeResponseData)}`);
+      
+      return nodeResponseData;
+    } catch (error) {
+      this.logger.error(`Failed to get node info: ${error.message}`);
+      this.logger.error(`Node error details:`, {
+        name: error.name,
+        stack: error.stack,
+        cause: error.cause,
+        url: url,
+        headers: headers
+      });
+    }
+  }
+
   async getValidatorInfo() {
     this.logger.debug(`Syncing validator info`);
 
@@ -73,20 +132,11 @@ export class LedgerService {
       if (seed) {
         headers['seed'] = seed;
       }
-      const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}`;
-      this.logger.debug(`Making request to: ${url}`);
 
-      const response = await fetch(url, {
-        headers
-      });
-      const responseData = await response.json();
-      this.logger.debug(`Monitor response: ${JSON.stringify(responseData)}`);
-
-      const nodeResponse = await fetch(`http://${monitorHost}:${monitorPort}/networks/${networkName}/node1`, {headers});
-      const nodeResponseData = await nodeResponse.json();
-      this.logger.debug(`Node response: ${JSON.stringify(nodeResponseData)}`);
-
-      return responseData;
+      const monitorData = await this.getMonitorInfo(monitorHost, monitorPort, networkName, headers);
+      const nodeData = await this.getNodeInfo(monitorHost, monitorPort, networkName, headers);
+      
+      return monitorData;
     } catch (error) {
       this.logger.error(`Failed to get validator info from monitor: ${error.message}`);
       throw error;
