@@ -21,7 +21,7 @@ module "ecs" {
   server_ecr_repo         = var.ECR_SERVER_REPO
   SOLTAG                  = var.SOLTAG
   steward_did             = module.node_genesis_1.steward_did
-  steward_seed_arn        = aws_secretsmanager_secret.node_seed_1.arn
+  steward_seed_arn        = aws_secretsmanager_secret.steward_seed_1.arn
   vpc_cidr                = local.vpc_cidr
   vpc_id                  = module.vpc.vpc_id
   MONITOR_CONTAINER_NAME  = var.MONITOR_CONTAINER_NAME
