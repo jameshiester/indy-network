@@ -80,8 +80,8 @@ if __name__ == "__main__":
     APP_MODULE = os.environ.get('APP_MODULE', f"{MODULE_NAME}:{VARIABLE_NAME}")
 
     if args.debug:
-        HOST = os.environ.get('HOST', '0.0.0.0')
-        PORT = os.environ.get('PORT', '8080')
+        HOST = '0.0.0.0'
+        PORT = os.environ.get('PORT', '9000')
         LOG_LEVEL = os.environ.get('LOG_LEVEL', 'info')
 
         log("Starting web server in debug mode ...")
