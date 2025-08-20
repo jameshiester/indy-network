@@ -2,7 +2,7 @@
 
 ## Building Plug-ins
 
-Build your own class based plugins to extract the information you want. Have a look at the included [example plug-in](Example/example.py) to see how to build your own. 
+Build your own class based plugins to extract the information you want. Have a look at the included [example plug-in](Example/example.py) to see how to build your own.
 
 ## About Plug-ins
 
@@ -20,19 +20,21 @@ Have a look at the included plug-ins to get an idea of how to build your own!
 
 The [Analysis Plug-in](analysis.py) does an analysis of the response returned from the network; returns result.
 
-*WARNING this plug-in has to run first in order for the other plug-ins to work. Plug-in index should be set to ZERO set inside the plug-in class under the INIT method. i.e. `self.index = 0`*
-*This plug-in is required in order to run this monitor and will automatically run without a command line argument*
+_WARNING this plug-in has to run first in order for the other plug-ins to work. Plug-in index should be set to ZERO set inside the plug-in class under the INIT method. i.e. `self.index = 0`_
+_This plug-in is required in order to run this monitor and will automatically run without a command line argument_
 
 ## Status Only Plug-in
 
 The [Status Only Plug-in](status_only.py) removes response from the result returning only the status.
 
 ### How To Use
+
 `./run.sh --net ssn --status` or `./run.sh --net ssn --status --alerts`
 
 --status: enables the plug-in
 
 ### Example Print Out
+
 ```
 [
   {

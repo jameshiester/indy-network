@@ -8,5 +8,3 @@ import { DBModule } from './db/db.module';
   imports: [HealthModule, LedgerModule, ScheduleModule.forRoot(), DBModule],
 })
 export class AppModule {}
-
-

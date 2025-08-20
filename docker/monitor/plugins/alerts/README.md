@@ -3,11 +3,13 @@
 The [Alerts Plug-in](alerts.py) filters out nodes that contain "info", "warnings", or "errors" in the "status" field. Can by used in conjuction with the Status Only Plug-in.
 
 ## How To Use
+
 `./run.sh --net ssn --alerts` or `./run.sh --net ssn --alerts --status `
 
 --alerts: enables the plug-in
 
 ## Example Print Out
+
 ```
 [
   {

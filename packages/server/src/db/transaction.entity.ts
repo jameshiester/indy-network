@@ -1,4 +1,10 @@
-import { Entity, PrimaryColumn, Column, UpdateDateColumn, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  UpdateDateColumn,
+  CreateDateColumn,
+} from 'typeorm';
 import { IndyRoleType, IndyTransactionType } from 'model';
 
 @Entity()
@@ -7,9 +13,9 @@ export class Transaction {
   id!: number;
 
   @PrimaryColumn('int')
-  ledger!:number;
+  ledger!: number;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   transactionType!: IndyTransactionType;
 
   @Column({ nullable: true })

@@ -3,8 +3,7 @@ import { LedgerService } from './ledger.service.js';
 
 @Controller('ledger')
 export class LedgerController {
-  constructor(private readonly ledgerService: LedgerService) {
-  }
+  constructor(private readonly ledgerService: LedgerService) {}
 
   @Get('status')
   getStatus() {
@@ -17,5 +16,3 @@ export class LedgerController {
     return this.ledgerService.getGenesisTransactionsText();
   }
 }
-
-

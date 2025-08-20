@@ -7,6 +7,4 @@ export class Pointer {
 
   @Column()
   sequence!: number;
-
-  
 }

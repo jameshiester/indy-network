@@ -10,14 +10,16 @@
     "build-docker-server": "docker build -t indy-server -f docker/server/Dockerfile --progress=plain .",
     "build-docker-monitor": "docker build -t indy-monitor -f docker/monitor/Dockerfile --progress=plain ./docker/monitor",
     "start": "turbo run start",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\""
   },
   "devDependencies": {
     "turbo": "^2.0.6",
     "concurrently": "^9.0.1",
     "@types/node": "^22.13.10",
-    "typescript": "~5.4.0"
+    "typescript": "~5.4.0",
+    "prettier": "^3.4.1"
   },
   "packageManager": "pnpm@9.15.4"
 }
-

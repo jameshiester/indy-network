@@ -22,7 +22,7 @@ The rest of the steps assume you are in your bash terminal in a folder where Git
 
 To start a local Indy network to test with, we'll clone a VON Network, build it and start it using the following commands run in a bash terminal:
 
-``` bash
+```bash
 git clone https://github.com/bcgov/von-network
 cd von-network
 ./manage build
@@ -31,7 +31,7 @@ cd ..
 
 ```
 
-The build step will take a while as 1/3 of the Internet is downloaded. Eventually, the `start` step will execute and a four-node Indy ledger will start.  Wait about 30 seconds and then go to the web interface to view the network.
+The build step will take a while as 1/3 of the Internet is downloaded. Eventually, the `start` step will execute and a four-node Indy ledger will start. Wait about 30 seconds and then go to the web interface to view the network.
 
 - If you are running locally, go to [http://localhost:9000](http://localhost:9000).
 - If you are on Play with Docker, click the `9000` link above the terminal session window.
@@ -60,36 +60,44 @@ cd indy-node-monitor/fetch-validator-status
 ### Run the Validator Info Script
 
 For a full list of script options run:
-``` bash
+
+```bash
 ./run.sh -h
 ```
 
 To get the details for the known networks available for use with the `--net` option, run:
-``` bash
+
+```bash
 ./run.sh --list-nets
 ```
 
 To run the validator script, run the following command in your bash terminal from the `fetch-validator-status` folder in the `indy-node-monitor` clone:
 
-``` bash
+```bash
 ./run.sh --net=<netId> --seed=<SEED>
 ```
+
 or
-``` bash
+
+```bash
 ./run.sh --genesis-url=<URL> --seed=<SEED>
 ```
 
 To just get a status summary for the nodes, run:
-``` bash
+
+```bash
 ./run.sh --net=<netId> --seed=<SEED> --status
 ```
+
 or
-``` bash
+
+```bash
 ./run.sh --genesis-url=<URL> --seed=<SEED> --status
 ```
 
 To fetch data for a single node, or a particular set of nodes use the `--nodes` argument and provide a comma delimited list of node names (aliases);
-``` bash
+
+```bash
 ./run.sh --net=<netId> --seed=<SEED> --status --nodes node1,node2
 ```
 
@@ -100,21 +108,25 @@ For the first test run using von-network:
 
 If you are running locally, the full command is:
 
-``` bash
+```bash
 ./run.sh --net=vn --seed=000000000000000000000000Trustee1
 ```
+
 or
-``` bash
+
+```bash
 ./run.sh --genesis-url=http://localhost:9000/genesis --seed=000000000000000000000000Trustee1
 ```
 
 To perform an anonymous connection test when a privileged DID seed is not available, omit the `SEED` (`-a` is no longer needed to perform an anonymous connection):
 
-``` bash
+```bash
 ./run.sh --net=<netId>
 ```
+
 or
-``` bash
+
+```bash
 ./run.sh --genesis-url=<URL>
 ```
 
@@ -128,7 +140,7 @@ If you use the Seed of a DID that does not have permission to see validator info
 
 To see what happens when a node is terminated, or inaccessible, terminate one of the von-network nodes and then re-run the validator info script. To terminate a von-network node run:
 
-``` bash
+```bash
 docker kill von_node1_1
 ```
 
@@ -142,7 +154,7 @@ Try redirecting the output to `>bad.json` and then use `diff good.json bad.json`
 
 If you are finished trying this out with a local Indy network, don't forget to go back and shutdown the instance of von-network, using the commands:
 
-``` bash
+```bash
 cd ../..
 cd von-network
 ./manage down
@@ -165,7 +177,6 @@ Once you have the script running, you can write a plug-in that takes the JSON in
 The suggestions above are only ideas. Precise meanings of the values should be investigated, particularly for "ledger" type data (e.g. number of transactions) but that are generated on a per node basis.
 
 Note that there are three different formats for the timestamps in the data structure, and all appear to be UTC. Make sure to convert times into a single format during collection.
-
 
 ## Plug-ins
 

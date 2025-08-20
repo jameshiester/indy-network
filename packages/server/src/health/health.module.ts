@@ -7,5 +7,3 @@ import { HealthController } from './health.controller';
   providers: [],
 })
 export class HealthModule {}
-
-

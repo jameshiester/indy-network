@@ -14,7 +14,9 @@ async function bootstrap() {
   const s3Key = process.env.GENESIS_S3_KEY;
   if (genesisPath && s3Bucket && s3Key) {
     try {
-      const s3 = new S3Client({region: process.env.AWS_REGION || 'us-east-1' });
+      const s3 = new S3Client({
+        region: process.env.AWS_REGION || 'us-east-1',
+      });
       const cmd = new GetObjectCommand({ Bucket: s3Bucket, Key: s3Key });
       const res = await s3.send(cmd);
       const body = res.Body as unknown as NodeJS.ReadableStream;
@@ -34,5 +36,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-
-

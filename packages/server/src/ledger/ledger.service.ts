@@ -1,17 +1,34 @@
-import { GetTransactionResponse, IndyVdrPool, GetTransactionRequest, PoolCreate, GetValidatorInfoAction, GetValidatorInfoResponse } from '@hyperledger/indy-vdr-nodejs';
-import { Injectable, Logger, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  GetTransactionResponse,
+  IndyVdrPool,
+  GetTransactionRequest,
+  PoolCreate,
+  GetValidatorInfoResponse,
+} from '@hyperledger/indy-vdr-nodejs';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { INode } from 'model';
 import { PointerService } from '../pointer/pointer.service.js';
 import { readFile } from 'fs/promises';
-import { Key, KeyAlgorithm } from '@openwallet-foundation/askar-nodejs';
+import { NodeService } from '../node/node.service.js';
 
 @Injectable()
 export class LedgerService {
   private readonly logger = new Logger(LedgerService.name);
   private readonly pool: IndyVdrPool;
 
-  constructor(private readonly pointerService: PointerService) {
-    this.pool = new PoolCreate({ parameters: { transactions_path: process.env.GENESIS_TXN_PATH } })
+  constructor(
+    private readonly pointerService: PointerService,
+    private readonly nodeService: NodeService,
+  ) {
+    this.pool = new PoolCreate({
+      parameters: { transactions_path: process.env.GENESIS_TXN_PATH },
+    });
   }
 
   getStatus() {
@@ -25,15 +42,21 @@ export class LedgerService {
       throw new InternalServerErrorException('GENESIS_TXN_PATH is not set');
     }
     try {
-      const fileContent = await readFile(genesisFilePath, { encoding: 'utf-8' });
+      const fileContent = await readFile(genesisFilePath, {
+        encoding: 'utf-8',
+      });
       return fileContent;
     } catch (error: any) {
       if (error?.code === 'ENOENT') {
         this.logger.error(`Genesis file not found at path: ${genesisFilePath}`);
         throw new NotFoundException('Genesis transactions file not found');
       }
-      this.logger.error(`Failed to read genesis file: ${error?.message ?? error}`);
-      throw new InternalServerErrorException('Failed to read genesis transactions file');
+      this.logger.error(
+        `Failed to read genesis file: ${error?.message ?? error}`,
+      );
+      throw new InternalServerErrorException(
+        'Failed to read genesis transactions file',
+      );
     }
   }
 
@@ -43,18 +66,25 @@ export class LedgerService {
     this.logger.debug(`Syncing ledger ${ledger} from ${latest}`);
     while (!complete) {
       try {
-        const request = new GetTransactionRequest({ ledgerType: ledger, seqNo: latest + 1 })
-        const response: GetTransactionResponse = await this.pool.submitRequest(request)
+        const request = new GetTransactionRequest({
+          ledgerType: ledger,
+          seqNo: latest + 1,
+        });
+        const response: GetTransactionResponse =
+          await this.pool.submitRequest(request);
 
         if (response.result.seqNo === undefined) {
-          this.logger.debug(`Syncing ledger ${ledger} complete. Last synced txn: ${latest}`)
+          this.logger.debug(
+            `Syncing ledger ${ledger} complete. Last synced txn: ${latest}`,
+          );
           complete = true;
         } else {
           await this.pointerService.setLatest(ledger, response.result.seqNo);
           latest = response.result.seqNo;
-          this.logger.debug(`Txn ${response.result.seqNo} synced from ledger ${ledger}`)
+          this.logger.debug(
+            `Txn ${response.result.seqNo} synced from ledger ${ledger}`,
+          );
         }
-
       } catch (error) {
         this.logger.error(error);
         complete = true;
@@ -62,53 +92,44 @@ export class LedgerService {
     }
   }
 
-  private async getMonitorInfo(monitorHost: string, monitorPort: string, networkName: string, headers: Record<string, string>) {
-    const url = `http://${monitorHost}:${monitorPort}/networks`;
-    // const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}`;
-    this.logger.debug(`Making request to: ${url}`);
-
-    try {
-      const response = await fetch(url, {
-        headers
-      });
-
-      if (!response.ok) {
-        this.logger.error(`Monitor request failed with status: ${response.status} ${response.statusText}`);
-        throw new Error(`Monitor request failed with status: ${response.status} ${response.statusText}`);
-      }
-
-      const responseData = await response.json();
-      this.logger.debug(`Monitor response: ${JSON.stringify(responseData)}`);
-
-      return responseData;
-    } catch (error) {
-      this.logger.error(`Failed to get monitor info: ${error.message}`);
-      this.logger.error(`Monitor error details:`, {
-        name: error.name,
-        stack: error.stack,
-        cause: error.cause,
-        url: url,
-        headers: headers
-      });
-    }
-  }
-
-  private async getNodeInfo(monitorHost: string, monitorPort: string, networkName: string, headers: Record<string, string>) {
-    const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}/node1`;
+  private async getNodeInfo(
+    monitorHost: string,
+    monitorPort: string,
+    networkName: string,
+    headers: Record<string, string>,
+    node: string,
+  ) {
+    const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}/${node}`;
     this.logger.debug(`Making node request to: ${url}`);
 
     try {
       const nodeResponse = await fetch(url, { headers });
 
       if (!nodeResponse.ok) {
-        this.logger.error(`Node request failed with status: ${nodeResponse.status} ${nodeResponse.statusText}`);
-        throw new Error(`Node request failed with status: ${nodeResponse.status} ${nodeResponse.statusText}`);
+        this.logger.error(
+          `Node request failed with status: ${nodeResponse.status} ${nodeResponse.statusText}`,
+        );
+        throw new Error(
+          `Node request failed with status: ${nodeResponse.status} ${nodeResponse.statusText}`,
+        );
       }
 
-      const nodeResponseData = await nodeResponse.json();
-      this.logger.debug(`Node response: ${JSON.stringify(nodeResponseData)}`);
-
-      return nodeResponseData;
+      const nodeResponseDataArray: Array<any> = await nodeResponse.json();
+      const nodeData = nodeResponseDataArray[0];
+      this.logger.debug(
+        `Node response: ${JSON.stringify(nodeResponseDataArray)}`,
+      );
+      const data: INode = {
+        name: node,
+        active: nodeData?.status?.ok === true,
+        value: nodeData,
+        indyVersion: nodeData?.status?.software?.['indy-node'],
+        did: nodeData.response.data['Node_info'].did,
+        verkey: nodeData.response.data['Node_info'].verkey,
+        uptimeSeconds: nodeData.response.data['Node_info'].Metrics.uptime,
+      };
+      console.log(data);
+      await this.nodeService.upsertNode(data);
     } catch (error) {
       this.logger.error(`Failed to get node info: ${error.message}`);
       this.logger.error(`Node error details:`, {
@@ -116,13 +137,13 @@ export class LedgerService {
         stack: error.stack,
         cause: error.cause,
         url: url,
-        headers: headers
+        headers: headers,
       });
     }
   }
 
-  async getValidatorInfo() {
-    this.logger.debug(`Syncing validator info`);
+  async getValidatorInfo(node: string) {
+    this.logger.debug(`Syncing validator info for node ${node}`);
 
     try {
       const monitorHost = process.env.MONITOR_HOST || 'localhost';
@@ -133,50 +154,36 @@ export class LedgerService {
       if (seed) {
         headers['seed'] = seed;
       }
-
-      const monitorData = await this.getMonitorInfo(monitorHost, monitorPort, networkName, headers);
-      const nodeData = await this.getNodeInfo(monitorHost, monitorPort, networkName, headers);
-
-      return monitorData;
+      await this.getNodeInfo(
+        monitorHost,
+        monitorPort,
+        networkName,
+        headers,
+        node,
+      );
     } catch (error) {
-      this.logger.error(`Failed to get validator info from monitor: ${error.message}`);
+      this.logger.error(
+        `Failed to get validator info from monitor: ${error.message}`,
+      );
       throw error;
     }
   }
-
-  async getValidatorInfoSigned() {
-    try {
-      const did = process.env.DID;
-      this.logger.log(`Getting validator info for DID: ${did}`);
-      const request = new GetValidatorInfoAction({ submitterDid: did });
-      const seed = Uint8Array.from(Buffer.from(process.env.SEED));
-      const key = Key.fromSeed({ algorithm: KeyAlgorithm.Ed25519, seed });
-      const signature = key.signMessage({ message: Buffer.from(request.signatureInput, 'utf8') });
-      this.logger.log(signature);
-      request.setSignature({ signature: signature });
-      const response: GetValidatorInfoResponse = await this.pool.submitRequest(request)
-      this.logger.log(response);
-    } catch (error) {
-      this.logger.error(`Failed to get validator info: ${error.message}`);
-      throw error;
-    }
-  }
-
 
   @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_MINUTE)
   async syncLedgers() {
     await Promise.all([
       this.syncLedger(0),
       this.syncLedger(1),
-      this.syncLedger(2)
-    ])
+      this.syncLedger(2),
+    ]);
   }
 
   @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_MINUTE)
   async syncStatus() {
-    // await this.getValidatorInfo();
-    await this.getValidatorInfoSigned();
+    const verifiers = await this.pool.verifiers;
+    const nodes = Object.keys(verifiers);
+    nodes.forEach(async (node) => {
+      await this.getValidatorInfo(node);
+    });
   }
 }
-
-

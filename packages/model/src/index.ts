@@ -1,56 +1,66 @@
-
 export enum LedgerType {
-    POOL = 0,
-    DOMAIN = 1,
-    CONFIG = 2,
+  POOL = 0,
+  DOMAIN = 1,
+  CONFIG = 2,
 }
 
 export enum IndyTransactionType {
-    NODE = '0',
-    NYM = '1',
-    ATTRIB = '100',
-    SCHEMA = '101',
-    CRED_DEF = '102',
-    DISCLO = '103',
-    GET_ATTR = '104',
-    GET_NYM = '105',
-    GET_SCHEMA = '107',
-    GET_CLAIM_DEF = '108',
-    POOL_UPGRADE = '109',
-    NODE_UPGRADE = '110',
-    POOL_CONFIG = '111',
-    CHANGE_KEY = '112',
-    REVOC_REG_DEF = '113',
-    RECOV_REG_ENTRY = '114',
-    POOL_RESTART = '118',
-    AUTH_RULE = '120',
+  NODE = '0',
+  NYM = '1',
+  ATTRIB = '100',
+  SCHEMA = '101',
+  CRED_DEF = '102',
+  DISCLO = '103',
+  GET_ATTR = '104',
+  GET_NYM = '105',
+  GET_SCHEMA = '107',
+  GET_CLAIM_DEF = '108',
+  POOL_UPGRADE = '109',
+  NODE_UPGRADE = '110',
+  POOL_CONFIG = '111',
+  CHANGE_KEY = '112',
+  REVOC_REG_DEF = '113',
+  RECOV_REG_ENTRY = '114',
+  POOL_RESTART = '118',
+  AUTH_RULE = '120',
 }
 
 export const mapTransactionTypeToName = (type?: string): string | undefined => {
-    if (!type) return undefined;
-    const transactionType = Object.entries(IndyTransactionType).find(
-      (transactionType) => transactionType[1] === type
-    );
-    if (!transactionType) {
-      return undefined;
-    }
-    return transactionType[0];
-  };
+  if (!type) return undefined;
+  const transactionType = Object.entries(IndyTransactionType).find(
+    (transactionType) => transactionType[1] === type,
+  );
+  if (!transactionType) {
+    return undefined;
+  }
+  return transactionType[0];
+};
 
-  export const mapRoleTypeToName = (type?: string): string | undefined => {
-    if (!type) return undefined;
-    const role = Object.entries(IndyRoleType).find(
-      (roleType) => roleType[1] === type
-    );
-    if (!role) {
-      return undefined;
-    }
-    return role[0];
-  };
+export const mapRoleTypeToName = (type?: string): string | undefined => {
+  if (!type) return undefined;
+  const role = Object.entries(IndyRoleType).find(
+    (roleType) => roleType[1] === type,
+  );
+  if (!role) {
+    return undefined;
+  }
+  return role[0];
+};
 
 export enum IndyRoleType {
-    TRUSTEE = '0',
-    STEWARD = '2',
-    TGB = '100',
-    ENDORSER = '101',
-  }
+  TRUSTEE = '0',
+  STEWARD = '2',
+  TGB = '100',
+  ENDORSER = '101',
+}
+
+export interface INode {
+  name: string;
+  active: boolean;
+  value?: unknown;
+  indyVersion?: string;
+  did?: string;
+  verkey?: string;
+  uptimeSeconds?: number;
+  ClientAddress?: string;
+}

@@ -9,10 +9,11 @@
       "cache": false
     },
     "lint": {},
+    "format": {},
+    "format:check": {},
     "start": {
       "cache": false
     },
     "test": {}
   }
 }
-
