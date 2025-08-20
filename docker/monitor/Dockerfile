@@ -32,6 +32,9 @@ ENV PATH="$HOME/.local/bin:$PATH"
 ENV LD_LIBRARY_PATH="$HOME/.local/lib:$LD_LIBRARY_PATH"
 RUN echo "$HOME/.local/lib" > /etc/ld.so.conf.d/local.conf && ldconfig
 
+# Install curl for HTTP requests
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # Add indy user
 RUN useradd -U -ms /bin/bash -u $uid $user
 WORKDIR $HOME

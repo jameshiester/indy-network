@@ -71,6 +71,11 @@ async def redirect():
     response = RedirectResponse(url='/docs')
     return response
 
+@app.get("/health", include_in_schema=False)
+async def health():
+    response = {"status": "ok"}
+    return response
+
 @app.get("/networks")
 async def networks():
     data = Networks.get_networks()
