@@ -66,20 +66,20 @@ export class LedgerService {
     const url = `http://${monitorHost}:${monitorPort}/networks`;
     // const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}`;
     this.logger.debug(`Making request to: ${url}`);
-    
+
     try {
       const response = await fetch(url, {
         headers
       });
-      
+
       if (!response.ok) {
         this.logger.error(`Monitor request failed with status: ${response.status} ${response.statusText}`);
         throw new Error(`Monitor request failed with status: ${response.status} ${response.statusText}`);
       }
-      
+
       const responseData = await response.json();
       this.logger.debug(`Monitor response: ${JSON.stringify(responseData)}`);
-      
+
       return responseData;
     } catch (error) {
       this.logger.error(`Failed to get monitor info: ${error.message}`);
@@ -96,18 +96,18 @@ export class LedgerService {
   private async getNodeInfo(monitorHost: string, monitorPort: string, networkName: string, headers: Record<string, string>) {
     const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}/node1`;
     this.logger.debug(`Making node request to: ${url}`);
-    
+
     try {
-      const nodeResponse = await fetch(url, {headers});
-      
+      const nodeResponse = await fetch(url, { headers });
+
       if (!nodeResponse.ok) {
         this.logger.error(`Node request failed with status: ${nodeResponse.status} ${nodeResponse.statusText}`);
         throw new Error(`Node request failed with status: ${nodeResponse.status} ${nodeResponse.statusText}`);
       }
-      
+
       const nodeResponseData = await nodeResponse.json();
       this.logger.debug(`Node response: ${JSON.stringify(nodeResponseData)}`);
-      
+
       return nodeResponseData;
     } catch (error) {
       this.logger.error(`Failed to get node info: ${error.message}`);
@@ -136,7 +136,7 @@ export class LedgerService {
 
       const monitorData = await this.getMonitorInfo(monitorHost, monitorPort, networkName, headers);
       const nodeData = await this.getNodeInfo(monitorHost, monitorPort, networkName, headers);
-      
+
       return monitorData;
     } catch (error) {
       this.logger.error(`Failed to get validator info from monitor: ${error.message}`);
@@ -148,18 +148,18 @@ export class LedgerService {
     try {
 
 
-    const request = new GetValidatorInfoAction({ submitterDid: process.env.VALIDATOR_DID });
-        const seed = Uint8Array.from(Buffer.from(process.env.SEED));
-        const key = Key.fromSeed({ algorithm: KeyAlgorithm.Ed25519, seed });
-        const signature = key.signMessage({ message: Buffer.from(request.signatureInput, 'utf8') });
-        this.logger.log(signature);
-        request.setSignature({ signature: signature });
-        const response: GetValidatorInfoResponse = await this.pool.submitRequest(request)
-        this.logger.log(response);
-      } catch (error) {
-        this.logger.error(`Failed to get validator info: ${error.message}`);
-        throw error;
-      }
+      const request = new GetValidatorInfoAction({ submitterDid: process.env.DID });
+      const seed = Uint8Array.from(Buffer.from(process.env.SEED));
+      const key = Key.fromSeed({ algorithm: KeyAlgorithm.Ed25519, seed });
+      const signature = key.signMessage({ message: Buffer.from(request.signatureInput, 'utf8') });
+      this.logger.log(signature);
+      request.setSignature({ signature: signature });
+      const response: GetValidatorInfoResponse = await this.pool.submitRequest(request)
+      this.logger.log(response);
+    } catch (error) {
+      this.logger.error(`Failed to get validator info: ${error.message}`);
+      throw error;
+    }
   }
 
 
