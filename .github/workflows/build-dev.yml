@@ -374,6 +374,12 @@ jobs:
         run: |
           aws ecs describe-task-definition --task-definition $TASK_DEFINITION --query taskDefinition > task-definition.json
 
+      - name: Setup
+        id: setup-task-definition
+        run: |
+          echo ${{needs.ecr-server.outputs.image}}
+          echo ${{needs.ecr-monitor.outputs.image}}
+
       - name: Fill in the new image ID in the Amazon ECS task definition
         # if: ${{needs.ecr-server.outputs.changes}}
         id: task-def-server
