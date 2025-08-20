@@ -79,6 +79,14 @@ resource "aws_security_group" "app01" {
     self            = true
   }
 
+  ingress {
+    description     = "Self Inbound"
+    from_port       = 9000
+    to_port         = 9000
+    protocol        = "tcp"
+    self            = true
+  }
+
   egress {
     description = "Application Outbound"
     from_port   = 0
