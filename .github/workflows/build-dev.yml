@@ -370,12 +370,12 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           TASK_DEFINITION: ${{ vars.TF_VAR_ECR_SERVER_REPO }}
-        if: ${{needs.ecr-monitor.outputs.changes}} || ${{needs.ecr-server.outputs.changes}}
+        # if: ${{needs.ecr-monitor.outputs.changes}} || ${{needs.ecr-server.outputs.changes}}
         run: |
           aws ecs describe-task-definition --task-definition $TASK_DEFINITION --query taskDefinition > task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
-        if: ${{needs.ecr-server.outputs.changes}}
+        # if: ${{needs.ecr-server.outputs.changes}}
         id: task-def-server
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
@@ -384,7 +384,7 @@ jobs:
           image:  ${{needs.ecr-server.outputs.image}}
 
       - name: Fill in the new image ID in the Amazon ECS task definition
-        if: ${{needs.ecr-monitor.outputs.changes}}
+        # if: ${{needs.ecr-monitor.outputs.changes}}
         id: task-def-monitor
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
