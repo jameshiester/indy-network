@@ -32,8 +32,8 @@ ENV PATH="$HOME/.local/bin:$PATH"
 ENV LD_LIBRARY_PATH="$HOME/.local/lib:$LD_LIBRARY_PATH"
 RUN echo "$HOME/.local/lib" > /etc/ld.so.conf.d/local.conf && ldconfig
 
-# Install curl for HTTP requests
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# Install curl and jq for HTTP requests and JSON processing
+RUN apt-get update && apt-get install -y curl jq && rm -rf /var/lib/apt/lists/*
 
 # Add indy user
 RUN useradd -U -ms /bin/bash -u $uid $user
@@ -66,5 +66,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 ADD networks.json .
 ADD *.py ./
 ADD plugins ./plugins
+ADD startup.sh ./
 
-ENTRYPOINT ["bash", "-c", "python main.py --web $@", "--"]
+# Make the startup script executable
+RUN chmod +x startup.sh
+
+ENTRYPOINT ["./startup.sh"]

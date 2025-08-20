@@ -23,37 +23,6 @@ class Networks(object, metaclass=Singleton):
 
     def __load_network_list(self):
         log("Loading known network list ...")
-        genesis_url = os.environ.get('GENESIS_URL')
-        network_name = os.environ.get('INDY_NETWORK_NAME')
-        indy_namespace = os.environ.get('INDY_NAMESPACE')
-        if genesis_url and network_name and indy_namespace:
-            try:
-                # Read existing networks.json or create new one
-                networks_file = f"{self.__get_script_dir()}/networks.json"
-                networks_data = {}
-                
-                if os.path.exists(networks_file):
-                    with open(networks_file, 'r') as f:
-                        networks_data = json.load(f)
-                
-                # Create new network entry
-                new_network = {
-                    "genesisUrl": genesis_url,
-                    "name": network_name,
-                    "indyNamespace": indy_namespace
-                }
-                
-                # Add to networks data (using network_name as key)
-                networks_data[network_name] = new_network
-                
-                # Write back to file
-                with open(networks_file, 'w') as f:
-                    json.dump(networks_data, f, indent=2)
-                
-                log(f"Added network '{network_name}' to networks.json")
-                
-            except Exception as e:
-                log(f"Error adding network to networks.json: {e}")
         with open(f"{self.__get_script_dir()}/networks.json") as json_file:
             networks = json.load(json_file)
         return networks
