@@ -82,6 +82,10 @@ export class LedgerService {
       const responseData = await response.json();
       this.logger.debug(`Monitor response: ${JSON.stringify(responseData)}`);
 
+      const nodeResponse = await fetch(`http://${monitorHost}:${monitorPort}/networks/${networkName}/node1`, {headers});
+      const nodeResponseData = await nodeResponse.json();
+      this.logger.debug(`Node response: ${JSON.stringify(nodeResponseData)}`);
+
       return responseData;
     } catch (error) {
       this.logger.error(`Failed to get validator info from monitor: ${error.message}`);
