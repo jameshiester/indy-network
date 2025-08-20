@@ -388,7 +388,7 @@ jobs:
         id: task-def-monitor
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: task-definition.json
+          task-definition: ${{ needs.ecr-server.outputs.changes == 'true' && steps.task-def-server.outputs.task-definition || 'task-definition.json' }}
           container-name: ${{ vars.TF_VAR_MONITOR_CONTAINER_NAME }}
           image:  ${{needs.ecr-monitor.outputs.image}}
 
