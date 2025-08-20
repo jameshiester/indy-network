@@ -57,6 +57,11 @@ RUN chown -R $user:root $HOME && \
     chmod -R ug+rw $HOME $HOME/log $HOME/cache && \
     chmod +rx $(python -m site --user-site)
 
+ADD startup.sh ./
+
+# Make the startup script executable
+RUN chmod +x startup.sh
+
 USER $user
 
 ADD requirements.txt .
@@ -66,9 +71,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 ADD networks.json .
 ADD *.py ./
 ADD plugins ./plugins
-ADD startup.sh ./
 
-# Make the startup script executable
-RUN chmod +x startup.sh
 
 ENTRYPOINT ["./startup.sh"]
