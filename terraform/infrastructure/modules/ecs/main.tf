@@ -51,6 +51,10 @@ resource "aws_ecs_task_definition" "mswebapp" {
         },
         {
           name  = "MONITOR_HOST"
+          value = "localhost"
+        },
+        {
+          name  = "MONITOR_CONTAINER_NAME"
           value = var.MONITOR_CONTAINER_NAME
         },
         {
