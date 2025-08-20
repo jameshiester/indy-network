@@ -146,9 +146,9 @@ export class LedgerService {
 
   async getValidatorInfoSigned() {
     try {
-
-
-      const request = new GetValidatorInfoAction({ submitterDid: process.env.DID });
+      const did = process.env.DID;
+      this.logger.log(`Getting validator info for DID: ${did}`);
+      const request = new GetValidatorInfoAction({ submitterDid: did });
       const seed = Uint8Array.from(Buffer.from(process.env.SEED));
       const key = Key.fromSeed({ algorithm: KeyAlgorithm.Ed25519, seed });
       const signature = key.signMessage({ message: Buffer.from(request.signatureInput, 'utf8') });
