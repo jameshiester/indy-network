@@ -105,8 +105,6 @@ export class LedgerService {
 
   @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_MINUTE)
   async syncStatus() {
-    const status = await this.pool.status;
-    console.log(status);
     await this.getValidatorInfo();
   }
 }

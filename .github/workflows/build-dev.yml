@@ -13,7 +13,7 @@ env:
   AWS_REGION: ${{ vars.TF_VAR_REGION }}
   AWS_BUCKET_NAME: ${{ secrets.TF_STATE_BUCKET_NAME }}
   AWS_BUCKET_KEY_NAME: ${{ secrets.TF_STATE_BUCKET_KEY }}
-  IMAGE_TAG: ${{github.sha}}
+  IMAGE_TAG: ${{ github.sha }}
   TF_VAR_AZ01: ${{ vars.TF_VAR_AZ01 }}
   TF_VAR_AZ02: ${{ vars.TF_VAR_AZ02 }}
   TF_VAR_ECR_MONITOR_REPO_URL: ${{ vars.TF_VAR_ECR_MONITOR_REPO_URL }} 
@@ -394,109 +394,11 @@ jobs:
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        if: ${{needs.ecr-monitor.outputs.changes}} || ${{needs.ecr-server.outputs.changes}}
+        # if: ${{needs.ecr-monitor.outputs.changes}} || ${{needs.ecr-server.outputs.changes}}
         with:
           task-definition: ${{ needs.ecr-monitor.outputs.changes == 'true' && steps.task-def-monitor.outputs.task-definition || steps.task-def-server.outputs.task-definition }}
           service: ${{ vars.TF_VAR_ECSSERVICE  }}
           cluster: ${{ vars.TF_VAR_ECSCLUSTER  }}
           wait-for-service-stability: true
           wait-for-minutes: 7
-
-
-  # deploy-image:
-  #   needs: terraform
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: ./
-  #   environment: 
-  #     name: dev
-  #   env:
-  #     TF_VAR_Region: ${{ vars.TF_VAR_REGION }}
-  #     TF_VAR_Prefix: ${{ vars.TF_VAR_PREFIX }}
-  #     TF_VAR_SolTag: ${{ vars.TF_VAR_SOLTAG }}
-  #     TF_VAR_GitHubRepo: ${{ vars.TF_VAR_GITHUBREPO }}
-  #     TF_VAR_EnvCode: ${{ vars.TF_VAR_ENVCODE }}
-  #     TF_VAR_EnvTag: ${{ vars.TF_VAR_ENVTAG }}
-  #     TF_VAR_VPCCIDR: ${{ vars.TF_VAR_VPCCIDR }}
-  #     TF_VAR_ECRRepo: ${{ vars.TF_VAR_ECRREPO }}
-  #     TF_VAR_ECSCluster: ${{ vars.TF_VAR_ECSCLUSTER }}
-  #     TF_VAR_ECSService: ${{ vars.TF_VAR_ECSSERVICE }}
-  #     IMAGE_TAG: ${{github.sha}}
-
-  #   steps:
-  #     - name: Git checkout
-  #       uses: actions/checkout@v4
-
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         aws-region: ${{ vars.TF_VAR_REGION }}
-  #         role-to-assume: ${{ secrets.AWS_ROLE }}
-  #         role-session-name: GitHub-Actions-OIDC-TERRAFORM 
-
-  #     - name: Check ECS image exists
-  #       id: ecsimage
-  #       run: |
-  #         if aws ecr describe-images --repository-name ${{ vars.TF_VAR_ECRREPO }} --image-ids imageTag=$IMAGE_TAG >/dev/null 2>&1
-  #         then
-  #           echo "image_exists=true" >> "$GITHUB_ENV"
-  #         else
-  #           echo "image_exists=false" >> "$GITHUB_ENV"
-  #         fi
-
-  #     - name: Check for changes in go api
-  #       uses: dorny/paths-filter@v3
-  #       id: filter
-  #       with:
-  #         working-directory: ./
-  #         base: ${{ github.ref }}
-  #         filters: |
-  #           go:
-  #             - './go/**'
-
-  #     - name: Login to Amazon ECR
-  #       if: steps.filter.outputs.go == 'true' || env.image_exists == 'false'
-  #       id: login-ecr
-  #       uses: aws-actions/amazon-ecr-login@v2
-
-  #     - name: Build, tag, and push docker image to Amazon ECR
-  #       id: build-image
-  #       if: steps.filter.outputs.go == 'true' || env.image_exists == 'false'
-  #       env:
-  #         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-  #         REPOSITORY: ${{ vars.TF_VAR_ECRREPO }}
-  #       run: |
-  #         docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./go/API.Dockerfile .
-  #         docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-  #         docker tag $REGISTRY/$REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:latest
-  #         docker push $REGISTRY/$REPOSITORY:latest
-  #         echo "image=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-  #     - name: Download task definition
-  #       env:
-  #         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-  #         REPOSITORY: ${{ vars.TF_VAR_ECRREPO }}
-  #       if: steps.filter.outputs.go == 'true' || env.image_exists == 'false'
-  #       run: |
-  #         aws ecs describe-task-definition --task-definition $REPOSITORY --query taskDefinition > task-definition.json
-
-  #     - name: Fill in the new image ID in the Amazon ECS task definition
-  #       if: steps.filter.outputs.go == 'true' || env.image_exists == 'false'
-  #       id: task-def
-  #       uses: aws-actions/amazon-ecs-render-task-definition@v1
-  #       with:
-  #         task-definition: task-definition.json
-  #         container-name: go-api
-  #         image: ${{ steps.build-image.outputs.image }}
-
-  #     - name: Deploy Amazon ECS task definition
-  #       uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-  #       if: steps.filter.outputs.go == 'true' || env.image_exists == 'false'
-  #       with:
-  #         task-definition: ${{ steps.task-def.outputs.task-definition }}
-  #         service: ${{ vars.TF_VAR_ECSSERVICE  }}
-  #         cluster: ${{ vars.TF_VAR_ECSCLUSTER  }}
-  #         wait-for-service-stability: true
-  #         wait-for-minutes: 7
 
