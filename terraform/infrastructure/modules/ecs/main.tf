@@ -168,7 +168,7 @@ resource "aws_ecs_service" "mswebapp" {
   cluster         = aws_ecs_cluster.network.id
   task_definition = aws_ecs_task_definition.mswebapp.arn
   launch_type     = "FARGATE"
-  desired_count   = 2
+  desired_count   = 1
   propagate_tags  = "TASK_DEFINITION"
 
 
