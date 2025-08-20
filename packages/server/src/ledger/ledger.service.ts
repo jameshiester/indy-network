@@ -62,25 +62,31 @@ export class LedgerService {
   }
 
   async getValidatorInfo() {
-      this.logger.debug(`Syncing validator info`);
-      
-      try {
-        const monitorHost = process.env.MONITOR_HOST || 'localhost';
-        const monitorPort = process.env.MONITOR_PORT || '8080';
-        const networkName = process.env.INDY_NETWORK_NAME || 'default';
-        
-        const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}`;
-        this.logger.debug(`Making request to: ${url}`);
-        
-        const response = await fetch(url);
-        const responseData = await response.json();
-        this.logger.debug(`Monitor response: ${JSON.stringify(responseData)}`);
-        
-        return responseData;
-      } catch (error) {
-        this.logger.error(`Failed to get validator info from monitor: ${error.message}`);
-        throw error;
+    this.logger.debug(`Syncing validator info`);
+
+    try {
+      const monitorHost = process.env.MONITOR_HOST || 'localhost';
+      const monitorPort = process.env.MONITOR_PORT || '8080';
+      const networkName = process.env.INDY_NETWORK_NAME || 'default';
+      const seed = process.env.SEED;
+      const headers: Record<string, string> = {};
+      if (seed) {
+        headers['seed'] = seed;
       }
+      const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}`;
+      this.logger.debug(`Making request to: ${url}`);
+
+      const response = await fetch(url, {
+        headers
+      });
+      const responseData = await response.json();
+      this.logger.debug(`Monitor response: ${JSON.stringify(responseData)}`);
+
+      return responseData;
+    } catch (error) {
+      this.logger.error(`Failed to get validator info from monitor: ${error.message}`);
+      throw error;
+    }
   }
 
 

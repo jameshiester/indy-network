@@ -62,7 +62,7 @@ resource "aws_ecs_task_definition" "mswebapp" {
           value = "postgres"
         },
         {
-          name  = "VALIDATOR_DID"
+          name  = "DID"
           value = var.steward_did
         },
         {
@@ -80,7 +80,7 @@ resource "aws_ecs_task_definition" "mswebapp" {
       ]
       secrets = [
         {
-          name      = "VALIDATOR_SEED"
+          name      = "SEED"
           valueFrom = var.steward_seed_arn
         },
         {
