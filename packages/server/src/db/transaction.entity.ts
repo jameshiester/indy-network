@@ -5,10 +5,10 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
 } from 'typeorm';
-import { IndyRoleType, IndyTransactionType } from 'model';
+import { IndyRoleType, IndyTransactionType, ITransaction } from 'model';
 
 @Entity()
-export class Transaction {
+export class Transaction implements ITransaction {
   @PrimaryColumn('int')
   id!: number;
 
@@ -34,10 +34,13 @@ export class Transaction {
   value?: any;
 
   @Column({ nullable: true })
-  source?: string;
+  from?: string;
 
   @Column({ nullable: true })
   destination?: string;
+
+  @Column({ nullable: true })
+  transactionTime?: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt!: Date;

@@ -19,7 +19,9 @@ export class NodeService {
     return node;
   }
 
-  async upsertNode(node: INode): Promise<INode> {
+  async upsertNode(
+    node: Omit<INode, 'createdAt' | 'updatedAt'>,
+  ): Promise<INode> {
     const result = await this.nodeRepository.save(node);
     return result;
   }

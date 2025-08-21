@@ -1,5 +1,11 @@
 import { INode } from 'model';
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  UpdateDateColumn,
+  CreateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Node implements INode {
@@ -13,7 +19,7 @@ export class Node implements INode {
   value?: unknown;
 
   @Column({ nullable: true })
-  indy_version?: string;
+  indyVersion?: string;
 
   @Column({ nullable: true })
   did?: string;
@@ -22,5 +28,11 @@ export class Node implements INode {
   verkey?: string;
 
   @Column('bigint', { nullable: true })
-  uptime_seconds?: number;
+  uptimeSeconds?: number;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt!: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt!: Date;
 }

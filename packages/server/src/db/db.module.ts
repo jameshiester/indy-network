@@ -1,8 +1,8 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { Pointer } from './pointer.entity';
-import { Transaction } from './transaction.entity';
 import { Node } from './node.entity';
+import { NodeHistory } from './nodeHistory.entity';
 
 const {
   DB_PORT = 5432,
@@ -30,7 +30,7 @@ const {
         rejectUnauthorized: false,
       },
     }),
-    TypeOrmModule.forFeature([Pointer, Transaction, Node]),
+    TypeOrmModule.forFeature([Pointer, Node, NodeHistory]),
   ],
   exports: [TypeOrmModule],
 })
