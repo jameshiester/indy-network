@@ -31,8 +31,8 @@ resource "aws_security_group" "app01" {
 
   ingress {
     description     = "Application Inbound"
-    from_port       = 8080
-    to_port         = 8080
+    from_port       = 443
+    to_port         = 443
     protocol        = "tcp"
     security_groups = [aws_security_group.web01.id]
     self            = true
@@ -114,7 +114,7 @@ resource "aws_lb_listener" "mswebapp" {
 # WARNING: Lifecyle and name_prefix added for testing. Issue discussed here https://github.com/hashicorp/terraform-provider-aws/issues/16889
 resource "aws_lb_target_group" "mswebapp" {
   name_prefix                   = "indy-"
-  port                          = 8080
+  port                          = 443
   protocol                      = "HTTP"
   target_type                   = "ip"
   vpc_id                        = var.vpc_id
