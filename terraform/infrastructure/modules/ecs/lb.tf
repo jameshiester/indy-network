@@ -81,7 +81,7 @@ resource "aws_lb" "mswebapp" {
 module "acm_certificate" {
   source    = "../acm_cert"
   Domain    = var.DOMAIN
-  Subdomain = var.EnvCode == "pd" ? "identity-network.${var.DOMAIN}" : "${var.EnvCode}.identity-network.${var.DOMAIN}"
+  Subdomain = var.EnvCode == "pd" ? "identity-network" : "${var.EnvCode}.identity-network"
   EnvCode   = var.EnvCode
   EnvTag    = var.EnvTag
   Prefix    = var.Prefix
