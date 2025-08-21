@@ -123,13 +123,13 @@ resource "aws_lb_target_group" "mswebapp" {
   load_balancing_algorithm_type = "round_robin"
 
   health_check {
-    path    = "/health"
-    matcher = "200"
-    healthy_threshold = 2
+    path                = "/health"
+    matcher             = "200"
+    healthy_threshold   = 2
     unhealthy_threshold = 10
-    timeout = 5
-    interval = 30
-    port = 443
+    timeout             = 5
+    interval            = 30
+    port                = 443
   }
 
   stickiness {
@@ -160,6 +160,4 @@ resource "aws_route53_record" "app" {
     zone_id                = aws_lb.mswebapp.zone_id
     evaluate_target_health = true
   }
-
-  depends_on = [aws_acm_certificate_validation.cert]
 }
