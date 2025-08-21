@@ -1,4 +1,6 @@
-
+locals {
+  subdomain = var.EnvCode == "pd" ? "identity-network" : "${var.EnvCode}.identity-network"
+}
 # Create Security Groups
 resource "aws_security_group" "web01" {
   name        = format("%s%s%s%s", var.Prefix, "scg", var.EnvCode, "web01")
@@ -81,7 +83,7 @@ resource "aws_lb" "mswebapp" {
 module "acm_certificate" {
   source    = "../acm_cert"
   Domain    = var.DOMAIN
-  Subdomain = var.EnvCode == "pd" ? "identity-network" : "${var.EnvCode}.identity-network"
+  Subdomain = local.subdomain
   EnvCode   = var.EnvCode
   EnvTag    = var.EnvTag
   Prefix    = var.Prefix
@@ -144,4 +146,20 @@ resource "aws_lb_target_group" "mswebapp" {
     Name  = format("%s-%s-%s-%s", var.Region, "indy-api", var.EnvCode, "api")
     rtype = "network"
   })
+}
+
+
+# Create DNS record pointing to the load balancer
+resource "aws_route53_record" "app" {
+  zone_id = data.aws_route53_zone.selected.zone_id
+  name    = local.subdomain
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mswebapp.dns_name
+    zone_id                = aws_lb.mswebapp.zone_id
+    evaluate_target_health = true
+  }
+
+  depends_on = [aws_acm_certificate_validation.cert]
 }
