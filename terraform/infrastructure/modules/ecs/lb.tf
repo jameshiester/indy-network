@@ -6,33 +6,9 @@ resource "aws_security_group" "web01" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "Web Inbound"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
     description = "HTTPS Inbound"
     from_port   = 443
     to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Http Inbound"
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Http Inbound"
-    from_port   = 9000
-    to_port     = 9000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -42,14 +18,6 @@ resource "aws_security_group" "web01" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description = "HTTPS Outbound"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -87,14 +55,6 @@ resource "aws_security_group" "app01" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  egress {
-    description = "HTTPS Outbound"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = local.tags
 }
 
@@ -118,14 +78,26 @@ resource "aws_lb" "mswebapp" {
   tags = local.tags
 }
 
+module "acm_certificate" {
+  source = "../acm_cert"
+  Domain = var.DOMAIN
+  Subdomain = var.EnvCode == "pd" ? "identity-network.${var.DOMAIN}" : "${var.EnvCode}.identity-network.${var.DOMAIN}"
+  EnvCode = var.EnvCode
+  EnvTag = var.EnvTag
+  Prefix = var.Prefix
+  SOLTAG = var.SOLTAG
+}
+
 
 
 # Create ALB listener
 # WARNING: Consider changing port to 443 and protocol to HTTPS for production environments 
 resource "aws_lb_listener" "mswebapp" {
   load_balancer_arn = aws_lb.mswebapp.arn
-  port              = "8080"
-  protocol          = "HTTP"
+  port              = "443"
+  protocol          = "HTTPS"
+  certificate_arn = module.acm_certificate.acm_certificate_arn
+  ssl_policy = "ELBSecurityPolicy-TLS-1-2-2019-08"
 
   default_action {
     type             = "forward"
@@ -134,24 +106,6 @@ resource "aws_lb_listener" "mswebapp" {
 
   tags = merge(local.tags, {
     Name  = format("%s-%s-%s", var.Region, "indy-api", var.EnvCode)
-    rtype = "network"
-  })
-}
-
-# Create ALB listener
-# WARNING: Consider changing port to 443 and protocol to HTTPS for production environments 
-resource "aws_lb_listener" "monitor" {
-  load_balancer_arn = aws_lb.mswebapp.arn
-  port              = "9000"
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.monitor.arn
-  }
-
-  tags = merge(local.tags, {
-    Name  = format("%s-%s-%s", var.Region, "indy-api-monitor", var.EnvCode)
     rtype = "network"
   })
 }
@@ -183,37 +137,6 @@ resource "aws_lb_target_group" "mswebapp" {
 
   tags = merge(local.tags, {
     Name  = format("%s-%s-%s-%s", var.Region, "indy-api", var.EnvCode, "api")
-    rtype = "network"
-  })
-}
-
-# Define ALB Target Group
-# WARNING: Lifecyle and name_prefix added for testing. Issue discussed here https://github.com/hashicorp/terraform-provider-aws/issues/16889
-resource "aws_lb_target_group" "monitor" {
-  name_prefix                   = "indy-"
-  port                          = 9000
-  protocol                      = "HTTP"
-  target_type                   = "ip"
-  vpc_id                        = var.vpc_id
-  load_balancing_algorithm_type = "round_robin"
-
-  health_check {
-    path    = "/health"
-    matcher = "200"
-  }
-
-  stickiness {
-    enabled         = true
-    type            = "lb_cookie"
-    cookie_duration = 86400
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags = merge(local.tags, {
-    Name  = format("%s-%s-%s-%s", var.Region, "indy-api", var.EnvCode, "monitor")
     rtype = "network"
   })
 }

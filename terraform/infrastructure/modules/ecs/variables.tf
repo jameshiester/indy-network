@@ -151,3 +151,8 @@ variable "MonitorPort" {
   type        = number
   default     = 9000
 }
+
+variable "DOMAIN" {
+  description = "Domain name"
+  type        = string
+}

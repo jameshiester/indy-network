@@ -188,12 +188,6 @@ resource "aws_ecs_service" "mswebapp" {
     container_port   = 8080
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.monitor.arn
-    container_name   = var.MONITOR_CONTAINER_NAME
-    container_port   = var.MonitorPort
-  }
-
   tags = local.tags
 }
 

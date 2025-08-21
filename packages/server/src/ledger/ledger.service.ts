@@ -248,7 +248,7 @@ export class LedgerService {
     return {
       name: nodeName,
       timestamp: validatorInfo?.status?.timestamp
-        ? new Date(validatorInfo?.status?.timestamp)
+        ? new Date(Number(validatorInfo?.status?.timestamp))
         : undefined,
       indyVersion: validatorInfo?.status?.software?.['indy-node'],
       readThroughput:

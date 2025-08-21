@@ -89,6 +89,11 @@ variable "SERVER_CONTAINER_NAME" {
   type        = string
 }
 
+variable "DOMAIN" {
+  description = "Domain name"
+  type        = string
+}
+
 variable "MONITOR_CONTAINER_NAME" {
   description = "Name of the monitor container"
   type        = string

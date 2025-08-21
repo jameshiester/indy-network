@@ -26,6 +26,8 @@ module "ecs" {
   vpc_id                  = module.vpc.vpc_id
   MONITOR_CONTAINER_NAME  = var.MONITOR_CONTAINER_NAME
   SERVER_CONTAINER_NAME   = var.SERVER_CONTAINER_NAME
+  DOMAIN                  = var.DOMAIN
 }
+
 
 

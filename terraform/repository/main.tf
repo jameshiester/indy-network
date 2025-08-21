@@ -228,6 +228,7 @@ locals {
     TF_VAR_VPCCIDR      = "10.0.0.0/16"
     TF_VAR_IMAGETAG     = "1.0.0"
     TF_VAR_NETWORK_NAME = var.NetworkName
+    TF_VAR_DOMAIN = var.Domain
   }
   # Declare dev specific GitHub Environments variables
   environment_variables_dev = merge(
