@@ -79,13 +79,13 @@ resource "aws_lb" "mswebapp" {
 }
 
 module "acm_certificate" {
-  source = "../acm_cert"
-  Domain = var.DOMAIN
+  source    = "../acm_cert"
+  Domain    = var.DOMAIN
   Subdomain = var.EnvCode == "pd" ? "identity-network.${var.DOMAIN}" : "${var.EnvCode}.identity-network.${var.DOMAIN}"
-  EnvCode = var.EnvCode
-  EnvTag = var.EnvTag
-  Prefix = var.Prefix
-  SOLTAG = var.SOLTAG
+  EnvCode   = var.EnvCode
+  EnvTag    = var.EnvTag
+  Prefix    = var.Prefix
+  SOLTAG    = var.SOLTAG
 }
 
 
@@ -96,8 +96,8 @@ resource "aws_lb_listener" "mswebapp" {
   load_balancer_arn = aws_lb.mswebapp.arn
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn = module.acm_certificate.acm_certificate_arn
-  ssl_policy = "ELBSecurityPolicy-TLS-1-2-2019-08"
+  certificate_arn   = module.acm_certificate.acm_cert_arn
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2019-08"
 
   default_action {
     type             = "forward"
