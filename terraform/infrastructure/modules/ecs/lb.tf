@@ -94,7 +94,7 @@ module "acm_certificate" {
 # WARNING: Consider changing port to 443 and protocol to HTTPS for production environments 
 resource "aws_lb_listener" "mswebapp" {
   load_balancer_arn = aws_lb.mswebapp.arn
-  port              = "443"
+  port              = 443
   protocol          = "HTTPS"
   certificate_arn   = module.acm_certificate.acm_cert_arn
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
@@ -123,6 +123,11 @@ resource "aws_lb_target_group" "mswebapp" {
   health_check {
     path    = "/health"
     matcher = "200"
+    healthy_threshold = 2
+    unhealthy_threshold = 10
+    timeout = 5
+    interval = 30
+    port = 443
   }
 
   stickiness {
