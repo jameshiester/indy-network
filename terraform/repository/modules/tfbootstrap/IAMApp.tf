@@ -29,6 +29,7 @@ data "aws_iam_policy_document" "SampleApp" {
       "elasticloadbalancing:DescribeTargetGroupAttributes",
       "elasticloadbalancing:DescribeTargetGroups",
       "elasticloadbalancing:DescribeTargetHealth",
+      "elasticloadbalancing:ModifyTargetGroup",
       "elasticloadbalancing:RegisterTargets",
       "elasticloadbalancing:SetSecurityGroups",
       "iam:AddRoleToInstanceProfile",
