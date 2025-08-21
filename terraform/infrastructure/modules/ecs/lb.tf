@@ -148,6 +148,11 @@ resource "aws_lb_target_group" "mswebapp" {
   })
 }
 
+data "aws_route53_zone" "selected" {
+  name         = var.DOMAIN
+  private_zone = false
+
+}
 
 # Create DNS record pointing to the load balancer
 resource "aws_route53_record" "app" {
