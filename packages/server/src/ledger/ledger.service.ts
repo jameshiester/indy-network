@@ -27,6 +27,7 @@ import { readFile } from 'fs/promises';
 import { NodeService } from '../node/node.service.js';
 import { TransactionService } from '../transaction/transaction.service.js';
 import { DidService } from '../did/did.service.js';
+import { NodeHistoryService } from '../node/nodeHistory.service.js';
 
 @Injectable()
 export class LedgerService {
@@ -38,6 +39,7 @@ export class LedgerService {
     private readonly nodeService: NodeService,
     private readonly transactionService: TransactionService,
     private readonly didService: DidService,
+    private readonly nodeHistoryService: NodeHistoryService,
   ) {
     this.pool = new PoolCreate({
       parameters: { transactions_path: process.env.GENESIS_TXN_PATH },
@@ -209,8 +211,6 @@ export class LedgerService {
       headers['seed'] = seed;
     }
     const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}/${node}`;
-    this.logger.debug(`Making node request to: ${url}`);
-
     const nodeResponse = await fetch(url, { headers });
 
     if (!nodeResponse.ok) {
@@ -222,11 +222,6 @@ export class LedgerService {
     const nodeResponseDataArray: Array<IValidatorInfo> =
       await nodeResponse.json();
     const nodeData = nodeResponseDataArray[0];
-
-    this.logger.debug(
-      `Node response: ${JSON.stringify(nodeResponseDataArray)}`,
-    );
-
     return nodeData;
   }
 
@@ -283,6 +278,7 @@ export class LedgerService {
         node,
         validatorInfo,
       );
+      await this.nodeHistoryService.upsertNodeHistory(nodeHistory);
     } catch (error) {
       this.logger.error(`Failed to get node info: ${error.message}`);
     }
