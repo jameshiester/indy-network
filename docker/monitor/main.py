@@ -73,7 +73,7 @@ if __name__ == "__main__":
             log(f"Added network '{network_name}' to networks.json")
             
         except Exception as e:
-            log(f"Error adding network to networks.json: {e}")
+            log(f"Error adding network: {e}")
 
     MODULE_NAME = os.environ.get('MODULE_NAME', "rest_api")
     VARIABLE_NAME = os.environ.get('VARIABLE_NAME', "app")
