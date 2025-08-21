@@ -11,6 +11,7 @@ data "aws_iam_policy_document" "SampleApp" {
       "cloudformation:GetResourceRequestStatus",
       "cloudformation:UpdateResource",
       "ec2:*",
+      "route53:*",
       "ecr:*",
       "ecs:CreateCluster",
       "ecs:DeregisterTaskDefinition",
