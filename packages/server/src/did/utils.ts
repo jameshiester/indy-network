@@ -7,7 +7,7 @@ export const transactionResponseToDidAdapter = (
   const {
     txn,
     // @ts-ignore
-    txnMetadata: { txnId, txnTime },
+    txnMetadata: { seqNo, txnTime },
   } = response.result.data;
   const txnData = txn.data as any;
   const did: Omit<IDid, 'createdAt' | 'updatedAt'> = {
@@ -17,7 +17,7 @@ export const transactionResponseToDidAdapter = (
     roleName: mapRoleTypeToName(txnData.role),
     verkey: txnData.verkey,
     alias: txnData.alias,
-    transactionId: txnId,
+    transactionId: seqNo,
     transactionTime: txnTime ? new Date(txnTime) : undefined,
   };
   return did;

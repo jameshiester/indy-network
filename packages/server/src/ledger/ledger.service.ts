@@ -81,7 +81,7 @@ export class LedgerService {
     const {
       txn,
       // @ts-ignore
-      txnMetadata: { txnId, txnTime },
+      txnMetadata: { seqNo, txnTime },
     } = response.result.data;
     const txnData = txn.data as any;
     const did: Omit<IDid, 'createdAt' | 'updatedAt'> = {
@@ -91,7 +91,7 @@ export class LedgerService {
       roleName: mapRoleTypeToName(txnData.role),
       verkey: txnData.verkey,
       alias: txnData.alias,
-      transactionId: txnId,
+      transactionId: seqNo,
       transactionTime: txnTime ? new Date(txnTime) : undefined,
     };
     return did;
@@ -105,7 +105,7 @@ export class LedgerService {
     const {
       txn,
       // @ts-ignore
-      txnMetadata: { txnId, txnTime },
+      txnMetadata: { seqNo, txnTime },
     } = response.result.data;
     const txnData = txn.data as any;
     const baseProps: Omit<ITransaction, 'createdAt' | 'updatedAt'> = {
@@ -113,7 +113,7 @@ export class LedgerService {
       transactionTypeName: mapTransactionTypeToName(txn.type),
       id: (response.result.seqNo || sequence) as number,
       ledger: ledger.valueOf(),
-      transactionId: txnId,
+      transactionId: seqNo,
       value: response.result,
       from: txn?.metadata?.from as string,
       transactionTime: txnTime ? new Date(txnTime) : undefined,
