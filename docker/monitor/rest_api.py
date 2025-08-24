@@ -73,8 +73,6 @@ async def redirect():
 
 @app.get("/health", include_in_schema=False)
 async def health():
-    if not node_info:
-        raise HTTPException(status_code=500, detail="Service not initialized")
     response = {"status": "ok"}
     return response
 
