@@ -146,6 +146,10 @@ resource "aws_ecs_task_definition" "mswebapp" {
           value = tostring(var.MonitorPort)
         },
         {
+          name  = "ACCESS_LOG"
+          value = "-"
+        },
+        {
           name  = "GENESIS_URL"
           value = "https://${var.genesis_bucket_name}.s3.${var.Region}.amazonaws.com/${var.pool_transactions_key}"
         }

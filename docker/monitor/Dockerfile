@@ -72,5 +72,4 @@ ADD networks.json .
 ADD *.py ./
 ADD plugins ./plugins
 
-
-ENTRYPOINT ["./startup.sh"]
+CMD ["./startup.sh"]
