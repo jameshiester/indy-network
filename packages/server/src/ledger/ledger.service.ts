@@ -127,7 +127,7 @@ export class LedgerService {
     try {
       const response = await this.fetchTransactionFromMonitor(ledger, 1);
       this.logger.log(
-        `transaction 1 from ledger ${ledger}: ${(response as any).data}}`,
+        `transaction from ledger ${ledger}: ${(response as any).data}}`,
       );
     } catch (error) {
       this.logger.error(
