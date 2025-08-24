@@ -167,7 +167,7 @@ export class LedgerService {
   private async fetchTransactionFromMonitor(
     ledger: number,
     seqNo: number,
-  ): Promise<IValidatorInfo> {
+  ): Promise<GetTransactionResponse> {
     const monitorHost = process.env.MONITOR_HOST || 'localhost';
     const monitorPort = process.env.MONITOR_PORT || '8080';
     const networkName = process.env.INDY_NETWORK_NAME || 'default';
@@ -180,10 +180,7 @@ export class LedgerService {
       );
     }
 
-    const nodeResponseDataArray =
-      (await nodeResponse.json()) as Array<IValidatorInfo>;
-    const nodeData = nodeResponseDataArray[0];
-    return nodeData;
+    return (await nodeResponse.json()) as GetTransactionResponse;
   }
 
   private transformValidatorInfoToNode(
