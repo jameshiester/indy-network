@@ -125,10 +125,10 @@ resource "aws_lb_target_group" "mswebapp" {
   health_check {
     path                = "/health"
     matcher             = "200"
-    healthy_threshold   = 1
+    healthy_threshold   = 2
     unhealthy_threshold = 3
     timeout             = 5
-    interval            = 30
+    interval            = 15
     port                = 443
   }
 
