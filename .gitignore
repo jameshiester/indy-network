@@ -11,6 +11,10 @@ node_modules/
 # Distribution / packaging
 .Python
 build/
+.output/
+.start/
+.nitro/
+.tanstack/
 develop-eggs/
 dist/
 downloads/
@@ -45,6 +49,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.turbo/
 nosetests.xml
 coverage.xml
 *.cover
