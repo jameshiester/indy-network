@@ -6,11 +6,6 @@ import { LedgerService } from './ledger.service.js';
 export class LedgerController {
   constructor(private readonly ledgerService: LedgerService) {}
 
-  @Get('status')
-  getStatus() {
-    return this.ledgerService.getStatus();
-  }
-
   @Get('genesis')
   @Header('Content-Type', 'text/plain; charset=utf-8')
   getGenesis(): Promise<string> {

@@ -1,22 +1,20 @@
-import {
-  MongoQueryParser,
-  allParsingInstructions,
-  MongoQuery,
-} from '@ucast/mongo';
+import { allParsingInstructions, MongoQueryParser } from '@ucast/mongo';
 import { interpret } from '@ucast/sql/typeorm';
+import { IBaseSearchOptions } from 'model';
 import { Repository } from 'typeorm';
 
 const parser = new MongoQueryParser(allParsingInstructions);
 
 const findAndCount = async <TEntity>(
   repository: Repository<TEntity>,
-  filter: MongoQuery<TEntity>,
-  offset?: number,
-  limit?: number,
+  { filter, offset, limit }: IBaseSearchOptions<TEntity>,
 ) => {
-  const ast = parser.parse(filter);
-  const condition = interpret(ast, repository.createQueryBuilder('a'));
-  const query = repository.createQueryBuilder('a').where(condition);
+  const query = repository.createQueryBuilder('a');
+  if (filter) {
+    const ast = parser.parse(filter);
+    const condition = interpret(ast, query);
+    query.where(condition);
+  }
   if (offset) {
     query.skip(offset);
   }

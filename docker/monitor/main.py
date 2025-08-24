@@ -1,15 +1,10 @@
 import argparse
-import asyncio
 import json
 import os
-import indy_vdr
 from util import (
     enable_verbose,
     log,
-    create_did
 )
-from fetch_status import FetchStatus
-from pool import PoolCollection
 from networks import Networks
 from plugin_collection import PluginCollection
 

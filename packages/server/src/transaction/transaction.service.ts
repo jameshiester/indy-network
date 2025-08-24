@@ -1,9 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ITransaction } from 'model';
+import { IBaseSearchOptions, ITransaction } from 'model';
 import { Repository } from 'typeorm';
 
 import { Transaction } from '../db/transaction.entity.js';
+import { findAndCount } from '../db/utils.js';
 
 @Injectable()
 export class TransactionService {
@@ -39,6 +40,10 @@ export class TransactionService {
       );
       throw error;
     }
+  }
+
+  async search(options: IBaseSearchOptions<ITransaction>) {
+    return findAndCount(this.transactionRepository, options);
   }
 
   async getTransactionsByLedger(

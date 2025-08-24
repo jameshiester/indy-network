@@ -166,10 +166,10 @@ resource "aws_ecs_task_definition" "mswebapp" {
       }
       healthCheck = {
         command         = ["CMD-SHELL", "curl -f http://localhost:9000/health || exit 1"]
-        intervalSeconds = 30
+        intervalSeconds = 10
         timeoutSeconds  = 5
         retries         = 3
-        startPeriod     = 30
+        startPeriod     = 60
       }
     }
   ])
