@@ -123,7 +123,7 @@ resource "aws_lb_target_group" "mswebapp" {
   load_balancing_algorithm_type = "round_robin"
 
   health_check {
-    path                = "/health"
+    path                = "/api/v1/health"
     matcher             = "200"
     healthy_threshold   = 2
     unhealthy_threshold = 3
