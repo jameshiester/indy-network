@@ -126,7 +126,7 @@ export class LedgerService {
     }
     try {
       const response = await this.fetchTransactionFromMonitor(ledger, 1);
-      this.logger.log(JSON.stringify(response));
+      this.logger.log(`${ledger} transaction 1: ${JSON.stringify(response)}`);
     } catch (error) {
       this.logger.error(
         `Failed to fetch transaction from monitor: ${(error as { message: string }).message}`,
