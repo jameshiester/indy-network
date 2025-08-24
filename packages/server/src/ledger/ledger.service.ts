@@ -46,10 +46,6 @@ export class LedgerService {
     });
   }
 
-  getStatus() {
-    return { status: 'ledger-ok' };
-  }
-
   async getGenesisTransactionsText(): Promise<string> {
     const genesisFilePath = process.env.GENESIS_TXN_PATH;
     if (!genesisFilePath) {
@@ -80,7 +76,10 @@ export class LedgerService {
   }
 
   async syncLedger(ledger: number) {
-    let latest = await this.pointerService.getLatest(ledger);
+    const startFromBeginning = process.env.START_FROM_BEGINNING === 'true';
+    let latest = startFromBeginning
+      ? 0
+      : await this.pointerService.getLatest(ledger);
     let complete = false;
     this.logger.debug(`Syncing ledger ${ledger} from ${latest}`);
     while (!complete) {

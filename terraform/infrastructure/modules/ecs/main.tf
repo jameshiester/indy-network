@@ -90,6 +90,10 @@ resource "aws_ecs_task_definition" "mswebapp" {
         {
           name  = "DB_USERNAME"
           value = var.db_master_username
+        },
+        {
+          name  = "START_FROM_BEGINNING"
+          value = "true"
         }
       ]
       secrets = [
