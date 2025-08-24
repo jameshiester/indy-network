@@ -30,7 +30,7 @@ export class Did implements IDid {
   @Column({ nullable: true })
   roleName?: string;
 
-  @Column({ type: 'simple-json' })
+  @Column({ type: 'simple-json', nullable: true })
   attributes?: Record<string, unknown>;
 
   @Column({ nullable: true, type: 'timestamp' })
