@@ -60,5 +60,5 @@ class FetchStatus(object, metaclass=Singleton):
         request = build_get_txn_request(None, ledger, seq_no)
 
         log("Submitting request ...")
-        response = await pool.submit_request(request)
+        response = await pool.submit_action(request)
         return response
