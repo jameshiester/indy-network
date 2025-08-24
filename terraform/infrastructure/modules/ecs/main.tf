@@ -32,6 +32,12 @@ resource "aws_ecs_task_definition" "mswebapp" {
           protocol      = "tcp"
         }
       ]
+      dependsOn = [
+        {
+          containerName = var.MONITOR_CONTAINER_NAME
+          condition     = "HEALTHY"
+        }
+      ]
       environment = [
         {
           name  = "INDY_NETWORK_NAME"
