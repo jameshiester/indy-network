@@ -1,16 +1,26 @@
-## Monorepo (Turborepo)
-
-This repo now includes a Turborepo with two apps:
-
-- apps/api: NestJS API with a `/health` endpoint
-- apps/client: TanStack Start app that renders "Hello World"
-
-Scripts at the root:
-
-- `pnpm dev` or `npm run dev` to run all apps
-- `pnpm build` or `npm run build` to build
-
 # indy-network
+
+This repository is intended to provision a near production grade Hyperledger Indy Network including lower environments for development and testing.
+
+## Folder Structure
+
+The `terraform` directory includes two folders:
+
+- `Repository:` This folder uses terraform to provision branches, branch protections, environments, environment variables, and secrets.
+
+- `Infrastructure:` This folder uses terraform to provision the actual infrastructure. It is intended to be used by github actions triggered on specific branches for each environment. The input variables are a combination of environment variables and secrets configured by the repository folder.
+
+The `docker` folder includes Dockfiles and scripts for several images that are used as part of the provisioning process, as well as services that will be part of the network.
+
+The `packages` folder includes the javascript code associated with the API service and UI. This repository follows a turborepo monorepository pattern.
+
+## Service Setup
+
+- 4 Hyperledger Indy Nodes (see node Dockerfile) deployed across 2 EC2 instances in separate availability zones.
+- An ECS service consisting of:
+  - A `Server API` (see server Dockerfile) that pulls data from the nodes and creates a queryable interface for transactions, DIDs, Schemas, and Node status.
+- An ECS sidecar container that allows the Server API to query the Node status.
+- A Postgres DB used by the Server API
 
 ## Creating DIDs
 

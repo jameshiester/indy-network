@@ -1,33 +1,33 @@
+import { readFile } from 'fs/promises';
+
 import {
+  GetTransactionRequest,
   GetTransactionResponse,
   IndyVdrPool,
-  GetTransactionRequest,
   PoolCreate,
 } from '@hyperledger/indy-vdr-nodejs';
 import {
   Injectable,
-  Logger,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import {
   INode,
-  IValidatorInfo,
-  LedgerType,
-  mapTransactionTypeToName,
-  mapRoleTypeToName,
-  ITransaction,
-  IndyTransactionType,
-  IDid,
   INodeHistory,
+  IValidatorInfo,
+  IndyTransactionType,
+  LedgerType,
 } from 'model';
-import { PointerService } from '../pointer/pointer.service.js';
-import { readFile } from 'fs/promises';
-import { NodeService } from '../node/node.service.js';
-import { TransactionService } from '../transaction/transaction.service.js';
+
 import { DidService } from '../did/did.service.js';
-import { NodeHistoryService } from '../node/nodeHistory.service.js';
+import { transactionResponseToDidAdapter } from '../did/utils.js';
+import { NodeHistoryService } from '../node/node-history.service.js';
+import { NodeService } from '../node/node.service.js';
+import { PointerService } from '../pointer/pointer.service.js';
+import { TransactionService } from '../transaction/transaction.service.js';
+import { transactionResponseToTransactionAdapter } from '../transaction/utils.js';
 
 @Injectable()
 export class LedgerService {
@@ -61,96 +61,21 @@ export class LedgerService {
         encoding: 'utf-8',
       });
       return fileContent;
-    } catch (error: any) {
-      if (error?.code === 'ENOENT') {
+    } catch (error) {
+      const err = error as {
+        code: string;
+        message: string;
+      };
+      if (err?.code === 'ENOENT') {
         this.logger.error(`Genesis file not found at path: ${genesisFilePath}`);
         throw new NotFoundException('Genesis transactions file not found');
       }
       this.logger.error(
-        `Failed to read genesis file: ${error?.message ?? error}`,
+        `Failed to read genesis file: ${err?.message ?? error}`,
       );
       throw new InternalServerErrorException(
         'Failed to read genesis transactions file',
       );
-    }
-  }
-
-  private transformDidFromPool(
-    response: GetTransactionResponse,
-  ): Omit<IDid, 'createdAt' | 'updatedAt'> {
-    const {
-      txn,
-      // @ts-ignore
-      txnMetadata: { seqNo, txnTime },
-    } = response.result.data;
-    const txnData = txn.data as any;
-    const did: Omit<IDid, 'createdAt' | 'updatedAt'> = {
-      id: txnData.dest,
-      from: txn.metadata.from as string,
-      role: txnData.role,
-      roleName: mapRoleTypeToName(txnData.role),
-      verkey: txnData.verkey,
-      alias: txnData.alias,
-      transactionId: seqNo,
-      transactionTime: txnTime ? new Date(txnTime) : undefined,
-    };
-    return did;
-  }
-
-  private transformTransactionFromPool(
-    ledger: LedgerType,
-    sequence: number,
-    response: GetTransactionResponse,
-  ): Omit<ITransaction, 'createdAt' | 'updatedAt'> {
-    const {
-      txn,
-      // @ts-ignore
-      txnMetadata: { seqNo, txnTime },
-    } = response.result.data;
-    const txnData = txn.data as any;
-    const baseProps: Omit<ITransaction, 'createdAt' | 'updatedAt'> = {
-      transactionType: txn.type as IndyTransactionType,
-      transactionTypeName: mapTransactionTypeToName(txn.type),
-      id: (response.result.seqNo || sequence) as number,
-      ledger: ledger.valueOf(),
-      transactionId: seqNo,
-      value: response.result,
-      from: txn?.metadata?.from as string,
-      transactionTime: txnTime ? new Date(txnTime) : undefined,
-    };
-    switch (txn.type) {
-      case IndyTransactionType.NYM:
-        return {
-          ...baseProps,
-          role: txnData.role,
-          roleName: mapRoleTypeToName(txnData.role),
-          destination: txnData.dest,
-        };
-      case IndyTransactionType.ATTRIB:
-        return {
-          ...baseProps,
-          destination: txnData.dest as string,
-        };
-      case IndyTransactionType.NODE:
-        return {
-          ...baseProps,
-          destination: txnData.dest as string,
-        };
-      case IndyTransactionType.CRED_DEF:
-        return {
-          ...baseProps,
-          destination: txnId,
-        };
-      case IndyTransactionType.SCHEMA:
-        return {
-          ...baseProps,
-          destination: txnData.data.name,
-        };
-      default:
-        return {
-          ...baseProps,
-          destination: txnId,
-        };
     }
   }
 
@@ -174,7 +99,7 @@ export class LedgerService {
           complete = true;
         } else {
           // Transform and save the transaction
-          const transactionData = this.transformTransactionFromPool(
+          const transactionData = transactionResponseToTransactionAdapter(
             ledger as LedgerType,
             response.result.seqNo,
             response,
@@ -182,7 +107,7 @@ export class LedgerService {
           await this.transactionService.upsertTransaction(transactionData);
 
           if (transactionData.transactionType === IndyTransactionType.NYM) {
-            const didData = this.transformDidFromPool(response);
+            const didData = transactionResponseToDidAdapter(response);
             await this.didService.upsertDid(didData);
           }
 
@@ -193,9 +118,20 @@ export class LedgerService {
           );
         }
       } catch (error) {
-        this.logger.error(`Error syncing ledger ${ledger}: ${error.message}`);
+        const err = error as {
+          message: string;
+        };
+        this.logger.error(`Error syncing ledger ${ledger}: ${err.message}`);
         complete = true;
       }
+    }
+    try {
+      const response = await this.fetchTransactionFromMonitor(ledger, latest);
+      this.logger.log(JSON.stringify(response));
+    } catch (error) {
+      this.logger.error(
+        `Failed to fetch transaction from monitor: ${(error as { message: string }).message}`,
+      );
     }
   }
 
@@ -219,8 +155,30 @@ export class LedgerService {
       );
     }
 
-    const nodeResponseDataArray: Array<IValidatorInfo> =
-      await nodeResponse.json();
+    const nodeResponseDataArray =
+      (await nodeResponse.json()) as Array<IValidatorInfo>;
+    const nodeData = nodeResponseDataArray[0];
+    return nodeData;
+  }
+
+  private async fetchTransactionFromMonitor(
+    ledger: number,
+    seqNo: number,
+  ): Promise<IValidatorInfo> {
+    const monitorHost = process.env.MONITOR_HOST || 'localhost';
+    const monitorPort = process.env.MONITOR_PORT || '8080';
+    const networkName = process.env.INDY_NETWORK_NAME || 'default';
+    const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}/ledger/${ledger}/transactions/${seqNo}`;
+    const nodeResponse = await fetch(url);
+
+    if (!nodeResponse.ok) {
+      throw new Error(
+        `Transaction request failed with status: ${nodeResponse.status} ${nodeResponse.statusText}`,
+      );
+    }
+
+    const nodeResponseDataArray =
+      (await nodeResponse.json()) as Array<IValidatorInfo>;
     const nodeData = nodeResponseDataArray[0];
     return nodeData;
   }
@@ -280,7 +238,9 @@ export class LedgerService {
       );
       await this.nodeHistoryService.upsertNodeHistory(nodeHistory);
     } catch (error) {
-      this.logger.error(`Failed to get node info: ${error.message}`);
+      this.logger.error(
+        `Failed to get node info: ${(error as { message: string }).message}`,
+      );
     }
   }
 
@@ -297,8 +257,6 @@ export class LedgerService {
   async syncStatus() {
     const verifiers = await this.pool.verifiers;
     const nodes = Object.keys(verifiers);
-    nodes.forEach(async (node) => {
-      await this.getValidatorInfo(node);
-    });
+    await Promise.all(nodes.map((node) => this.getValidatorInfo(node)));
   }
 }

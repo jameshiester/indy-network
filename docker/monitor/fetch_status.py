@@ -53,3 +53,12 @@ class FetchStatus(object, metaclass=Singleton):
         result = await monitor_plugins.apply_all_plugins_on_value(result, network_name, response, verifiers)
         log("Processing complete.")
         return result
+
+    async def fetch_txn(self, network_id: str, ledger: int, seq_no: int):
+        pool = await self.pool_collection.get_pool(network_id)
+        log("Building txn request ...")
+        request = build_get_txn_request(None, ledger, seq_no)
+
+        log("Submitting request ...")
+        response = await pool.submit_request(request)
+        return response

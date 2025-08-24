@@ -27,16 +27,20 @@ JSON
   }
 }
 
+# Generate random string for bucket name uniqueness
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+  lower   = true
+  numeric = true
+}
+
 # Create Amazon S3 bucket for ALB logs
 resource "aws_s3_bucket" "alblogs" {
-  bucket_prefix = format("%s%s%s%s", var.Prefix, "sss", var.EnvCode, "alblogs")
+  bucket_prefix = format("%s-%s-%s-%s", var.Prefix, "alb", var.EnvCode, random_string.bucket_suffix.result)
   force_destroy = true
-
-  tags = {
-    Name      = format("%s%s%s%s", var.Prefix, "sss", var.EnvCode, "alblogs"),
-    rtype     = "storage"
-    codeblock = "lzbase"
-  }
+  tags = local.tags
 }
 
 # Create IAM Policy to enforce TLS 1.2 on Amazon S3 bucket and allow ALB access

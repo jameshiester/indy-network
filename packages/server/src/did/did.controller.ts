@@ -1,4 +1,5 @@
-import { Controller, Get, Param, Query, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
+
 import { DidService } from './did.service.js';
 
 const defaultLimit = 1000;
@@ -9,7 +10,9 @@ export class DidController {
 
   @Get()
   async getAllDids(@Query('limit') limit?: string) {
-    const limitNumber = limit ? parseInt(limit, defaultLimit) : undefined;
+    const limitNumber = limit
+      ? Number.parseInt(limit, defaultLimit)
+      : undefined;
     return await this.didService.searchDids(limitNumber);
   }
 
@@ -23,7 +26,9 @@ export class DidController {
     @Param('from') from: string,
     @Query('limit') limit?: string,
   ) {
-    const limitNumber = limit ? parseInt(limit, defaultLimit) : undefined;
+    const limitNumber = limit
+      ? Number.parseInt(limit, defaultLimit)
+      : undefined;
     return await this.didService.getDidsByFrom(from, limitNumber);
   }
 }

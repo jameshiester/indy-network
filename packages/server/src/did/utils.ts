@@ -1,15 +1,20 @@
 import { GetTransactionResponse } from '@hyperledger/indy-vdr-nodejs';
-import { IDid, mapRoleTypeToName } from 'model';
+import { IDid, IndyRoleType, mapRoleTypeToName } from 'model';
 
 export const transactionResponseToDidAdapter = (
   response: GetTransactionResponse,
 ): Omit<IDid, 'createdAt' | 'updatedAt'> => {
   const {
     txn,
-    // @ts-ignore
+    // @ts-expect-error txnMetadata is not typed correctly.
     txnMetadata: { seqNo, txnTime },
   } = response.result.data;
-  const txnData = txn.data as any;
+  const txnData = txn.data as {
+    dest: string;
+    role: IndyRoleType;
+    verkey: string;
+    alias: string;
+  };
   const did: Omit<IDid, 'createdAt' | 'updatedAt'> = {
     id: txnData.dest,
     from: txn.metadata.from as string,
@@ -18,7 +23,7 @@ export const transactionResponseToDidAdapter = (
     verkey: txnData.verkey,
     alias: txnData.alias,
     transactionId: seqNo,
-    transactionTime: txnTime ? new Date(txnTime) : undefined,
+    transactionTime: txnTime ? new Date(txnTime as string) : undefined,
   };
   return did;
 };

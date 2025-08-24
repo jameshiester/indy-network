@@ -1,6 +1,6 @@
 {
   "../../../../~start/default-client-entry.tsx": {
-    "file": "assets/main-CHmge0IH.js",
+    "file": "assets/main-Bgcx4UA1.js",
     "name": "main",
     "src": "../../../../~start/default-client-entry.tsx",
     "isEntry": true,
@@ -9,7 +9,7 @@
     ]
   },
   "src/routes/index.tsx?tsr-split=component": {
-    "file": "assets/index-CXbnkbH1.js",
+    "file": "assets/index-DiNe9cmD.js",
     "name": "index",
     "src": "src/routes/index.tsx?tsr-split=component",
     "isDynamicEntry": true,

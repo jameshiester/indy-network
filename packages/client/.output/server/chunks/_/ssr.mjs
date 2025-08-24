@@ -3249,9 +3249,9 @@ async function loadVirtualModule(id) {
     case VIRTUAL_MODULES.routeTree:
       return await Promise.resolve().then(() => routeTree_gen);
     case VIRTUAL_MODULES.startManifest:
-      return await import('./_tanstack-start-manifest_v-BXk0LFYh.mjs');
+      return await import('./_tanstack-start-manifest_v-wOAa6no4.mjs');
     case VIRTUAL_MODULES.serverFnManifest:
-      return await import('./_tanstack-start-server-fn-manifest_v-DK5l-5Id.mjs');
+      return await import('./_tanstack-start-server-fn-manifest_v-wnS4cGdS.mjs');
     default:
       throw new Error(`Unknown virtual module: ${id}`);
   }
@@ -3817,7 +3817,7 @@ function RootComponent() {
 function RootDocument({
   children
 }) {
-  return /* @__PURE__ */ jsxs("html", { children: [
+  return /* @__PURE__ */ jsxs("html", { lang: "en", children: [
     /* @__PURE__ */ jsx("head", { children: /* @__PURE__ */ jsx(HeadContent, {}) }),
     /* @__PURE__ */ jsxs("body", { children: [
       children,
@@ -3839,10 +3839,10 @@ const createServerRpc = (functionId, serverBase, splitImportFn) => {
     functionId
   });
 };
-const $$splitComponentImporter = () => import('./index-7pq_QqU0.mjs');
+const $$splitComponentImporter = () => import('./index-B0O3rrln.mjs');
 const filePath = "count.txt";
 async function readCount() {
-  return parseInt(await fs.promises.readFile(filePath, "utf-8").catch(() => "0"));
+  return Number.parseInt(await fs.promises.readFile(filePath, "utf-8").catch(() => "0"));
 }
 const getCount_createServerFn_handler = createServerRpc("src_routes_index_tsx--getCount_createServerFn_handler", "/_serverFn", (opts, signal) => {
   return getCount.__executeServer(opts, signal);

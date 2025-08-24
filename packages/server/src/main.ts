@@ -1,11 +1,13 @@
-import 'reflect-metadata';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { createWriteStream } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
-import { pipeline } from 'node:stream/promises';
 import { dirname } from 'node:path';
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { pipeline } from 'node:stream/promises';
+import 'reflect-metadata';
+
+import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { NestFactory } from '@nestjs/core';
+
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   // Download genesis file from S3 to local path if S3 envs are provided
@@ -22,17 +24,17 @@ async function bootstrap() {
       const body = res.Body as unknown as NodeJS.ReadableStream;
       await mkdir(dirname(genesisPath), { recursive: true });
       await pipeline(body, createWriteStream(genesisPath));
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to download genesis from S3:', err);
+    } catch (error) {
+      console.error('Failed to download genesis from S3:', error);
     }
   }
 
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT ? Number(process.env.PORT) : 8080;
   await app.listen(port);
-  // eslint-disable-next-line no-console
+
   console.log(`API listening on http://localhost:${port}`);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 bootstrap();

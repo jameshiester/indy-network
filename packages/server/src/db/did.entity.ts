@@ -1,11 +1,11 @@
+import { IDid, IndyRoleType } from 'model';
 import {
+  Column,
+  CreateDateColumn,
   Entity,
   PrimaryColumn,
-  Column,
   UpdateDateColumn,
-  CreateDateColumn,
 } from 'typeorm';
-import { IndyRoleType, IDid } from 'model';
 
 @Entity()
 export class Did implements IDid {
@@ -31,7 +31,7 @@ export class Did implements IDid {
   roleName?: string;
 
   @Column({ type: 'simple-json' })
-  attributes?: any;
+  attributes?: Record<string, unknown>;
 
   @Column({ nullable: true, type: 'timestamp' })
   transactionTime?: Date;

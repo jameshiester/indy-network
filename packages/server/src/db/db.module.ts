@@ -1,8 +1,9 @@
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
-import { Pointer } from './pointer.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { NodeHistory } from './node-history.entity';
 import { Node } from './node.entity';
-import { NodeHistory } from './nodeHistory.entity';
+import { Pointer } from './pointer.entity';
 
 const {
   DB_PORT = 5432,
@@ -18,7 +19,7 @@ const {
   imports: [
     TypeOrmModule.forRoot({
       autoLoadEntities: true,
-      type: DB_TYPE as any,
+      type: DB_TYPE as 'postgres',
       host: DB_HOST,
       port: Number(DB_PORT),
       username: DB_USERNAME,

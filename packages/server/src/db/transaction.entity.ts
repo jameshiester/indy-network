@@ -1,11 +1,11 @@
+import { IndyRoleType, IndyTransactionType, ITransaction } from 'model';
 import {
+  Column,
+  CreateDateColumn,
   Entity,
   PrimaryColumn,
-  Column,
   UpdateDateColumn,
-  CreateDateColumn,
 } from 'typeorm';
-import { IndyRoleType, IndyTransactionType, ITransaction } from 'model';
 
 @Entity()
 export class Transaction implements ITransaction {
@@ -31,7 +31,7 @@ export class Transaction implements ITransaction {
   transactionId?: string;
 
   @Column('simple-json')
-  value?: any;
+  value?: unknown;
 
   @Column({ nullable: true })
   from?: string;

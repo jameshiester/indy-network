@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Did } from '../db/did.entity.js';
 import { IDid } from 'model';
+import { Repository } from 'typeorm';
+
+import { Did } from '../db/did.entity.js';
 
 @Injectable()
 export class DidService {
@@ -41,7 +42,9 @@ export class DidService {
       const dids = await query.getMany();
       return dids;
     } catch (error) {
-      this.logger.error(`Failed to get DIDs by from ${from}: ${error.message}`);
+      this.logger.error(
+        `Failed to get DIDs by from ${from}: ${(error as { message: string }).message}`,
+      );
       throw error;
     }
   }

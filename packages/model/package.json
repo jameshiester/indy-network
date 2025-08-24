@@ -9,5 +9,8 @@
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
   },
-  "rootDir": "src"
+  "rootDir": "src",
+  "dependencies": {
+    "@ucast/mongo": "^2.4.3"
+  }
 }

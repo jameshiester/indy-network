@@ -1,5 +1,6 @@
 import { GetTransactionResponse } from '@hyperledger/indy-vdr-nodejs';
 import {
+  IndyRoleType,
   IndyTransactionType,
   ITransaction,
   LedgerType,
@@ -14,21 +15,27 @@ export const transactionResponseToTransactionAdapter = (
 ): Omit<ITransaction, 'createdAt' | 'updatedAt'> => {
   const {
     txn,
-    // @ts-ignore
+    // @ts-expect-error txnMetadata is not typed correctly.
     txnMetadata: { txnId, txnTime },
   } = response.result.data;
-  const txnData = txn.data as any;
+  const txnData = txn.data as {
+    role: IndyRoleType;
+    dest: string;
+    data: {
+      name: string;
+    };
+  };
   const baseProps: Omit<ITransaction, 'createdAt' | 'updatedAt'> = {
     transactionType: txn.type as IndyTransactionType,
     transactionTypeName: mapTransactionTypeToName(txn.type),
-    id: (response.result.seqNo || sequence) as number,
+    id: response.result.seqNo || sequence,
     ledger: ledger.valueOf(),
-    transactionId: txnId,
+    transactionId: txnId as string,
     value: response.result,
     from: txn?.metadata?.from as string,
-    transactionTime: txnTime ? new Date(txnTime) : undefined,
+    transactionTime: txnTime ? new Date(txnTime as string) : undefined,
   };
-  switch (txn.type) {
+  switch (txn.type as IndyTransactionType) {
     case IndyTransactionType.NYM:
       return {
         ...baseProps,
@@ -39,17 +46,17 @@ export const transactionResponseToTransactionAdapter = (
     case IndyTransactionType.ATTRIB:
       return {
         ...baseProps,
-        destination: txnData.dest as string,
+        destination: txnData.dest,
       };
     case IndyTransactionType.NODE:
       return {
         ...baseProps,
-        destination: txnData.dest as string,
+        destination: txnData.dest,
       };
     case IndyTransactionType.CRED_DEF:
       return {
         ...baseProps,
-        destination: txnId,
+        destination: txnId as string,
       };
     case IndyTransactionType.SCHEMA:
       return {
@@ -59,7 +66,7 @@ export const transactionResponseToTransactionAdapter = (
     default:
       return {
         ...baseProps,
-        destination: txnId,
+        destination: txnId as string,
       };
   }
 };

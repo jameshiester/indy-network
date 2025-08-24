@@ -1,3 +1,12 @@
+# Generate random string for bucket name uniqueness
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+  lower   = true
+  numeric = true
+}
+
 # Generate 4 random passwords for trustee seeds
 resource "random_password" "trustee_seed_1" {
   length  = 32
@@ -162,7 +171,7 @@ resource "aws_s3_object" "docker_compose_yml" {
 
 # S3 Bucket for storing genesis files
 resource "aws_s3_bucket" "genesis_bucket" {
-  bucket        = format("%s-%s-%s", var.Prefix, "genesis", var.EnvCode)
+  bucket        = format("%s-%s-%s-%s", var.Prefix, "genesis", var.EnvCode, random_string.bucket_suffix.result)
   force_destroy = true
 
   tags = local.tags
@@ -310,7 +319,7 @@ resource "aws_s3_bucket_policy" "genesis_bucket" {
 
 # S3 Bucket for storing compose files (private)
 resource "aws_s3_bucket" "compose_bucket" {
-  bucket        = format("%s-%s-%s", var.Prefix, "compose", var.EnvCode)
+  bucket        = format("%s-%s-%s-%s", var.Prefix, "compose", var.EnvCode, random_string.bucket_suffix.result)
   force_destroy = true
 
   tags = local.tags

@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
-import { PointerService } from './pointer.service';
+
 import { DBModule } from '../db/db.module';
+
+import { PointerService } from './pointer.service';
 
 @Module({
   imports: [DBModule],

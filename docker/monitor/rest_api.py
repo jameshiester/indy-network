@@ -82,7 +82,7 @@ async def networks():
     return data
 
 @app.get("/networks/{network}")
-async def network(network: Network = Path(path=example_network_enum, example=example_network_name, description="The network code."),
+async def get_network(network: Network = Path(..., example=example_network_name, description="The network code."),
                   status: bool = Query(False, description="Filter results to status only."),
                   alerts: bool = Query(False, description="Filter results to alerts only."),
                   seed: Optional[str] = Header(None, description="Your network monitor seed.")):
@@ -92,22 +92,34 @@ async def network(network: Network = Path(path=example_network_enum, example=exa
     return result
 
 @app.get("/networks/{network}/pool/transactions", response_class=PlainTextResponse)
-async def network(network: Network = Path(path=example_network_enum, example=example_network_name, description="The network code.")):
+async def get_network_transactions(network: Network = Path(..., example=example_network_name, description="The network code.")):
     set_plugin_parameters()
     pool, _ = await pool_collection.get_pool(network.value)
     result = await pool.get_transactions()
     return result
 
 @app.get("/networks/{network}/pool/verifiers")
-async def network(network: Network = Path(path=example_network_enum, example=example_network_name, description="The network code.")):
+async def get_network_verifiers(network: Network = Path(..., example=example_network_name, description="The network code.")):
     set_plugin_parameters()
     pool, _ = await pool_collection.get_pool(network.value)
     await pool.refresh()
     result = await pool.get_verifiers()
     return result
 
+@app.get("/networks/{network}/ledger/{ledger}/transactions/{seq_no}")
+async def get_transaction(network: Network = Path(..., example=example_network_name, description="The network code."),
+               ledger: int = Path(..., example=1, description="The ledger ID."),
+               seq_no: int = Path(..., example=1, description="The transaction sequence number.")):
+    try:
+        result = await node_info.fetch_txn(network_id=network.value, ledger=ledger, seq_no=seq_no)
+    except NodeNotFound as error:
+        print(error)
+        raise HTTPException(status_code=400, detail=str(error))
+
+    return result
+
 @app.get("/networks/{network}/{node}")
-async def node(network: Network = Path(path=example_network_enum, example=example_network_name, description="The network code."),
+async def get_node(network: Network = Path(..., example=example_network_name, description="The network code."),
                node: str = Path(..., example="FoundationBuilder", description="The node name."),
                status: bool = Query(False, description="Filter results to status only."),
                alerts: bool = Query(False, description="Filter results to alerts only."),
@@ -121,3 +133,4 @@ async def node(network: Network = Path(path=example_network_enum, example=exampl
         raise HTTPException(status_code=400, detail=str(error))
 
     return result
+

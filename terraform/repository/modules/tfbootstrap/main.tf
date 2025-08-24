@@ -1,12 +1,19 @@
 ### This module sets up AWS resources for Terraform bootstrapping across multiple accounts
 
+# Generate random string for bucket name uniqueness
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+  lower   = true
+  numeric = true
+}
+
 # Create Amazon S3 buckets for Terraform state file
 resource "aws_s3_bucket" "tfstate" {
-  bucket_prefix = format("%s%s%s%s", var.Prefix, "sss", var.EnvCode, "tfstate")
+  bucket_prefix = format("%s-%s-%s-%s", var.Prefix, "tfstate", var.EnvCode, random_string.bucket_suffix.result)
   force_destroy = true
-
   tags = {
-    Name      = format("%s%s%s%s", var.Prefix, "sss", var.EnvCode, "tfstate"),
     rtype     = "storage"
     codeblock = "infrastructure"
   }

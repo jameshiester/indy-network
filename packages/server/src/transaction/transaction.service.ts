@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Transaction } from '../db/transaction.entity.js';
 import { ITransaction } from 'model';
+import { Repository } from 'typeorm';
+
+import { Transaction } from '../db/transaction.entity.js';
 
 @Injectable()
 export class TransactionService {
@@ -34,7 +35,7 @@ export class TransactionService {
       return transaction;
     } catch (error) {
       this.logger.error(
-        `Failed to get transaction ${id} from ledger ${ledger}: ${error.message}`,
+        `Failed to get transaction ${id} from ledger ${ledger}: ${(error as { message: string }).message}`,
       );
       throw error;
     }
@@ -60,7 +61,7 @@ export class TransactionService {
       return transactions;
     } catch (error) {
       this.logger.error(
-        `Failed to get transactions for ledger ${ledger}: ${error.message}`,
+        `Failed to get transactions for ledger ${ledger}: ${(error as { message: string }).message}`,
       );
       throw error;
     }

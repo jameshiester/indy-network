@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
+
 import { DBModule } from '../db/db.module';
+
+import { NodeHistoryService } from './node-history.service';
 import { NodeService } from './node.service';
-import { NodeHistoryService } from './nodeHistory.service';
 
 @Module({
   imports: [DBModule],
