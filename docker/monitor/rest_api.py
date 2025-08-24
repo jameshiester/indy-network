@@ -110,6 +110,7 @@ async def get_network_verifiers(network: Network = Path(..., example=example_net
 async def get_transaction(network: Network = Path(..., example=example_network_name, description="The network code."),
                ledger: int = Path(..., example=1, description="The ledger ID."),
                seq_no: int = Path(..., example=1, description="The transaction sequence number.")):
+    set_plugin_parameters() 
     try:
         result = await node_info.fetch_txn(network_id=network.value, ledger=ledger, seq_no=seq_no)
     except NodeNotFound as error:

@@ -2,13 +2,13 @@ import { GetTransactionResponse } from '@hyperledger/indy-vdr-nodejs';
 import { IDid, IndyRoleType, mapRoleTypeToName } from 'model';
 
 export const transactionResponseToDidAdapter = (
-  response: GetTransactionResponse,
+  response: GetTransactionResponse['result'],
 ): Omit<IDid, 'createdAt' | 'updatedAt'> => {
   const {
     txn,
     // @ts-expect-error txnMetadata is not typed correctly.
     txnMetadata: { seqNo, txnTime },
-  } = response.result.data;
+  } = response.data;
   const txnData = txn.data as {
     dest: string;
     role: IndyRoleType;

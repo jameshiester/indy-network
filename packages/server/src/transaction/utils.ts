@@ -11,13 +11,13 @@ import {
 export const transactionResponseToTransactionAdapter = (
   ledger: LedgerType,
   sequence: number,
-  response: GetTransactionResponse,
+  response: GetTransactionResponse['result'],
 ): Omit<ITransaction, 'createdAt' | 'updatedAt'> => {
   const {
     txn,
     // @ts-expect-error txnMetadata is not typed correctly.
     txnMetadata: { txnId, txnTime },
-  } = response.result.data;
+  } = response.data;
   const txnData = txn.data as {
     role: IndyRoleType;
     dest: string;
@@ -28,10 +28,10 @@ export const transactionResponseToTransactionAdapter = (
   const baseProps: Omit<ITransaction, 'createdAt' | 'updatedAt'> = {
     transactionType: txn.type as IndyTransactionType,
     transactionTypeName: mapTransactionTypeToName(txn.type),
-    id: response.result.seqNo || sequence,
+    id: response.seqNo || sequence,
     ledger: ledger.valueOf(),
     transactionId: txnId as string,
-    value: response.result,
+    value: response,
     from: txn?.metadata?.from as string,
     transactionTime: txnTime ? new Date(txnTime as string) : undefined,
   };

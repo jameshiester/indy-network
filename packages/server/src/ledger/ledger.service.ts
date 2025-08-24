@@ -1,7 +1,6 @@
 import { readFile } from 'fs/promises';
 
 import {
-  GetTransactionRequest,
   GetTransactionResponse,
   IndyVdrPool,
   PoolCreate,
@@ -84,14 +83,12 @@ export class LedgerService {
     this.logger.debug(`Syncing ledger ${ledger} from ${latest}`);
     while (!complete) {
       try {
-        const request = new GetTransactionRequest({
-          ledgerType: ledger,
-          seqNo: latest + 1,
-        });
-        const response: GetTransactionResponse =
-          await this.pool.submitRequest(request);
+        const response = await this.fetchTransactionFromMonitor(
+          ledger,
+          latest + 1,
+        );
 
-        if (response.result.seqNo === undefined) {
+        if (response.seqNo === undefined) {
           this.logger.debug(
             `Syncing ledger ${ledger} complete. Last synced txn: ${latest}`,
           );
@@ -100,7 +97,7 @@ export class LedgerService {
           // Transform and save the transaction
           const transactionData = transactionResponseToTransactionAdapter(
             ledger as LedgerType,
-            response.result.seqNo,
+            response.seqNo,
             response,
           );
           await this.transactionService.upsertTransaction(transactionData);
@@ -110,10 +107,10 @@ export class LedgerService {
             await this.didService.upsertDid(didData);
           }
 
-          await this.pointerService.setLatest(ledger, response.result.seqNo);
-          latest = response.result.seqNo;
+          await this.pointerService.setLatest(ledger, response.seqNo);
+          latest = response.seqNo;
           this.logger.debug(
-            `Txn ${response.result.seqNo} synced from ledger ${ledger}`,
+            `Txn ${response.seqNo} synced from ledger ${ledger}`,
           );
         }
       } catch (error) {
@@ -165,7 +162,7 @@ export class LedgerService {
   private async fetchTransactionFromMonitor(
     ledger: number,
     seqNo: number,
-  ): Promise<GetTransactionResponse> {
+  ): Promise<GetTransactionResponse['result']> {
     const monitorHost = process.env.MONITOR_HOST || 'localhost';
     const monitorPort = process.env.MONITOR_PORT || '8080';
     const networkName = process.env.INDY_NETWORK_NAME || 'default';
@@ -178,7 +175,7 @@ export class LedgerService {
       );
     }
 
-    return (await nodeResponse.json()) as GetTransactionResponse;
+    return (await nodeResponse.json()) as GetTransactionResponse['result'];
   }
 
   private transformValidatorInfoToNode(
