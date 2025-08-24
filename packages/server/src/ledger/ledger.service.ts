@@ -1,11 +1,6 @@
 import { readFile } from 'fs/promises';
 
 import {
-  GetTransactionResponse,
-  IndyVdrPool,
-  PoolCreate,
-} from '@hyperledger/indy-vdr-nodejs';
-import {
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -27,11 +22,11 @@ import { NodeService } from '../node/node.service.js';
 import { PointerService } from '../pointer/pointer.service.js';
 import { TransactionService } from '../transaction/transaction.service.js';
 import { transactionResponseToTransactionAdapter } from '../transaction/utils.js';
+import { GetTransactionResponse } from './types.js';
 
 @Injectable()
 export class LedgerService {
   private readonly logger = new Logger(LedgerService.name);
-  private readonly pool: IndyVdrPool;
 
   constructor(
     private readonly pointerService: PointerService,
@@ -39,11 +34,7 @@ export class LedgerService {
     private readonly transactionService: TransactionService,
     private readonly didService: DidService,
     private readonly nodeHistoryService: NodeHistoryService,
-  ) {
-    this.pool = new PoolCreate({
-      parameters: { transactions_path: process.env.GENESIS_TXN_PATH },
-    });
-  }
+  ) {}
 
   async getGenesisTransactionsText(): Promise<string> {
     const genesisFilePath = process.env.GENESIS_TXN_PATH;
@@ -121,61 +112,74 @@ export class LedgerService {
         complete = true;
       }
     }
-    try {
-      const response = await this.fetchTransactionFromMonitor(ledger, 1);
-      this.logger.log(
-        `transaction from ledger ${ledger}: ${(response as any).data}}`,
-      );
-    } catch (error) {
-      this.logger.error(
-        `Failed to fetch transaction from monitor: ${(error as { message: string }).message}`,
+  }
+
+  private async callMonitorApi<T>(
+    endpoint: string,
+    options?: {
+      headers?: Record<string, string>;
+      method?: string;
+    },
+  ): Promise<T> {
+    const monitorHost = process.env.MONITOR_HOST || 'localhost';
+    const monitorPort = process.env.MONITOR_PORT || '8080';
+    const networkName = process.env.INDY_NETWORK_NAME || 'default';
+
+    const baseUrl = `http://${monitorHost}:${monitorPort}/networks/${networkName}`;
+    const url = `${baseUrl}${endpoint}`;
+
+    const requestOptions: RequestInit = {
+      method: options?.method || 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+    };
+
+    // Add seed header if available
+    const seed = process.env.SEED;
+    if (seed) {
+      requestOptions.headers = {
+        ...requestOptions.headers,
+        seed,
+      };
+    }
+
+    this.logger.debug(`Calling monitor API: ${url}`);
+
+    const response = await fetch(url, requestOptions);
+
+    if (!response.ok) {
+      throw new Error(
+        `Monitor API request failed: ${response.status} ${response.statusText} - ${url}`,
       );
     }
+
+    return (await response.json()) as T;
   }
 
   private async fetchNodeInfoFromMonitor(
     node: string,
   ): Promise<IValidatorInfo> {
-    const monitorHost = process.env.MONITOR_HOST || 'localhost';
-    const monitorPort = process.env.MONITOR_PORT || '8080';
-    const networkName = process.env.INDY_NETWORK_NAME || 'default';
-    const seed = process.env.SEED;
-    const headers: Record<string, string> = {};
-    if (seed) {
-      headers['seed'] = seed;
-    }
-    const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}/${node}`;
-    const nodeResponse = await fetch(url, { headers });
-
-    if (!nodeResponse.ok) {
-      throw new Error(
-        `Node request failed with status: ${nodeResponse.status} ${nodeResponse.statusText}`,
-      );
-    }
-
-    const nodeResponseDataArray =
-      (await nodeResponse.json()) as Array<IValidatorInfo>;
-    const nodeData = nodeResponseDataArray[0];
-    return nodeData;
+    const nodeResponseDataArray = await this.callMonitorApi<
+      Array<IValidatorInfo>
+    >(`/${node}`);
+    return nodeResponseDataArray[0];
   }
 
   private async fetchTransactionFromMonitor(
     ledger: number,
     seqNo: number,
-  ): Promise<GetTransactionResponse['result']> {
-    const monitorHost = process.env.MONITOR_HOST || 'localhost';
-    const monitorPort = process.env.MONITOR_PORT || '8080';
-    const networkName = process.env.INDY_NETWORK_NAME || 'default';
-    const url = `http://${monitorHost}:${monitorPort}/networks/${networkName}/ledger/${ledger}/transactions/${seqNo}`;
-    const nodeResponse = await fetch(url);
+  ): Promise<GetTransactionResponse> {
+    return await this.callMonitorApi<GetTransactionResponse>(
+      `/ledger/${ledger}/transactions/${seqNo}`,
+    );
+  }
 
-    if (!nodeResponse.ok) {
-      throw new Error(
-        `Transaction request failed with status: ${nodeResponse.status} ${nodeResponse.statusText}`,
-      );
-    }
-
-    return (await nodeResponse.json()) as GetTransactionResponse['result'];
+  private async fetchVerifiersFromMonitor() {
+    return await this.callMonitorApi<Record<string, unknown>>(
+      '/pool/verifiers',
+    );
   }
 
   private transformValidatorInfoToNode(
@@ -250,7 +254,8 @@ export class LedgerService {
 
   @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_MINUTE)
   async syncStatus() {
-    const verifiers = await this.pool.verifiers;
+    const verifiers = await this.fetchVerifiersFromMonitor();
+    this.logger.log(`Verifiers: ${JSON.stringify(verifiers)}`);
     const nodes = Object.keys(verifiers);
     await Promise.all(nodes.map((node) => this.getValidatorInfo(node)));
   }
