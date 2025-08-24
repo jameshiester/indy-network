@@ -21,7 +21,7 @@ export class Did implements IDid {
   @Column()
   verkey?: string;
 
-  @Column()
+  @Column({ nullable: true })
   alias?: string;
 
   @Column()

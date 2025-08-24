@@ -56,7 +56,7 @@ class FetchStatus(object, metaclass=Singleton):
 
     async def fetch_txn(self, network_id: str, ledger: int, seq_no: int):
         pool = await self.pool_collection.get_pool(network_id)
-        log("Building txn request ...")
+        log(f"Building txn request for ledger {ledger} and seq_no {seq_no} ...")
         request = build_get_txn_request(None, ledger, seq_no)
 
         log("Submitting request ...")
