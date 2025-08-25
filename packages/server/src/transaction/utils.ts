@@ -30,7 +30,7 @@ export const transactionResponseToTransactionAdapter = (
     id: response.seqNo || sequence,
     ledger: ledger.valueOf(),
     transactionId: txnId as string,
-    value: response,
+    value: response.data,
     from: txn?.metadata?.from as string,
     transactionTime: txnTime ? new Date(txnTime) : undefined,
   };

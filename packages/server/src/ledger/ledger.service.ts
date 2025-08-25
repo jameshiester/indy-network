@@ -66,10 +66,7 @@ export class LedgerService {
   }
 
   async syncLedger(ledger: number) {
-    const startFromBeginning = process.env.START_FROM_BEGINNING === 'true';
-    let latest = startFromBeginning
-      ? 0
-      : await this.pointerService.getLatest(ledger);
+    let latest = await this.pointerService.getLatest(ledger);
     let complete = false;
     this.logger.debug(`Syncing ledger ${ledger} from ${latest}`);
     while (!complete) {
@@ -189,7 +186,7 @@ export class LedgerService {
     return {
       name: nodeName,
       active: validatorInfo?.status?.ok === true,
-      value: validatorInfo,
+      value: validatorInfo?.response?.result?.data,
       indyVersion: validatorInfo?.status?.software?.['indy-node'],
       did: validatorInfo?.response?.result?.data['Node_info']?.did,
       verkey: validatorInfo?.response?.result?.data['Node_info']?.verkey,
@@ -255,7 +252,6 @@ export class LedgerService {
   @Cron(process.env.CRON_EXPRESSION || CronExpression.EVERY_MINUTE)
   async syncStatus() {
     const verifiers = await this.fetchVerifiersFromMonitor();
-    this.logger.log(`Verifiers: ${JSON.stringify(verifiers)}`);
     const nodes = Object.keys(verifiers);
     await Promise.all(nodes.map((node) => this.getValidatorInfo(node)));
   }
