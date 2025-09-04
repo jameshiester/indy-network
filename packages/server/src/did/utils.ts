@@ -1,4 +1,5 @@
 import { IDid, IndyRoleType, mapRoleTypeToName } from 'model';
+
 import { GetTransactionResponse } from '../ledger/types';
 
 export const transactionResponseToDidAdapter = (

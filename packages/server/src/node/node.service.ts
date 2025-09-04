@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { INode } from 'model';
+import { IBaseSearchOptions, INode } from 'model';
 import { Repository } from 'typeorm';
 
 import { Node } from '../db/node.entity';
+import { findAndCount } from '../db/utils';
 
 @Injectable()
 export class NodeService {
@@ -18,6 +19,10 @@ export class NodeService {
       return undefined;
     }
     return node;
+  }
+
+  search(options: IBaseSearchOptions<INode>) {
+    return findAndCount(this.nodeRepository, options);
   }
 
   async upsertNode(

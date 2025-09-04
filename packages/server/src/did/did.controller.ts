@@ -1,34 +1,21 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { IBaseSearchOptions, IDid } from 'model';
 
-import { DidService } from './did.service.js';
-
-const defaultLimit = 1000;
+import { DidService } from './did.service';
 
 @Controller('dids')
 export class DidController {
   constructor(private readonly didService: DidService) {}
 
-  @Get()
-  async getAllDids(@Query('limit') limit?: string) {
-    const limitNumber = limit
-      ? Number.parseInt(limit, defaultLimit)
-      : undefined;
-    return await this.didService.searchDids(limitNumber);
+  @Post('search')
+  search(@Body() body: IBaseSearchOptions<IDid>) {
+    const { order = { transactionId: 'ASC' }, ...options } =
+      body || ({} as IBaseSearchOptions<IDid>);
+    return this.didService.search({ ...options, order });
   }
 
   @Get(':id')
   async getDid(@Param('id') id: string) {
     return await this.didService.getDid(id);
-  }
-
-  @Get('from/:from')
-  async getDidsByFrom(
-    @Param('from') from: string,
-    @Query('limit') limit?: string,
-  ) {
-    const limitNumber = limit
-      ? Number.parseInt(limit, defaultLimit)
-      : undefined;
-    return await this.didService.getDidsByFrom(from, limitNumber);
   }
 }

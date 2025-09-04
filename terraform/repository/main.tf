@@ -262,6 +262,18 @@ locals {
   environment_variables_prod = merge(
     local.environment_variables_common,
     {
+      TF_STATE_BUCKET_KEY         = "terraform/${var.GitHubRepo}/prod.tfstate"
+      TF_STATE_BUCKET_NAME        = module.tfbootstrap_dev.tfstate_bucket_name
+      TF_VAR_ECR_MONITOR_REPO     = module.tfbootstrap_dev.ecr_monitor_repo_name
+      TF_VAR_ECR_MONITOR_REPO_URL = module.tfbootstrap_dev.ecr_monitor_repo_url
+      TF_VAR_ECR_NODE_REPO        = module.tfbootstrap_dev.ecr_node_repo_name
+      TF_VAR_ECR_NODE_REPO_URL    = module.tfbootstrap_dev.ecr_node_repo_url
+      TF_VAR_ECR_SERVER_REPO      = module.tfbootstrap_dev.ecr_server_repo_name
+      TF_VAR_ECR_SERVER_REPO_URL  = module.tfbootstrap_dev.ecr_server_repo_url
+      TF_VAR_ECR_UTILS_REPO       = module.tfbootstrap_dev.ecr_utils_repo_name
+      TF_VAR_ECR_UTILS_REPO_URL   = module.tfbootstrap_dev.ecr_utils_repo_url
+      TF_VAR_ECSCLUSTER           = "indy-cluster-prd"
+      TF_VAR_ECSSERVICE           = "indy-prd"
       TF_VAR_ENVCODE = "pd"
       TF_VAR_ENVTAG  = "Production"
     }

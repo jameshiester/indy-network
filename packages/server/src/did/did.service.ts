@@ -1,9 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IDid } from 'model';
+import { IBaseSearchOptions, IDid } from 'model';
 import { Repository } from 'typeorm';
 
-import { Did } from '../db/did.entity.js';
+import { Did } from '../db/did.entity';
+import { findAndCount } from '../db/utils';
 
 @Injectable()
 export class DidService {
@@ -49,16 +50,7 @@ export class DidService {
     }
   }
 
-  async searchDids(limit?: number): Promise<Did[]> {
-    const query = this.didRepository
-      .createQueryBuilder('did')
-      .orderBy('did.createdAt', 'DESC');
-
-    if (limit) {
-      query.limit(limit);
-    }
-
-    const dids = await query.getMany();
-    return dids;
+  search(options: IBaseSearchOptions<IDid>) {
+    return findAndCount(this.didRepository, options);
   }
 }

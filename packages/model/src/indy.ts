@@ -28,6 +28,7 @@ export enum IndyTransactionType {
 export const mapTransactionTypeToName = (type?: string): string | undefined => {
   if (!type) return undefined;
   const transactionType = Object.entries(IndyTransactionType).find(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     (transactionType) => transactionType[1] === type,
   );
   if (!transactionType) {
@@ -39,6 +40,7 @@ export const mapTransactionTypeToName = (type?: string): string | undefined => {
 export const mapRoleTypeToName = (type?: string): string | undefined => {
   if (!type) return undefined;
   const role = Object.entries(IndyRoleType).find(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     (roleType) => roleType[1] === type,
   );
   if (!role) {
@@ -91,7 +93,7 @@ export interface IDid {
   alias?: string;
   transactionId?: number;
   roleName?: string;
-  attributes?: any;
+  attributes?: Record<string, unknown>;
   transactionTime?: Date;
   createdAt: Date;
   updatedAt: Date;

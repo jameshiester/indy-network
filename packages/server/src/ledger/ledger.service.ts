@@ -15,14 +15,15 @@ import {
   LedgerType,
 } from 'model';
 
-import { DidService } from '../did/did.service.js';
-import { transactionResponseToDidAdapter } from '../did/utils.js';
-import { NodeHistoryService } from '../node/node-history.service.js';
-import { NodeService } from '../node/node.service.js';
-import { PointerService } from '../pointer/pointer.service.js';
-import { TransactionService } from '../transaction/transaction.service.js';
-import { transactionResponseToTransactionAdapter } from '../transaction/utils.js';
-import { GetTransactionResponse } from './types.js';
+import { DidService } from '../did/did.service';
+import { transactionResponseToDidAdapter } from '../did/utils';
+import { NodeHistoryService } from '../node/node-history.service';
+import { NodeService } from '../node/node.service';
+import { PointerService } from '../pointer/pointer.service';
+import { TransactionService } from '../transaction/transaction.service';
+import { transactionResponseToTransactionAdapter } from '../transaction/utils';
+
+import { GetTransactionResponse } from './types';
 
 @Injectable()
 export class LedgerService {

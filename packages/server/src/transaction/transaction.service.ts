@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IBaseSearchOptions, ITransaction } from 'model';
 import { Repository } from 'typeorm';
 
-import { Transaction } from '../db/transaction.entity.js';
-import { findAndCount } from '../db/utils.js';
+import { Transaction } from '../db/transaction.entity';
+import { findAndCount } from '../db/utils';
 
 @Injectable()
 export class TransactionService {
@@ -42,7 +42,7 @@ export class TransactionService {
     }
   }
 
-  async search(options: IBaseSearchOptions<ITransaction>) {
+  search(options: IBaseSearchOptions<ITransaction>) {
     return findAndCount(this.transactionRepository, options);
   }
 

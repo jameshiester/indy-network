@@ -6,6 +6,7 @@ import {
   mapRoleTypeToName,
   mapTransactionTypeToName,
 } from 'model';
+
 import { GetTransactionResponse } from '../ledger/types';
 
 export const transactionResponseToTransactionAdapter = (
@@ -29,7 +30,7 @@ export const transactionResponseToTransactionAdapter = (
     transactionTypeName: mapTransactionTypeToName(txn.type),
     id: response.seqNo || sequence,
     ledger: ledger.valueOf(),
-    transactionId: txnId as string,
+    transactionId: txnId,
     value: response.data,
     from: txn?.metadata?.from as string,
     transactionTime: txnTime ? new Date(txnTime) : undefined,
@@ -55,7 +56,7 @@ export const transactionResponseToTransactionAdapter = (
     case IndyTransactionType.CRED_DEF:
       return {
         ...baseProps,
-        destination: txnId as string,
+        destination: txnId,
       };
     case IndyTransactionType.SCHEMA:
       return {
@@ -65,7 +66,7 @@ export const transactionResponseToTransactionAdapter = (
     default:
       return {
         ...baseProps,
-        destination: txnId as string,
+        destination: txnId,
       };
   }
 };

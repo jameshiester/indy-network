@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { INodeHistory } from 'model';
+import { IBaseSearchOptions, INodeHistory } from 'model';
 import { Repository } from 'typeorm';
 
 import { NodeHistory } from '../db/node-history.entity';
+import { findAndCount } from '../db/utils';
 
 @Injectable()
 export class NodeHistoryService {
@@ -17,5 +18,9 @@ export class NodeHistoryService {
   ): Promise<INodeHistory> {
     const result = await this.nodeHistoryRepository.save(nodeHistory);
     return result;
+  }
+
+  search(options: IBaseSearchOptions<INodeHistory>) {
+    return findAndCount(this.nodeHistoryRepository, options);
   }
 }

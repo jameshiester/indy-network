@@ -7,7 +7,7 @@ const parser = new MongoQueryParser(allParsingInstructions);
 
 const findAndCount = async <TEntity>(
   repository: Repository<TEntity>,
-  { filter, offset, limit }: IBaseSearchOptions<TEntity>,
+  { filter, offset, limit, order }: IBaseSearchOptions<TEntity>,
 ) => {
   const query = repository.createQueryBuilder('a');
   if (filter) {
@@ -20,6 +20,11 @@ const findAndCount = async <TEntity>(
   }
   if (limit) {
     query.take(limit);
+  }
+  if (order) {
+    Object.entries(order).forEach(([key, value]) => {
+      query.orderBy(key, value);
+    });
   }
   const [results, totalRecords] = await query.getManyAndCount();
   return { results, totalRecords };

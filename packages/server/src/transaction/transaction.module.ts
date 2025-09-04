@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Transaction } from '../db/transaction.entity.js';
-import { TransactionController } from './transaction.controller.js';
-import { TransactionService } from './transaction.service.js';
+
+import { Transaction } from '../db/transaction.entity';
+
+import { TransactionController } from './transaction.controller';
+import { TransactionService } from './transaction.service';
 
 @Module({
   controllers: [TransactionController],

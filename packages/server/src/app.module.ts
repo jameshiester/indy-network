@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { DBModule } from './db/db.module';
-import { DidModule } from './did/did.module.js';
+import { DidModule } from './did/did.module';
 import { HealthModule } from './health/health.module';
 import { LedgerModule } from './ledger/ledger.module';
-import { TransactionModule } from './transaction/transaction.module.js';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
