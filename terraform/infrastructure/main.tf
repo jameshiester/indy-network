@@ -17,7 +17,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 6.0"
 
-  name               = format("%s%s%s%s", var.Prefix, "vpc", var.EnvCode, "01")
+  name               = format("%s-%s-%s", var.Prefix, "vpc", var.EnvCode)
   cidr               = local.vpc_cidr
   enable_nat_gateway = true
   single_nat_gateway = true
@@ -42,7 +42,7 @@ module "vpc_endpoints" {
   vpc_id = module.vpc.vpc_id
 
   create_security_group      = true
-  security_group_name_prefix = format("%s-%s-%s", var.Prefix, "indy", var.EnvCode)
+  security_group_name_prefix = format("%s-%s-%s", var.Prefix, "vpc-endpoints", var.EnvCode)
   security_group_description = "VPC endpoint security group"
   security_group_rules = {
     ingress_https = {
@@ -86,7 +86,7 @@ module "vpc_endpoints" {
 }
 
 resource "aws_security_group" "ec2_security_group" {
-  name        = format("%s-%s-%s", var.Prefix, "indy-client", var.EnvCode)
+  name        = format("%s-%s-%s", var.Prefix, "client", var.EnvCode)
   description = "Security group for EC2 instance"
   vpc_id      = module.vpc.vpc_id
 

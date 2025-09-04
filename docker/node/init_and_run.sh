@@ -24,7 +24,6 @@ echo "INDY_NODE_SEED=[$(echo -n $INDY_NODE_SEED|wc -c) characters]"
 mkdir -p /etc/indy
 tee -a /etc/indy/indy_config.py >/dev/null <<EOF
 NETWORK_NAME = "$INDY_NETWORK_NAME"
-enableStdOutLogging = True
 EOF
 cat /etc/indy/indy_config.py
 

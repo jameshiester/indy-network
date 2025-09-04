@@ -3,7 +3,7 @@ locals {
 }
 # Create Security Groups
 resource "aws_security_group" "web01" {
-  name        = format("%s%s%s%s", var.Prefix, "scg", var.EnvCode, "web01")
+  name        = format("%s-%s-%s", var.Prefix, "api-lb", var.EnvCode)
   description = "Web Security Group"
   vpc_id      = var.vpc_id
 
@@ -27,7 +27,7 @@ resource "aws_security_group" "web01" {
 }
 
 resource "aws_security_group" "app01" {
-  name        = format("%s%s%s%s", var.Prefix, "scg", var.EnvCode, "app01")
+  name        = format("%s-%s-%s", var.Prefix, "ecs-api-service", var.EnvCode)
   description = " Application Security Group"
   vpc_id      = var.vpc_id
 
@@ -64,7 +64,7 @@ resource "aws_security_group" "app01" {
 # Create Application Load Balancer
 # WARNING: Consider implementing AWS WAFv2 in front of an Application Load Balancer for production environments
 resource "aws_lb" "mswebapp" {
-  name                       = format("%s-%s-%s", var.Prefix, "indy-api", var.EnvCode)
+  name                       = format("%s-%s-%s", var.Prefix, "api", var.EnvCode)
   internal                   = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.web01.id]
@@ -107,7 +107,7 @@ resource "aws_lb_listener" "mswebapp" {
   }
 
   tags = merge(local.tags, {
-    Name  = format("%s-%s-%s", var.Region, "indy-api", var.EnvCode)
+    Name  = format("%s-%s-%s", var.Region, "api", var.EnvCode)
     rtype = "network"
   })
 }
@@ -143,7 +143,7 @@ resource "aws_lb_target_group" "mswebapp" {
   }
 
   tags = merge(local.tags, {
-    Name  = format("%s-%s-%s-%s", var.Region, "indy-api", var.EnvCode, "api")
+    Name  = format("%s-%s-%s", var.Prefix, "api", var.EnvCode)
     rtype = "network"
   })
 }

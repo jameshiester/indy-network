@@ -2,8 +2,8 @@
 
 # Create a Resource Group to identify Terraform created resources
 resource "aws_resourcegroups_group" "Terraform" {
-  name        = format("%s%s%s%s", var.Prefix, "rgg", var.EnvCode, "demoall")
-  description = "Terraform created demo environment resources"
+  name        = format("%s-%s-%s", var.Prefix, "indy", var.EnvCode)
+  description = "Terraform created environment resources"
 
   resource_query {
     query = <<JSON
@@ -15,6 +15,10 @@ resource "aws_resourcegroups_group" "Terraform" {
     {
       "Key": "Solution",
       "Values": ["${var.SOLTAG}"]
+    },
+    {
+      "Key": "Environment",
+      "Values": ["${var.EnvTag}"]
     }
   ]
 }
@@ -22,7 +26,7 @@ JSON
   }
 
   tags = {
-    Name  = format("%s%s%s%s", var.Prefix, "rgg", var.EnvCode, "demoall")
+    Name  = format("%s-%s-%s", var.Prefix, "indy", var.EnvCode)
     rtype = "scaffold"
   }
 }

@@ -465,7 +465,7 @@ resource "random_password" "node_seed_4" {
 }
 
 resource "aws_secretsmanager_secret" "node_seed_1" {
-  name                    = format("%s%s%s%s", var.Prefix, "node-seed-1", var.EnvCode, "node-seed-1")
+  name                    = format("%s-%s-%s", var.Prefix, "node-seed-1", var.EnvCode)
   recovery_window_in_days = 0
   tags                    = local.tags
 }
@@ -476,7 +476,7 @@ resource "aws_secretsmanager_secret_version" "node_seed_1" {
 }
 
 resource "aws_secretsmanager_secret" "node_seed_2" {
-  name                    = format("%s%s%s%s", var.Prefix, "node-seed-2", var.EnvCode, "node-seed-2")
+  name                    = format("%s-%s-%s", var.Prefix, "node-seed-2", var.EnvCode)
   recovery_window_in_days = 0
   tags                    = local.tags
 }
@@ -487,7 +487,7 @@ resource "aws_secretsmanager_secret_version" "node_seed_2" {
 }
 
 resource "aws_secretsmanager_secret" "node_seed_3" {
-  name                    = format("%s%s%s%s", var.Prefix, "node-seed-3", var.EnvCode, "node-seed-3")
+  name                    = format("%s-%s-%s", var.Prefix, "node-seed-3", var.EnvCode)
   recovery_window_in_days = 0
   tags                    = local.tags
 }
@@ -498,7 +498,7 @@ resource "aws_secretsmanager_secret_version" "node_seed_3" {
 }
 
 resource "aws_secretsmanager_secret" "node_seed_4" {
-  name                    = format("%s%s%s%s", var.Prefix, "node-seed-4", var.EnvCode, "node-seed-4")
+  name                    = format("%s-%s-%s", var.Prefix, "node-seed-4", var.EnvCode)
   recovery_window_in_days = 0
   tags                    = local.tags
 }
@@ -509,7 +509,7 @@ resource "aws_secretsmanager_secret_version" "node_seed_4" {
 }
 
 resource "aws_secretsmanager_secret" "steward_seed_1" {
-  name                    = format("%s%s%s%s", var.Prefix, "steward-seed-1", var.EnvCode, "steward-seed-1")
+  name                    = format("%s-%s-%s", var.Prefix, "steward-seed-1", var.EnvCode)
   recovery_window_in_days = 0
   tags                    = local.tags
 }
@@ -520,7 +520,7 @@ resource "aws_secretsmanager_secret_version" "steward_seed_1" {
 }
 
 resource "aws_secretsmanager_secret" "steward_seed_2" {
-  name                    = format("%s%s%s%s", var.Prefix, "steward-seed-2", var.EnvCode, "steward-seed-2")
+  name                    = format("%s-%s-%s", var.Prefix, "steward-seed-2", var.EnvCode)
   recovery_window_in_days = 0
   tags                    = local.tags
 }
@@ -530,7 +530,7 @@ resource "aws_secretsmanager_secret_version" "steward_seed_2" {
 }
 
 resource "aws_secretsmanager_secret" "steward_seed_3" {
-  name                    = format("%s%s%s%s", var.Prefix, "steward-seed-3", var.EnvCode, "steward-seed-3")
+  name                    = format("%s-%s-%s", var.Prefix, "steward-seed-3", var.EnvCode)
   recovery_window_in_days = 0
   tags                    = local.tags
 }
@@ -539,7 +539,7 @@ resource "aws_secretsmanager_secret_version" "steward_seed_3" {
   secret_string = random_password.steward_seed_3.result
 }
 resource "aws_secretsmanager_secret" "steward_seed_4" {
-  name                    = format("%s%s%s%s", var.Prefix, "steward-seed-4", var.EnvCode, "steward-seed-4")
+  name                    = format("%s-%s-%s", var.Prefix, "steward-seed-4", var.EnvCode)
   recovery_window_in_days = 0
   tags                    = local.tags
 }
@@ -549,7 +549,7 @@ resource "aws_secretsmanager_secret_version" "steward_seed_4" {
 }
 
 resource "aws_secretsmanager_secret" "trustee_seed_1" {
-  name                    = format("%s%s%s%s", var.Prefix, "trustee-seed-1", var.EnvCode, "trustee-seed-1")
+  name                    = format("%s-%s-%s", var.Prefix, "trustee-seed-1", var.EnvCode)
   recovery_window_in_days = 0
   tags                    = local.tags
 }
@@ -560,7 +560,7 @@ resource "aws_secretsmanager_secret_version" "trustee_seed_1" {
 }
 
 resource "aws_secretsmanager_secret" "trustee_seed_2" {
-  name                    = format("%s%s%s%s", var.Prefix, "trustee-seed-2", var.EnvCode, "trustee-seed-2")
+  name                    = format("%s-%s-%s", var.Prefix, "trustee-seed-2", var.EnvCode)
   recovery_window_in_days = 0
   tags                    = local.tags
 }
@@ -571,7 +571,7 @@ resource "aws_secretsmanager_secret_version" "trustee_seed_2" {
 }
 
 resource "aws_secretsmanager_secret" "trustee_seed_3" {
-  name                    = format("%s%s%s%s", var.Prefix, "trustee-seed-3", var.EnvCode, "trustee-seed-3")
+  name                    = format("%s-%s-%s", var.Prefix, "trustee-seed-3", var.EnvCode)
   recovery_window_in_days = 0
   tags                    = local.tags
 }
@@ -580,7 +580,7 @@ resource "aws_secretsmanager_secret_version" "trustee_seed_3" {
   secret_string = random_password.trustee_seed_3.result
 }
 resource "aws_secretsmanager_secret" "trustee_seed_4" {
-  name                    = format("%s%s%s%s", var.Prefix, "trustee-seed-4", var.EnvCode, "trustee-seed-4")
+  name                    = format("%s-%s-%s", var.Prefix, "trustee-seed-4", var.EnvCode)
   recovery_window_in_days = 0
   tags                    = local.tags
 }

@@ -81,13 +81,13 @@ data "aws_iam_policy_document" "instance_policy" {
 }
 
 resource "aws_iam_role_policy" "instance_policy" {
-  name   = format("%s-%s-%s-%s", var.Prefix, "ec2-indy-node", var.EnvCode, "instancepolicy")
+  name   = format("%s-%s-%s-%s", var.Prefix, "ec2-node", var.EnvCode, "instancepolicy")
   role   = aws_iam_role.instance_role.id
   policy = data.aws_iam_policy_document.instance_policy.json
 }
 
 resource "aws_cloudwatch_log_group" "indy_node_log_group" {
-  name              = format("%s-%s-%s", var.Prefix, "indy-node", var.EnvCode)
+  name              = format("%s-%s-%s", var.Prefix, "node", var.EnvCode)
   retention_in_days = 30
   tags              = local.tags
 }

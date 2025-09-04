@@ -84,7 +84,7 @@ resource "aws_ecs_cluster" "network" {
   }
 
   tags = {
-    Name         = format("%s-%s-%s", var.Prefix, "indy", var.EnvCode)
+    Name         = format("%s-%s-%s", var.Prefix, "api", var.EnvCode)
     resourcetype = "storage"
     codeblock    = "ecscluster"
   }
@@ -92,7 +92,7 @@ resource "aws_ecs_cluster" "network" {
 
 # Establish IAM Role with permissions for Amazon ECS to access Amazon ECR for image pulling and CloudWatch for logging
 resource "aws_iam_role" "ecstaskexec" {
-  name = format("%s-%s-%s-%s", var.Prefix, "indy-api", var.EnvCode, "exec")
+  name = format("%s-%s-%s", var.Prefix, "ecs-api", var.EnvCode)
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -107,13 +107,12 @@ resource "aws_iam_role" "ecstaskexec" {
   })
 
   tags = {
-    Name  = format("%s%s%s%s", var.Region, "iar", var.EnvCode, "ecstaskexec")
     rtype = "security"
   }
 }
 
 resource "aws_iam_role_policy" "ecstaskexec" {
-  name = format("%s-%s-%s-%s", var.Region, "irp", var.EnvCode, "ecstaskexec")
+  name = format("%s-%s-%s", var.Region, "ecs-api", var.EnvCode)
   role = aws_iam_role.ecstaskexec.id
   policy = jsonencode({
     Version = "2012-10-17"
@@ -160,7 +159,7 @@ resource "aws_iam_role_policy" "ecstaskexec" {
 
 # Establish IAM Role with permissions for Amazon ECS to access Amazon ECR for image pulling and CloudWatch for logging
 resource "aws_iam_role" "ecstask" {
-  name        = format("%s-%s-%s", var.Prefix, "indy-api", var.EnvCode)
+  name        = format("%s-%s-%s", var.Prefix, "ecs-api-task", var.EnvCode)
   description = "Role assumed by the indy network api tasks"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -179,7 +178,7 @@ resource "aws_iam_role" "ecstask" {
 }
 
 resource "aws_iam_role_policy" "ecstask" {
-  name = format("%s-%s-%s-%s", var.Region, "irp", var.EnvCode, "api-role")
+  name = format("%s-%s-%s", var.Region, "ecs-api-task", var.EnvCode)
   role = aws_iam_role.ecstask.id
   policy = jsonencode({
     Version = "2012-10-17"
