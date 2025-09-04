@@ -16,7 +16,7 @@ output "node_ip_address" {
 
 output "node_port" {
   description = "Node port"
-  value       = data.external.genesis_info.result.node_port
+  value       = tonumber(data.external.genesis_info.result.node_port)
 }
 
 output "client_ip_address" {
@@ -26,7 +26,7 @@ output "client_ip_address" {
 
 output "client_port" {
   description = "Client port"
-  value       = data.external.genesis_info.result.client_port
+  value       = tonumber(data.external.genesis_info.result.client_port)
 }
 
 output "validator_verkey" {

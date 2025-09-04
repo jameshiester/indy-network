@@ -1,0 +1,38 @@
+{
+  "name": "indy-network-monorepo",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "build-docker-server": "docker build -t indy-server -f docker/server/Dockerfile --progress=plain .",
+    "build-docker-monitor": "docker build -t indy-monitor -f docker/monitor/Dockerfile --progress=plain ./docker/monitor",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\""
+  },
+  "devDependencies": {
+    "turbo": "^2.0.6",
+    "concurrently": "^9.0.1",
+    "@types/node": "^22.13.10",
+    "typescript": "~5.4.0",
+    "prettier": "^3.4.1",
+    "eslint": "^9.0.0",
+    "@eslint/js": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "typescript-eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.34.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-unicorn": "^58.0.0"
+  },
+  "packageManager": "pnpm@9.15.4"
+}

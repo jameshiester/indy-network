@@ -1,0 +1,101 @@
+#!/bin/bash
+
+set -e
+echo "starting user data..."
+
+
+readonly EC2_INSTANCE_METADATA_URL="http://169.254.169.254/latest/meta-data"
+
+function lookup_path_in_instance_metadata {
+    local -r path=$1
+    curl --silent --show-error --location "$EC2_INSTANCE_METADATA_URL/$path/"
+}
+
+function get_instance_id {
+    lookup_path_in_instance_metadata "instance-id"
+}
+
+function get_instance_type {
+    lookup_path_in_instance_metadata "instance-type"
+}
+
+function get_public_ip {
+    lookup_path_in_instance_metadata "public-ipv4"
+}
+
+ec2_instance_id=$(get_instance_id)
+
+echo "installing dependencies..."
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+# sudo yum update -y
+sudo yum install -q -y amazon-cloudwatch-agent yum-utils systemd-networkd unzip
+mkdir -p /var/log/indy
+mkdir -p /var/log/indy2
+sudo tee /opt/aws/amazon-cloudwatch-agent/config.json <<EOF
+{
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+            {
+                "file_path": "/var/log/indy/*",
+                "log_group_name": "${log_group_name}",
+                "log_stream_name": "${node_name_1}-node"
+            },
+            {
+                "file_path": "/var/log/indy2/*",
+                "log_group_name": "${log_group_name}",
+                "log_stream_name": "${node_name_2}-node"
+            }
+        ]
+      }
+    }
+  }
+}
+EOF
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/config.json -s
+
+echo "installing docker..."
+
+sudo amazon-linux-extras install -y docker
+sudo systemctl enable --now docker
+sudo usermod -a -G docker ec2-user
+echo "installing docker compose v2 plugin..."
+sudo mkdir -p /usr/local/lib/docker/cli-plugins
+sudo curl -sSL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+aws s3api get-object --bucket ${compose_bucket} --key ${compose_key} docker-compose.yml
+
+
+sudo mkdir -p /etc/indy1
+aws s3 cp "s3://${genesis_bucket}/${genesis_pool_file_key}" /etc/indy1/pool_transactions_genesis
+aws s3 cp "s3://${genesis_bucket}/${genesis_domain_file_key}" /etc/indy1/domain_transactions_genesis
+sudo chmod 644 /etc/indy1/pool_transactions_genesis /etc/indy1/domain_transactions_genesis
+
+sudo mkdir -p /etc/indy2
+aws s3 cp "s3://${genesis_bucket}/${genesis_pool_file_key}" /etc/indy2/pool_transactions_genesis
+aws s3 cp "s3://${genesis_bucket}/${genesis_domain_file_key}" /etc/indy2/domain_transactions_genesis
+sudo chmod 644 /etc/indy2/pool_transactions_genesis /etc/indy2/domain_transactions_genesis
+
+
+echo "*** Logging in to ECR ***"
+command -v docker >/dev/null 2>&1 || { echo "Docker not found on PATH"; exit 1; }
+aws ecr get-login-password --region "${aws_region}" | docker login --username AWS --password-stdin "${account_id}.dkr.ecr.${aws_region}.amazonaws.com"
+echo "*** Getting Secrets ***"
+export INDY_NODE_SEED1=$(aws secretsmanager get-secret-value --secret-id ${node_seed_arn_1} --query SecretString --output text --region ${aws_region})
+export INDY_NODE_SEED2=$(aws secretsmanager get-secret-value --secret-id ${node_seed_arn_2} --query SecretString --output text --region ${aws_region})
+export INDY_NODE_NAME1=${node_name_1}
+export INDY_NODE_NAME2=${node_name_2}
+export INDY_NETWORK_NAME=${network_name}
+export INDY_NODE_IP=${node_ip}
+export INDY_CLIENT_IP=${client_ip}
+export AWS_REGION=${aws_region}
+export NODE_IMAGE_NAME=${ecr_node_repo}
+export LOG_GROUP=${log_group_name}
+sleep 30
+echo "*** Starting Network ***"
+
+docker compose -p network up -d --quiet-pull
+sleep 30
+echo "*** Grabbing Logs ***"
+ls -la /var/log/indy

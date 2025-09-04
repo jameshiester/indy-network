@@ -1,0 +1,16 @@
+{
+  "name": "model",
+  "version": "0.0.1",
+  "private": true,
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
+  },
+  "rootDir": "src",
+  "dependencies": {
+    "@ucast/mongo": "^2.4.3"
+  }
+}

@@ -21,7 +21,7 @@ variable "Prefix" {
   type        = string
 }
 
-variable "SolTag" {
+variable "SOLTAG" {
   description = "Solution tag value. All resources are created with a 'Solution' tag name and the value you set here"
   type        = string
 }
@@ -52,4 +52,67 @@ variable "NETWORK_NAME" {
   description = "Name of the indy network"
   type        = string
 }
+
+
+variable "ECR_NODE_REPO" {
+  description = "Name of Amazon ECR repository for indy node"
+  type        = string
+}
+
+variable "ECR_SERVER_REPO" {
+  description = "Name of Amazon ECR repository for indy api"
+  type        = string
+}
+
+variable "ECR_MONITOR_REPO" {
+  description = "Name of Amazon ECR repository for indy monitor"
+  type        = string
+}
+
+variable "ECR_NODE_REPO_URL" {
+  description = "URL of Amazon ECR repository for indy node"
+  type        = string
+}
+
+variable "ECR_SERVER_REPO_URL" {
+  description = "URL of Amazon ECR repository for indy api"
+  type        = string
+}
+
+variable "ECR_MONITOR_REPO_URL" {
+  description = "URL of Amazon ECR repository for indy monitor"
+  type        = string
+}
+
+variable "SERVER_CONTAINER_NAME" {
+  description = "Name of the server container"
+  type        = string
+}
+
+variable "DOMAIN" {
+  description = "Domain name"
+  type        = string
+}
+
+variable "MONITOR_CONTAINER_NAME" {
+  description = "Name of the monitor container"
+  type        = string
+}
+
+variable "ECR_UTILS_REPO_URL" {
+  description = "URL of Amazon ECR repository for indy utils"
+  type        = string
+}
+
+variable "ECSService" {
+  description = "Name of Amazon ECS Service"
+  type        = string
+}
+
+variable "ECSCluster" {
+  description = "Name of Amazon ECS Cluster"
+  type        = string
+}
+
+
 

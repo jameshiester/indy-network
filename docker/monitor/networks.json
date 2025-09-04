@@ -1,0 +1,7 @@
+{
+  "sbn": {
+    "name": "Sovrin Builder Net",
+    "indyNamespace": "sovrin:builder",
+    "genesisUrl": "https://raw.githubusercontent.com/sovrin-foundation/sovrin/stable/sovrin/pool_transactions_builder_genesis"
+  }
+}

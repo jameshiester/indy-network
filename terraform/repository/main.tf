@@ -62,6 +62,10 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
 
 # Use existing provider if it exists, otherwise use the newly created one
 locals {
+  ECRNodeRepo                 = "indy-node"
+  ECRServerRepo               = "indy-server"
+  ECRMonitorRepo              = "indy-monitor"
+  ECRUtilsRepo                = "indy-utils"
   github_actions_provider_arn = data.aws_iam_openid_connect_provider.github_actions_existing.arn != null ? data.aws_iam_openid_connect_provider.github_actions_existing.arn : aws_iam_openid_connect_provider.github_actions[0].arn
 }
 
@@ -70,29 +74,37 @@ module "tfbootstrap_dev" {
   providers = {
     aws = aws.development
   }
-  Region            = var.Region
-  Prefix            = var.Prefix
+  ECRMonitorRepo    = local.ECRMonitorRepo
+  ECRNodeRepo       = local.ECRNodeRepo
+  ECRServerRepo     = local.ECRServerRepo
+  ECRUtilsRepo      = local.ECRUtilsRepo
   EnvCode           = "dv"
-  GitHubOrg         = var.GitHubOrg
-  GitHubRepo        = var.GitHubRepo
   GitHubEnv         = "dev"
+  GitHubOrg         = var.GitHubOrg
   GitHubProviderArn = local.github_actions_provider_arn
+  GitHubRepo        = var.GitHubRepo
+  Prefix            = var.Prefix
+  Region            = var.Region
 }
 
 
 module "tfbootstrap_test" {
   source = "./modules/tfbootstrap"
+
   providers = {
     aws = aws.testing
   }
-  Region            = var.Region
-  Prefix            = var.Prefix
+  ECRMonitorRepo    = local.ECRMonitorRepo
+  ECRNodeRepo       = local.ECRNodeRepo
+  ECRServerRepo     = local.ECRServerRepo
+  ECRUtilsRepo      = local.ECRUtilsRepo
   EnvCode           = "ts"
-  GitHubOrg         = var.GitHubOrg
-  GitHubRepo        = var.GitHubRepo
   GitHubEnv         = "test"
+  GitHubOrg         = var.GitHubOrg
   GitHubProviderArn = local.github_actions_provider_arn
-
+  GitHubRepo        = var.GitHubRepo
+  Prefix            = var.Prefix
+  Region            = var.Region
 }
 
 module "tfbootstrap_prod" {
@@ -100,14 +112,17 @@ module "tfbootstrap_prod" {
   providers = {
     aws = aws.production
   }
-  Region            = var.Region
-  Prefix            = var.Prefix
+  ECRMonitorRepo    = local.ECRMonitorRepo
+  ECRNodeRepo       = local.ECRNodeRepo
+  ECRServerRepo     = local.ECRServerRepo
+  ECRUtilsRepo      = local.ECRUtilsRepo
   EnvCode           = "pd"
-  GitHubOrg         = var.GitHubOrg
-  GitHubRepo        = var.GitHubRepo
   GitHubEnv         = "prod"
+  GitHubOrg         = var.GitHubOrg
   GitHubProviderArn = local.github_actions_provider_arn
-
+  GitHubRepo        = var.GitHubRepo
+  Prefix            = var.Prefix
+  Region            = var.Region
 }
 
 resource "github_repository_environment_deployment_policy" "dev" {
@@ -203,24 +218,36 @@ locals {
     # Deployment Availability Zone 1 e.g. eu-west-1a
     TF_VAR_AZ01 = "us-east-1a"
     # Deployment Availability Zone 2 e.g. eu-west-1b
-    TF_VAR_AZ02       = "us-east-1b"
-    TF_VAR_PREFIX     = var.Prefix
-    TF_VAR_SOLTAG     = "INDY-NETWORK"
-    TF_VAR_GITHUBREPO = format("%s%s%s", var.GitHubOrg, "/", var.GitHubRepo)
+    TF_VAR_AZ02                   = "us-east-1b"
+    TF_VAR_PREFIX                 = var.Prefix
+    TF_VAR_SERVER_CONTAINER_NAME  = "server"
+    TF_VAR_MONITOR_CONTAINER_NAME = "monitor"
+    TF_VAR_SOLTAG                 = "INDY-NETWORK"
+    TF_VAR_GITHUBREPO             = format("%s%s%s", var.GitHubOrg, "/", var.GitHubRepo)
     # The first two octets of the CIDR IP address range e.g. 10.0
     TF_VAR_VPCCIDR      = "10.0.0.0/16"
     TF_VAR_IMAGETAG     = "1.0.0"
-    TF_VAR_NETWORK_NAME = "NAESB"
+    TF_VAR_NETWORK_NAME = var.NetworkName
+    TF_VAR_DOMAIN       = var.Domain
   }
   # Declare dev specific GitHub Environments variables
   environment_variables_dev = merge(
     local.environment_variables_common,
     {
-      TF_VAR_ENVCODE        = "dv"
-      TF_VAR_ENVTAG         = "Development"
-      TF_VAR_DBINSTANCESIZE = "db.t4g.micro"
-      TF_STATE_BUCKET_NAME  = module.tfbootstrap_dev.tfstate_bucket_name
-      TF_STATE_BUCKET_KEY   = "terraform/${var.GitHubRepo}/dev.tfstate"
+      TF_STATE_BUCKET_KEY         = "terraform/${var.GitHubRepo}/dev.tfstate"
+      TF_STATE_BUCKET_NAME        = module.tfbootstrap_dev.tfstate_bucket_name
+      TF_VAR_ECR_MONITOR_REPO     = module.tfbootstrap_dev.ecr_monitor_repo_name
+      TF_VAR_ECR_MONITOR_REPO_URL = module.tfbootstrap_dev.ecr_monitor_repo_url
+      TF_VAR_ECR_NODE_REPO        = module.tfbootstrap_dev.ecr_node_repo_name
+      TF_VAR_ECR_NODE_REPO_URL    = module.tfbootstrap_dev.ecr_node_repo_url
+      TF_VAR_ECR_SERVER_REPO      = module.tfbootstrap_dev.ecr_server_repo_name
+      TF_VAR_ECR_SERVER_REPO_URL  = module.tfbootstrap_dev.ecr_server_repo_url
+      TF_VAR_ECR_UTILS_REPO       = module.tfbootstrap_dev.ecr_utils_repo_name
+      TF_VAR_ECR_UTILS_REPO_URL   = module.tfbootstrap_dev.ecr_utils_repo_url
+      TF_VAR_ECSCLUSTER           = "indy-cluster-dev"
+      TF_VAR_ECSSERVICE           = "indy-dev"
+      TF_VAR_ENVCODE              = "dv"
+      TF_VAR_ENVTAG               = "Development"
     }
   )
   # Declare test specific GitHub Environments variables
@@ -235,6 +262,18 @@ locals {
   environment_variables_prod = merge(
     local.environment_variables_common,
     {
+      TF_STATE_BUCKET_KEY         = "terraform/${var.GitHubRepo}/prod.tfstate"
+      TF_STATE_BUCKET_NAME        = module.tfbootstrap_dev.tfstate_bucket_name
+      TF_VAR_ECR_MONITOR_REPO     = module.tfbootstrap_dev.ecr_monitor_repo_name
+      TF_VAR_ECR_MONITOR_REPO_URL = module.tfbootstrap_dev.ecr_monitor_repo_url
+      TF_VAR_ECR_NODE_REPO        = module.tfbootstrap_dev.ecr_node_repo_name
+      TF_VAR_ECR_NODE_REPO_URL    = module.tfbootstrap_dev.ecr_node_repo_url
+      TF_VAR_ECR_SERVER_REPO      = module.tfbootstrap_dev.ecr_server_repo_name
+      TF_VAR_ECR_SERVER_REPO_URL  = module.tfbootstrap_dev.ecr_server_repo_url
+      TF_VAR_ECR_UTILS_REPO       = module.tfbootstrap_dev.ecr_utils_repo_name
+      TF_VAR_ECR_UTILS_REPO_URL   = module.tfbootstrap_dev.ecr_utils_repo_url
+      TF_VAR_ECSCLUSTER           = "indy-cluster-prd"
+      TF_VAR_ECSSERVICE           = "indy-prd"
       TF_VAR_ENVCODE = "pd"
       TF_VAR_ENVTAG  = "Production"
     }

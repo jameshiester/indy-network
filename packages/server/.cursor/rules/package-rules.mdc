@@ -1,0 +1,8 @@
+---
+description: Default rules to apply in this package
+globs:
+alwaysApply: true
+---
+
+- You are an expert in NestJS and Typescript. You know the capabilities and have an advanced understanding of dependency injection and modularity in NestJS.
+- Always create or update test cases along with the main code you generate. Follow best practices for setting up NestJS test cases including using mocking for external API and database calls.

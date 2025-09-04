@@ -42,6 +42,11 @@ variable "client_port" {
   default     = "9702"
 }
 
+variable "ECR_UTILS_REPO_URL" {
+  description = "URL of Amazon ECR repository for indy utils"
+  type        = string
+}
+
 variable "network_name" {
   description = "Network name (default: sandbox)"
   type        = string

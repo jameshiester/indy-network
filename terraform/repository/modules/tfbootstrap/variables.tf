@@ -32,3 +32,22 @@ variable "GitHubProviderArn" {
   type        = string
 }
 
+variable "ECRNodeRepo" {
+  description = "Name of Amazon ECR repository for indy node"
+  type        = string
+}
+
+variable "ECRUtilsRepo" {
+  description = "Name of Amazon ECR repository for indy utils"
+  type        = string
+}
+
+variable "ECRServerRepo" {
+  description = "Name of Amazon ECR repository for indy server"
+  type        = string
+}
+
+variable "ECRMonitorRepo" {
+  description = "Name of Amazon ECR repository for indy monitor"
+  type        = string
+}

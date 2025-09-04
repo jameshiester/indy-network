@@ -8,15 +8,16 @@ locals {
   tags = {
     EnvCode     = var.EnvCode
     Environment = var.EnvTag
-    Solution    = var.SolTag
+    Solution    = var.SOLTAG
   }
+  master_username = format("%s%s%s", var.Prefix, "indy", var.EnvCode)
 }
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 6.0"
 
-  name               = format("%s%s%s%s", var.Prefix, "vpc", var.EnvCode, "01")
+  name               = format("%s-%s-%s", var.Prefix, "vpc", var.EnvCode)
   cidr               = local.vpc_cidr
   enable_nat_gateway = true
   single_nat_gateway = true
@@ -35,117 +36,112 @@ module "vpc" {
   tags = local.tags
 }
 
-# Generate random passwords for steward and node seeds
-resource "random_password" "steward_seed_1" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
+module "vpc_endpoints" {
+  source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+
+  vpc_id = module.vpc.vpc_id
+
+  create_security_group      = true
+  security_group_name_prefix = format("%s-%s-%s", var.Prefix, "vpc-endpoints", var.EnvCode)
+  security_group_description = "VPC endpoint security group"
+  security_group_rules = {
+    ingress_https = {
+      description = "HTTPS from VPC"
+      cidr_blocks = [module.vpc.vpc_cidr_block]
+    }
+  }
+
+  endpoints = {
+    rds = {
+      service             = "rds"
+      private_dns_enabled = true
+      subnet_ids          = module.vpc.private_subnets
+    },
+    ssm = {
+      service             = "ssm"
+      private_dns_enabled = true
+      subnet_ids          = module.vpc.private_subnets
+    },
+    ecs = {
+      service             = "ecs"
+      private_dns_enabled = true
+      subnet_ids          = module.vpc.private_subnets,
+      subnet_configurations = [
+        for v in module.vpc.private_subnet_objects :
+        {
+          ipv4      = cidrhost(v.cidr_block, 10)
+          subnet_id = v.id
+        }
+      ]
+    },
+    ecs_telemetry = {
+      create              = false
+      service             = "ecs-telemetry"
+      private_dns_enabled = true
+      subnet_ids          = module.vpc.private_subnets
+    },
+  }
+
+  tags = local.tags
 }
 
-resource "random_password" "steward_seed_2" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
+resource "aws_security_group" "ec2_security_group" {
+  name        = format("%s-%s-%s", var.Prefix, "client", var.EnvCode)
+  description = "Security group for EC2 instance"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 6543
+    to_port     = 6543
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 9702
+    to_port     = 9702
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 9704
+    to_port     = 9704
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 9702
+    to_port     = 9702
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 9704
+    to_port     = 9704
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = local.tags
 }
 
-resource "random_password" "steward_seed_3" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
 
-resource "random_password" "steward_seed_4" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
 
-resource "random_password" "node_seed_1" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
 
-resource "random_password" "node_seed_2" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
-
-resource "random_password" "node_seed_3" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
-
-resource "random_password" "node_seed_4" {
-  length  = 32
-  special = false
-  upper   = true
-  lower   = true
-  numeric = true
-}
-
-# Node Genesis Module Instances
-module "node_genesis_1" {
-  source       = "./modules/node_genesis"
-  node_name    = "1"
-  steward_name = var.NETWORK_NAME
-
-  steward_seed = random_password.steward_seed_1.result
-  node_seed    = random_password.node_seed_1.result
-  public_ip    = aws_eip.one.public_ip
-  private_ip   = aws_eip.one.private_ip
-  network_name = var.NETWORK_NAME
-
-}
-
-module "node_genesis_2" {
-  source       = "./modules/node_genesis"
-  node_name    = "2"
-  steward_name = var.NETWORK_NAME
-  steward_seed = random_password.steward_seed_2.result
-  node_seed    = random_password.node_seed_2.result
-  public_ip    = aws_eip.one.public_ip
-  private_ip   = aws_eip.one.private_ip
-  network_name = var.NETWORK_NAME
-  depends_on   = [module.node_genesis_1]
-}
-
-module "node_genesis_3" {
-  source       = "./modules/node_genesis"
-  node_name    = "3"
-  steward_name = var.NETWORK_NAME
-  steward_seed = random_password.steward_seed_3.result
-  node_seed    = random_password.node_seed_3.result
-  public_ip    = aws_eip.two.public_ip
-  private_ip   = aws_eip.two.private_ip
-  network_name = var.NETWORK_NAME
-  depends_on   = [module.node_genesis_2]
-}
-
-module "node_genesis_4" {
-  source       = "./modules/node_genesis"
-  node_name    = "4"
-  steward_name = var.NETWORK_NAME
-  steward_seed = random_password.steward_seed_4.result
-  node_seed    = random_password.node_seed_4.result
-  public_ip    = aws_eip.two.public_ip
-  private_ip   = aws_eip.two.private_ip
-  network_name = var.NETWORK_NAME
-  depends_on   = [module.node_genesis_3]
-}
