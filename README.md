@@ -39,7 +39,7 @@ The `packages` folder includes the javascript code associated with the API servi
 
 ## Creating DIDs
 
-Stewards and trustees will need to create one or more DIDs. The directions are as follows:
+Additional stewards and trustees will need to create one or more DIDs. The directions are as follows:
 
 1. Install indy-cli-rs from https://github.com/hyperledger/indy-cli-rs
 2. Generate random 32 character seed. Example in Bash: `head -c 32 /dev/random | base64 | head -c 32`
